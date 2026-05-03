@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — Przewodnik po Brennej i Beskidach | Domek Brenna</title>
+    <meta name="description" content="Szlaki, atrakcje, przepisy góralskie i porady na weekend w Brennej. Wszystko co musisz wiedzieć o Beskidzie Śląskim.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Blog — Przewodnik po Brennej i Beskidach | Domek Brenna">
+    <meta property="og:description" content="Szlaki, atrakcje, przepisy góralskie i porady na weekend w Brennej. Wszystko co musisz wiedzieć o Beskidzie Śląskim.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pl_PL">
+    <meta property="og:site_name" content="Domek Brenna">
+
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Styles specyficzne dla bloga -->
+    <style>
+        /* ===== BREADCRUMBS ===== */
+        .breadcrumbs {
+            padding: 100px 24px 16px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+
+        .breadcrumbs a {
+            color: var(--green-dark);
+            text-decoration: none;
+        }
+
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+            color: var(--copper);
+        }
+
+        .breadcrumbs .separator {
+            margin: 0 0.5rem;
+            color: var(--text-light);
+        }
+
+        /* ===== BLOG HERO ===== */
+        .blog-hero {
+            background: linear-gradient(135deg, #4a5d42 0%, #6b8a5e 100%);
+            color: #fff;
+            padding: 160px 24px 80px;
+            text-align: center;
+        }
+
+        .blog-hero h1 {
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .blog-hero p {
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+            line-height: 1.7;
+            color: #f5f4f0;
+        }
+
+        /* ===== BLOG LAYOUT ===== */
+        .blog-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 48px;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* ===== BLOG ARTICLES ===== */
+        .blog-articles {
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+
+        .blog-article-card {
+            background: var(--white);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+
+        .blog-article-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .blog-article-image {
+            aspect-ratio: 16/9;
+            overflow: hidden;
+        }
+
+        .blog-article-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .blog-article-card:hover .blog-article-image img {
+            transform: scale(1.05);
+        }
+
+        .blog-article-body {
+            padding: 28px 32px 32px;
+        }
+
+        .blog-article-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .blog-article-date {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .blog-article-author {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .blog-category-badge {
+            display: inline-block;
+            background-color: var(--beige);
+            color: var(--green-dark);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .blog-article-body h2 {
+            font-size: 1.4rem;
+            line-height: 1.35;
+            margin-bottom: 14px;
+            color: var(--text-dark);
+            transition: color var(--transition);
+        }
+
+        .blog-article-body h2 a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .blog-article-body h2 a:hover {
+            color: var(--copper);
+            text-decoration: none;
+        }
+
+        .blog-article-card:hover .blog-article-body h2 {
+            color: var(--copper);
+        }
+
+        .blog-article-excerpt {
+            color: var(--text-medium);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .blog-read-more {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--copper);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap var(--transition), color var(--transition);
+        }
+
+        .blog-read-more:hover {
+            gap: 10px;
+            text-decoration: none;
+            color: var(--wood);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .blog-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .sidebar-widget {
+            background: var(--beige);
+            border-radius: var(--radius-card);
+            padding: 28px;
+        }
+
+        .sidebar-widget h3 {
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        .sidebar-widget h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--copper);
+            border-radius: 2px;
+        }
+
+        .sidebar-about p {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .sidebar-categories ul {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar-categories li {
+            list-style: none;
+        }
+
+        .sidebar-categories li a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            color: var(--text-medium);
+            text-decoration: none;
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border);
+            transition: color var(--transition);
+        }
+
+        .sidebar-categories li:last-child a {
+            border-bottom: none;
+        }
+
+        .sidebar-categories li a:hover {
+            color: var(--copper);
+            text-decoration: none;
+        }
+
+        .sidebar-categories .cat-count {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            background: var(--white);
+            padding: 2px 10px;
+            border-radius: 50px;
+        }
+
+        .sidebar-popular ol {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            counter-reset: popular;
+            padding: 0;
+        }
+
+        .sidebar-popular li {
+            list-style: none;
+            counter-increment: popular;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .sidebar-popular li::before {
+            content: counter(popular);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+            background: var(--green-dark);
+            color: var(--white);
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .sidebar-popular li a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.4;
+            transition: color var(--transition);
+        }
+
+        .sidebar-popular li a:hover {
+            color: var(--copper);
+            text-decoration: none;
+        }
+
+        .sidebar-cta {
+            background: var(--green-dark);
+            text-align: center;
+        }
+
+        .sidebar-cta h3 {
+            color: var(--white);
+        }
+
+        .sidebar-cta h3::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-cta p {
+            color: var(--beige-dark);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .sidebar-cta .btn {
+            width: 100%;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .blog-layout {
+                grid-template-columns: 1fr 280px;
+                gap: 32px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .blog-hero {
+                padding: 120px 16px 60px;
+            }
+
+            .blog-layout {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 32px 16px 60px;
+            }
+
+            .blog-sidebar {
+                order: 1;
+            }
+
+            .blog-article-body {
+                padding: 20px 24px 24px;
+            }
+
+            .blog-article-body h2 {
+                font-size: 1.2rem;
+            }
+
+            .breadcrumbs {
+                padding-top: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAWIGACJA -->
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">Willa Słońce</a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html#o-domku" class="nav-link">Domek</a>
+                <a href="galeria.html" class="nav-link">Galeria</a>
+                <a href="rezerwacje.html" class="nav-link">Rezerwacje</a>
+                <a href="sklep.html" class="nav-link">Sklep</a>
+                <a href="blog.html" class="nav-link active">Blog</a>
+            </div>
+            <a href="rezerwacje.html" class="nav-cta">Rezerwuj</a>
+            <button class="hamburger" id="hamburger" aria-label="Otwórz menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="index.html#o-domku" class="mobile-menu-link">Domek</a>
+            <a href="galeria.html" class="mobile-menu-link">Galeria</a>
+            <a href="rezerwacje.html" class="mobile-menu-link">Rezerwacje</a>
+            <a href="sklep.html" class="mobile-menu-link">Sklep</a>
+            <a href="blog.html" class="mobile-menu-link">Blog</a>
+            <a href="rezerwacje.html" class="mobile-menu-cta">Rezerwuj</a>
+        </div>
+    </div>
+
+    <!-- ============ HERO ============ -->
+    <section class="blog-hero">
+        <h1>Blog</h1>
+        <p>Szlaki, atrakcje, przepisy góralskie i porady na weekend w Brennej. Wszystko co musisz wiedzieć o Beskidzie Śląskim.</p>
+    </section>
+
+    <!-- ============ BREADCRUMBS ============ -->
+    <div class="breadcrumbs">
+        <a href="index.html">Strona główna</a>
+        <span class="separator">›</span>
+        Blog
+    </div>
+
+    <!-- ============ BLOG LAYOUT ============ -->
+    <div class="blog-layout">
+
+        <!-- ===== ARTYKUŁY ===== -->
+        <main class="blog-articles">
+
+            <!-- Artykuł 1 -->
+            <article class="blog-article-card animate-on-scroll">
+                <div class="blog-article-image">
+                    <img src="https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800" alt="Zimowy widok na domek w Brennej pokryty śniegiem" loading="lazy">
+                </div>
+                <div class="blog-article-body">
+                    <div class="blog-article-meta">
+                        <span class="blog-article-date">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            5 marca 2026
+                        </span>
+                        <span class="blog-category-badge">Przewodnik</span>
+                        <span class="blog-article-author">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Marcel
+                        </span>
+                    </div>
+                    <h2><a href="#">Co robić w Brennej zimą — przewodnik dla tych, którzy nie jeżdżą na nartach</a></h2>
+                    <p class="blog-article-excerpt">Nie każdy zimowy wyjazd musi pachnieć stokiem. Brenna zimą to sauna o zmroku, spacer po śnieżnym lesie, gorąca czekolada z widokiem na białe szczyty. Zebraliśmy nasze ulubione pomysły na zimowy weekend bez nart — od beskidzkich karczm po wieczory przy kominku.</p>
+                    <a href="#" class="blog-read-more">Czytaj więcej &rarr;</a>
+                </div>
+            </article>
+
+            <!-- Artykuł 2 -->
+            <article class="blog-article-card animate-on-scroll">
+                <div class="blog-article-image">
+                    <img src="https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=800" alt="Szlak turystyczny w Beskidzie Śląskim wśród zielonych drzew" loading="lazy">
+                </div>
+                <div class="blog-article-body">
+                    <div class="blog-article-meta">
+                        <span class="blog-article-date">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            20 lutego 2026
+                        </span>
+                        <span class="blog-category-badge">Szlaki</span>
+                        <span class="blog-article-author">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Marcel
+                        </span>
+                    </div>
+                    <h2><a href="#">Najpiękniejsze szlaki w Beskidzie Śląskim — nasze 5 ulubionych</a></h2>
+                    <p class="blog-article-excerpt">Od Błatniej, na którą wejdziesz przed śniadaniem, po Baranią Górę, która wymaga szacunku. Każdy szlak z tym, co widzieliśmy i czuliśmy na szczycie. Podpowiadamy jak się przygotować, co zabrać i gdzie zjeść obiad po zejściu.</p>
+                    <a href="#" class="blog-read-more">Czytaj więcej &rarr;</a>
+                </div>
+            </article>
+
+            <!-- Artykuł 3 -->
+            <article class="blog-article-card animate-on-scroll">
+                <div class="blog-article-image">
+                    <img src="https://images.unsplash.com/photo-1517816428104-797678c7cf0c?w=800" alt="Ognisko wieczorem z iskrami lecącymi w ciemne niebo" loading="lazy">
+                </div>
+                <div class="blog-article-body">
+                    <div class="blog-article-meta">
+                        <span class="blog-article-date">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            10 lutego 2026
+                        </span>
+                        <span class="blog-category-badge">Lifestyle</span>
+                        <span class="blog-article-author">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Marcel
+                        </span>
+                    </div>
+                    <h2><a href="#">Przepis na wieczór przy ognisku — kiełbasa, nalewka i niebo pełne gwiazd</a></h2>
+                    <p class="blog-article-excerpt">Nie ma nic prostszego i jednocześnie nic trudniejszego do odtworzenia w mieście. Ognisko w beskidzkim ogrodzie, kiełbasa z patyka, domowa nalewka na rozgrzewkę i niebo, na którym widać Drogę Mleczną. Opowiadamy jak wygląda idealny wieczór w Brennej.</p>
+                    <a href="#" class="blog-read-more">Czytaj więcej &rarr;</a>
+                </div>
+            </article>
+
+            <!-- Artykuł 4 -->
+            <article class="blog-article-card animate-on-scroll">
+                <div class="blog-article-image">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800" alt="Widok na dolinę Brennicy i górskie szczyty o poranku" loading="lazy">
+                </div>
+                <div class="blog-article-body">
+                    <div class="blog-article-meta">
+                        <span class="blog-article-date">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            28 stycznia 2026
+                        </span>
+                        <span class="blog-category-badge">O nas</span>
+                        <span class="blog-article-author">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Marcel
+                        </span>
+                    </div>
+                    <h2><a href="#">Dlaczego wracamy do Brennej — list miłosny do doliny Brennicy</a></h2>
+                    <p class="blog-article-excerpt">Są piękniejsze góry, wyższe szczyty, bardziej instagramowe widoki. Ale Brenna ma coś, czego nie mają inne miejsca — cichą spokojną pewność, że tu jest dobrze. Opowiadamy dlaczego kupiliśmy tu dom i dlaczego wracamy przy każdej okazji.</p>
+                    <a href="#" class="blog-read-more">Czytaj więcej &rarr;</a>
+                </div>
+            </article>
+
+        </main>
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="blog-sidebar">
+
+            <!-- O blogu -->
+            <div class="sidebar-widget sidebar-about">
+                <h3>O blogu</h3>
+                <p>Piszemy o Brennej, Beskidach i życiu w górach. Szlaki, lokalne smaki, porady na weekend — wszystko z perspektywy ludzi, którzy tu mieszkają i kochają to miejsce. Zapraszamy do lektury.</p>
+            </div>
+
+            <!-- Kategorie -->
+            <div class="sidebar-widget sidebar-categories">
+                <h3>Kategorie</h3>
+                <ul>
+                    <li><a href="#">Przewodnik <span class="cat-count">3</span></a></li>
+                    <li><a href="#">Szlaki <span class="cat-count">5</span></a></li>
+                    <li><a href="#">Lifestyle <span class="cat-count">4</span></a></li>
+                    <li><a href="#">O nas <span class="cat-count">2</span></a></li>
+                    <li><a href="#">Przepisy <span class="cat-count">3</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Najpopularniejsze -->
+            <div class="sidebar-widget sidebar-popular">
+                <h3>Najpopularniejsze</h3>
+                <ol>
+                    <li><a href="#">Najpiękniejsze szlaki w Beskidzie Śląskim — nasze 5 ulubionych</a></li>
+                    <li><a href="#">Co robić w Brennej zimą — przewodnik dla tych, którzy nie jeżdżą na nartach</a></li>
+                    <li><a href="#">Dlaczego wracamy do Brennej — list miłosny do doliny Brennicy</a></li>
+                </ol>
+            </div>
+
+            <!-- CTA -->
+            <div class="sidebar-widget sidebar-cta">
+                <h3>Zarezerwuj domek</h3>
+                <p>Przekonaj się sam, o czym piszemy. Zarezerwuj pobyt w Domku Brenna i poczuj beskidzką ciszę.</p>
+                <a href="index.html#rezerwacje" class="btn btn-copper">Sprawdź dostępność</a>
+            </div>
+
+        </aside>
+
+    </div>
+
+    <!-- STOPKA -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4 class="footer-heading">O nas</h4>
+                    <p class="footer-text">Willa Słońce to klimatyczny dom w Beskidzie Śląskim. Cisza, natura i komfort — wszystko, czego potrzebujesz na górski wypoczynek.</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Nawigacja</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html#o-domku">Domek</a></li>
+                        <li><a href="galeria.html">Galeria</a></li>
+                        <li><a href="rezerwacje.html">Rezerwacje</a></li>
+                        <li><a href="sklep.html">Sklep</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Kontakt</h4>
+                    <ul class="footer-links">
+                        <li>ul. Markówka 26, 43-438 Brenna</li>
+                        <li><a href="tel:+48690300359">+48 690 300 359</a></li>
+                        <li><a href="mailto:marcelhoffman@gmail.com">marcelhoffman@gmail.com</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Social</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://instagram.com/willa_slonce" target="_blank" rel="noopener">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Willa Słońce. Wszelkie prawa zastrzeżone.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Polityka prywatności</a>
+                    <a href="#">Regulamin</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS -->
+    <script src="js/main.js"></script>
+
+</body>
+</html>

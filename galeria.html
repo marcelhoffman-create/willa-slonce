@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria zdjęć — Willa Słońce Brenna | Sauna, Taras, Sypialnia</title>
+    <meta name="description" content="Willa Słońce w Brennej — galeria zdjęć. Sypialnia, taras z leżakami, balkon z widokiem na góry, sauna. Do 6 osób.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Galeria — Willa Słońce Brenna">
+    <meta property="og:description" content="Sypialnia, taras, balkon z widokiem na góry i sauna. Zobacz, co na Ciebie czeka w Willi Słońce.">
+    <meta property="og:image" content="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0d91be96-fbdf-4d94-add3-287ccc658817.jpeg">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pl_PL">
+    <meta property="og:site_name" content="Willa Słońce">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* ===== GALLERY HERO ===== */
+        .gallery-hero {
+            padding: 140px 24px 80px;
+            text-align: center;
+            background-color: var(--beige);
+        }
+
+        .gallery-hero .section-label {
+            display: block;
+            margin-bottom: 16px;
+        }
+
+        .gallery-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 20px;
+        }
+
+        .gallery-hero p {
+            font-size: 1.1rem;
+            color: var(--text-medium);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ===== GALLERY GRID ===== */
+        .gallery-section {
+            padding: 64px 0 96px;
+            background-color: var(--white);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:nth-child(1) img,
+        .gallery-item:nth-child(4) img {
+            height: 380px;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.04);
+        }
+
+        .gallery-item-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(0deg, rgba(0,0,0,0.55) 0%, transparent 100%);
+            padding: 40px 20px 18px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item-overlay span {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        .gallery-zoom {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.92);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-zoom {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .gallery-zoom svg {
+            width: 20px; height: 20px;
+            stroke: var(--green-dark);
+        }
+
+        /* ===== CTA ===== */
+        .gallery-cta {
+            text-align: center;
+            padding: 80px 24px;
+            background-color: var(--beige);
+        }
+
+        .gallery-cta h2 {
+            margin-bottom: 16px;
+        }
+
+        .gallery-cta p {
+            color: var(--text-medium);
+            font-size: 1.1rem;
+            max-width: 520px;
+            margin: 0 auto 32px;
+        }
+
+        /* ===== LIGHTBOX ===== */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            cursor: pointer;
+        }
+
+        .lightbox-img-wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        .lightbox-img-wrap img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .lightbox-close {
+            position: fixed;
+            top: 20px; right: 24px;
+            z-index: 2;
+            font-size: 2.5rem;
+            color: #fff;
+            background: none;
+            border: none;
+            cursor: pointer;
+            line-height: 1;
+            opacity: 0.85;
+            transition: opacity 0.2s;
+        }
+
+        .lightbox-close:hover { opacity: 1; }
+
+        .lightbox-prev, .lightbox-next {
+            position: fixed;
+            top: 50%; transform: translateY(-50%);
+            z-index: 2;
+            font-size: 3rem;
+            color: #fff;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 16px;
+            opacity: 0.75;
+            transition: opacity 0.2s;
+        }
+
+        .lightbox-prev:hover, .lightbox-next:hover { opacity: 1; }
+        .lightbox-prev { left: 16px; }
+        .lightbox-next { right: 16px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .gallery-item:nth-child(1) img,
+            .gallery-item:nth-child(4) img {
+                height: 260px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .gallery-hero { padding: 110px 16px 56px; }
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                padding: 0 16px;
+            }
+            .gallery-item img,
+            .gallery-item:nth-child(1) img,
+            .gallery-item:nth-child(4) img {
+                height: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAWIGACJA -->
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">Willa Słońce</a>
+
+            <div class="nav-links" id="navLinks">
+                <a href="index.html#o-domku" class="nav-link">Domek</a>
+                <a href="galeria.html" class="nav-link active">Galeria</a>
+                <a href="index.html#rezerwacje" class="nav-link">Rezerwacje</a>
+                <a href="index.html#sklep" class="nav-link">Sklep</a>
+                <a href="index.html#blog" class="nav-link">Blog</a>
+            </div>
+
+            <a href="index.html#rezerwacje" class="nav-cta">Rezerwuj</a>
+
+            <button class="hamburger" id="hamburger" aria-label="Otwórz menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Menu mobilne -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="index.html#o-domku" class="mobile-menu-link">Domek</a>
+            <a href="galeria.html" class="mobile-menu-link">Galeria</a>
+            <a href="index.html#rezerwacje" class="mobile-menu-link">Rezerwacje</a>
+            <a href="index.html#sklep" class="mobile-menu-link">Sklep</a>
+            <a href="index.html#blog" class="mobile-menu-link">Blog</a>
+            <a href="index.html#rezerwacje" class="mobile-menu-cta">Rezerwuj</a>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="gallery-hero">
+        <span class="section-label">Galeria</span>
+        <h1>Willa Słońce<br><em>w obiektywie</em></h1>
+        <p>Taras z leżakami, balkon z widokiem na góry, przytulna sypialnia i prywatna sauna. Zobacz, co na Ciebie czeka.</p>
+    </section>
+
+    <!-- GALERIA -->
+    <section class="gallery-section">
+        <div class="gallery-grid" id="galleryGrid">
+
+            <!-- 1. Willa z zewnątrz -->
+            <div class="gallery-item">
+                <img
+                    src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0d91be96-fbdf-4d94-add3-287ccc658817.jpeg"
+                    data-full="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0d91be96-fbdf-4d94-add3-287ccc658817.jpeg"
+                    alt="Willa Słońce — drewniany dom z bali, widok z zewnątrz"
+                    loading="lazy"
+                >
+                <div class="gallery-item-overlay"><span>Willa z zewnątrz</span></div>
+                <div class="gallery-zoom">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+            </div>
+
+            <!-- 2. Salon -->
+            <div class="gallery-item">
+                <img
+                    src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/3ab1ca4a-262e-478d-9b60-e61e2f05c4cb.jpeg"
+                    data-full="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/3ab1ca4a-262e-478d-9b60-e61e2f05c4cb.jpeg"
+                    alt="Salon z kanapą i stolikiem z plastra drewna"
+                    loading="lazy"
+                >
+                <div class="gallery-item-overlay"><span>Salon</span></div>
+                <div class="gallery-zoom">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+            </div>
+
+            <!-- 3. Sypialnia -->
+            <div class="gallery-item">
+                <img
+                    src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0735ea0d-a7eb-4d52-a0ec-09de3f29df08.jpeg"
+                    data-full="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0735ea0d-a7eb-4d52-a0ec-09de3f29df08.jpeg"
+                    alt="Sypialnia na poddaszu z rzeźbionym łóżkiem"
+                    loading="lazy"
+                >
+                <div class="gallery-item-overlay"><span>Sypialnia</span></div>
+                <div class="gallery-zoom">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+            </div>
+
+            <!-- 4. Taras z leżakami -->
+            <div class="gallery-item">
+                <img
+                    src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/d402f7d7-7d2a-4953-8fc4-aac90db4993e.jpeg"
+                    data-full="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/d402f7d7-7d2a-4953-8fc4-aac90db4993e.jpeg"
+                    alt="Taras z żółtymi leżakami w słońcu"
+                    loading="lazy"
+                >
+                <div class="gallery-item-overlay"><span>Taras</span></div>
+                <div class="gallery-zoom">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+            </div>
+
+            <!-- 5. Balkon -->
+            <div class="gallery-item">
+                <img
+                    src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/89c67bf2-6090-4387-be7e-7057de50fedd.jpeg"
+                    data-full="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/89c67bf2-6090-4387-be7e-7057de50fedd.jpeg"
+                    alt="Balkon z rzeźbioną balustradą i widokiem na góry"
+                    loading="lazy"
+                >
+                <div class="gallery-item-overlay"><span>Balkon z widokiem</span></div>
+                <div class="gallery-zoom">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+            </div>
+
+            <!-- 6. Wnętrze (tło) -->
+            <div class="gallery-item">
+                <img
+                    src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/3d8f7c0b-b641-4830-b3a6-f7a1aa600ec3.jpeg"
+                    data-full="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/3d8f7c0b-b641-4830-b3a6-f7a1aa600ec3.jpeg"
+                    alt="Wnętrze Willi Słońce — drewniane bale i przytulna atmosfera"
+                    loading="lazy"
+                >
+                <div class="gallery-item-overlay"><span>Wnętrze</span></div>
+                <div class="gallery-zoom">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="gallery-cta">
+        <div class="container">
+            <h2>Chcesz zobaczyć więcej?</h2>
+            <p>Zarezerwuj pobyt i przekonaj się osobiście. Żadne zdjęcie nie odda ciszy, zapachu drewna i widoku z balkonu o świcie.</p>
+            <a href="index.html#rezerwacje" class="btn btn-primary btn-lg">Zarezerwuj termin</a>
+        </div>
+    </section>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+        <button class="lightbox-close" id="lightboxClose" aria-label="Zamknij">&times;</button>
+        <button class="lightbox-prev" id="lightboxPrev" aria-label="Poprzednie">&#8249;</button>
+        <button class="lightbox-next" id="lightboxNext" aria-label="Następne">&#8250;</button>
+        <div class="lightbox-img-wrap">
+            <img src="" alt="" id="lightboxImg">
+        </div>
+    </div>
+
+    <!-- STOPKA -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4 class="footer-heading">O nas</h4>
+                    <p class="footer-text">Willa Słońce to klimatyczny dom w Beskidzie Śląskim. Cisza, natura i komfort — wszystko, czego potrzebujesz na górski wypoczynek.</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Nawigacja</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html#o-domku">Domek</a></li>
+                        <li><a href="galeria.html">Galeria</a></li>
+                        <li><a href="index.html#rezerwacje">Rezerwacje</a></li>
+                        <li><a href="index.html#sklep">Sklep</a></li>
+                        <li><a href="index.html#blog">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Kontakt</h4>
+                    <ul class="footer-links">
+                        <li>ul. Leśna 12, 43-438 Brenna</li>
+                        <li><a href="tel:+48600123456">+48 600 123 456</a></li>
+                        <li><a href="mailto:kontakt@willaslonce.pl">kontakt@willaslonce.pl</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Social</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://facebook.com/willaslonce" target="_blank" rel="noopener">Facebook</a></li>
+                        <li><a href="https://instagram.com/willaslonce" target="_blank" rel="noopener">Instagram</a></li>
+                        <li><a href="https://booking.com" target="_blank" rel="noopener">Booking.com</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Willa Słońce. Wszelkie prawa zastrzeżone.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Polityka prywatności</a>
+                    <a href="#">Regulamin</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+    (function() {
+        var items = Array.from(document.querySelectorAll('.gallery-item'));
+        var lightbox = document.getElementById('lightbox');
+        var lightboxImg = document.getElementById('lightboxImg');
+        var currentIdx = 0;
+
+        function open(idx) {
+            currentIdx = idx;
+            var img = items[idx].querySelector('img');
+            lightboxImg.src = img.dataset.full || img.src;
+            lightboxImg.alt = img.alt;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function close() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function prev() {
+            currentIdx = (currentIdx - 1 + items.length) % items.length;
+            var img = items[currentIdx].querySelector('img');
+            lightboxImg.src = img.dataset.full || img.src;
+            lightboxImg.alt = img.alt;
+        }
+
+        function next() {
+            currentIdx = (currentIdx + 1) % items.length;
+            var img = items[currentIdx].querySelector('img');
+            lightboxImg.src = img.dataset.full || img.src;
+            lightboxImg.alt = img.alt;
+        }
+
+        items.forEach(function(item, i) {
+            item.addEventListener('click', function() { open(i); });
+        });
+
+        document.getElementById('lightboxBackdrop').addEventListener('click', close);
+        document.getElementById('lightboxClose').addEventListener('click', close);
+        document.getElementById('lightboxPrev').addEventListener('click', function(e) { e.stopPropagation(); prev(); });
+        document.getElementById('lightboxNext').addEventListener('click', function(e) { e.stopPropagation(); next(); });
+
+        document.addEventListener('keydown', function(e) {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') close();
+            if (e.key === 'ArrowLeft') prev();
+            if (e.key === 'ArrowRight') next();
+        });
+    })();
+    </script>
+
+</body>
+</html>

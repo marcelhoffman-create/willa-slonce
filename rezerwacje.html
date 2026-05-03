@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rezerwacja — Willa Słońce Brenna | Sauna, do 6 osób</title>
+  <meta name="description" content="Zarezerwuj pobyt w Willi Słońce w Brennej. Sauna, 2 tarasy, balkon z widokiem na góry. Do 6 osób. Rezerwacja bezpośrednia — taniej niż Booking.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Rezerwacja — Willa Słońce Brenna">
+  <meta property="og:description" content="Zarezerwuj Willę Słońce bezpośrednio i płać 10% mniej niż przez Booking.com.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pl_PL">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Flatpickr (kalendarz) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* ===== CSS VARIABLES (lokalne dla tej strony) ===== */
+    :root {
+      --green-dark:   #4a5d42;
+      --copper:       #8b6914;
+      --beige:        #f5f4f0;
+      --white:        #ffffff;
+      --border:       #e0ddd6;
+      --text-dark:    #1a1a1a;
+      --text-medium:  #555555;
+      --text-light:   #888888;
+      --font-body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* ===== HERO ===== */
+    .rez-hero {
+      padding: 140px 24px 60px;
+      text-align: center;
+      background-color: var(--beige);
+    }
+    .rez-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 16px; }
+    .rez-hero p { color: var(--text-medium); max-width: 560px; margin: 0 auto; font-size: 1.05rem; line-height: 1.7; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .rez-section {
+      padding: 64px 0 96px;
+      background: var(--white);
+    }
+    .rez-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      align-items: start;
+    }
+
+    /* ===== FORMULARZ ===== */
+    .booking-form-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+    }
+    .booking-form-card h2 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+    .booking-form-card .subtitle {
+      color: var(--text-medium);
+      font-size: 0.95rem;
+      margin-bottom: 32px;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      position: static;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+      pointer-events: auto;
+      transition: none;
+    }
+    .form-group label .req { color: var(--copper); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      background: var(--white);
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--green-dark);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    /* Daty — podwójny flatpickr */
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .date-row .form-group { margin-bottom: 0; }
+
+    /* Kalkulator ceny */
+    .price-summary {
+      background: var(--beige);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: var(--text-medium);
+      margin-bottom: 8px;
+    }
+    .price-row.total {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+
+    /* Metoda płatności */
+    .payment-info {
+      border: 1.5px solid var(--green-dark);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+      background: rgba(74, 93, 66, 0.04);
+    }
+    .payment-info h4 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .payment-info p {
+      font-size: 0.88rem;
+      color: var(--text-medium);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    /* Zgoda RODO */
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      accent-color: var(--green-dark);
+    }
+    .checkbox-group label {
+      font-size: 0.83rem;
+      color: var(--text-medium);
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    /* Submit */
+    .btn-submit {
+      width: 100%;
+      padding: 16px 24px;
+      background: var(--green-dark);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .btn-submit:hover { background: var(--copper); transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar-card {
+      background: var(--beige);
+      border-radius: 16px;
+      padding: 32px;
+      position: sticky;
+      top: 100px;
+    }
+    .sidebar-card h3 { font-size: 1.3rem; margin-bottom: 20px; }
+    .sidebar-info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .sidebar-info-row svg { flex-shrink: 0; margin-top: 2px; color: var(--green-dark); }
+    .sidebar-info-row div { font-size: 0.9rem; line-height: 1.5; }
+    .sidebar-info-row strong { display: block; font-size: 0.82rem; color: var(--text-medium); font-weight: 500; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+    .sidebar-amenities { list-style: none; padding: 0; margin: 0; }
+    .sidebar-amenities li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.88rem; color: var(--text-medium);
+      padding: 6px 0;
+    }
+    .sidebar-amenities li svg { color: var(--green-dark); }
+
+    .booking-guarantee {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 24px;
+      font-size: 0.85rem;
+      color: var(--text-medium);
+      text-align: center;
+      line-height: 1.5;
+    }
+    .booking-guarantee strong { color: var(--green-dark); }
+
+    /* ===== SUKCES OVERLAY ===== */
+    .success-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .success-overlay.active { display: flex; }
+    .success-box {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 48px 40px;
+      max-width: 540px;
+      width: 100%;
+      text-align: center;
+    }
+    .success-icon {
+      width: 72px; height: 72px;
+      background: #e8f5e9;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .success-icon svg { color: #2e7d32; }
+    .success-box h2 { font-size: 1.8rem; margin-bottom: 12px; }
+    .success-box p { color: var(--text-medium); line-height: 1.7; margin-bottom: 0; }
+    .transfer-details {
+      background: var(--beige);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      text-align: left;
+    }
+    .transfer-details h4 { font-size: 0.9rem; margin-bottom: 12px; color: var(--text-dark); }
+    .transfer-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.88rem; padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .transfer-row:last-child { border-bottom: none; }
+    .transfer-row span:first-child { color: var(--text-medium); }
+    .transfer-row strong { color: var(--text-dark); }
+    .transfer-title { word-break: break-word; }
+    .success-box .btn { margin-top: 8px; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .rez-grid { grid-template-columns: 1fr; }
+      .sidebar-card { position: static; }
+    }
+    @media (max-width: 600px) {
+      .rez-hero { padding: 110px 16px 48px; }
+      .booking-form-card { padding: 24px 20px; }
+      .form-row, .date-row { grid-template-columns: 1fr; gap: 0; }
+      .rez-grid { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAWIGACJA -->
+  <nav class="nav" id="nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">Willa Słońce</a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html#o-domku" class="nav-link">Domek</a>
+        <a href="galeria.html" class="nav-link">Galeria</a>
+        <a href="rezerwacje.html" class="nav-link active">Rezerwacje</a>
+        <a href="index.html#sklep" class="nav-link">Sklep</a>
+        <a href="index.html#blog" class="nav-link">Blog</a>
+      </div>
+      <a href="rezerwacje.html" class="nav-cta">Rezerwuj</a>
+      <button class="hamburger" id="hamburger" aria-label="Otwórz menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-content">
+      <a href="index.html#o-domku" class="mobile-menu-link">Domek</a>
+      <a href="galeria.html" class="mobile-menu-link">Galeria</a>
+      <a href="rezerwacje.html" class="mobile-menu-link">Rezerwacje</a>
+      <a href="index.html#sklep" class="mobile-menu-link">Sklep</a>
+      <a href="index.html#blog" class="mobile-menu-link">Blog</a>
+      <a href="rezerwacje.html" class="mobile-menu-cta">Rezerwuj</a>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="rez-hero">
+    <span class="section-label">Rezerwacja bezpośrednia</span>
+    <h1>Zarezerwuj <em>Willę Słońce</em></h1>
+    <p>Płać bezpośrednio i taniej niż przez Booking.com. Wyślij zapytanie — odpiszemy w ciągu kilku godzin i potwierdzimy termin.</p>
+  </section>
+
+  <!-- GŁÓWNA SEKCJA -->
+  <section class="rez-section">
+    <div class="rez-grid">
+
+      <!-- FORMULARZ -->
+      <div class="booking-form-card">
+        <h2>Formularz rezerwacji</h2>
+        <p class="subtitle">Wypełnij poniższe pola. Po wysłaniu otrzymasz dane do przelewu i potwierdzenie mailowe.</p>
+
+        <form id="bookingForm" novalidate>
+
+          <!-- Daty -->
+          <div class="date-row">
+            <div class="form-group">
+              <label>Przyjazd <span class="req">*</span></label>
+              <input type="text" id="checkin" name="checkin" placeholder="Wybierz datę" readonly required>
+            </div>
+            <div class="form-group">
+              <label>Wyjazd <span class="req">*</span></label>
+              <input type="text" id="checkout" name="checkout" placeholder="Wybierz datę" readonly required>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top:20px;">
+            <div class="form-group">
+              <label>Liczba gości <span class="req">*</span></label>
+              <select name="goscie" id="goscie" required>
+                <option value="">Wybierz</option>
+                <option value="1">1 osoba</option>
+                <option value="2">2 osoby</option>
+                <option value="3">3 osoby</option>
+                <option value="4">4 osoby</option>
+                <option value="5">5 osób</option>
+                <option value="6">6 osób</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Planowana godzina przyjazdu</label>
+              <select name="godzina" id="godzina">
+                <option value="15:00-17:00">15:00 – 17:00</option>
+                <option value="17:00-19:00">17:00 – 19:00</option>
+                <option value="19:00-21:00">19:00 – 21:00</option>
+                <option value="po 21:00">Po 21:00</option>
+                <option value="do ustalenia">Do ustalenia</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Kalkulator ceny -->
+          <div class="price-summary" id="priceSummary" style="display:none;">
+            <div class="price-row">
+              <span id="priceNightsLabel">Noce</span>
+              <span id="priceNightsVal">—</span>
+            </div>
+            <div class="price-row">
+              <span>Cena za noc</span>
+              <span id="pricePerNight">—</span>
+            </div>
+            <div class="price-row total">
+              <span>Łącznie</span>
+              <span id="priceTotal">—</span>
+            </div>
+          </div>
+
+          <!-- Dane osobowe -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Imię <span class="req">*</span></label>
+              <input type="text" name="imie" placeholder="Jan" required>
+            </div>
+            <div class="form-group">
+              <label>Nazwisko <span class="req">*</span></label>
+              <input type="text" name="nazwisko" placeholder="Kowalski" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email <span class="req">*</span></label>
+              <input type="email" name="email" placeholder="jan@example.com" required>
+            </div>
+            <div class="form-group">
+              <label>Telefon <span class="req">*</span></label>
+              <input type="tel" name="telefon" placeholder="+48 600 000 000" required>
+            </div>
+          </div>
+
+          <!-- RODO -->
+          <div class="checkbox-group">
+            <input type="checkbox" id="rodo" name="rodo" required>
+            <label for="rodo">Wyrażam zgodę na przetwarzanie moich danych osobowych w celu obsługi rezerwacji. Administratorem danych jest właściciel Willi Słońce. <span class="req">*</span></label>
+          </div>
+
+          <!-- Ukryte pola -->
+          <input type="hidden" name="noce" id="noceHidden" value="">
+          <input type="hidden" name="kwota" id="kwotaHidden" value="">
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            Rezerwuj termin →
+          </button>
+
+          <p style="font-size:0.8rem;color:var(--text-light);text-align:center;margin-top:12px;">
+            Po kliknięciu wyślemy Ci dane do przelewu. Termin zostaje zarezerwowany po zaksięgowaniu wpłaty.
+          </p>
+
+          <!-- Uwagi — opcjonalne, po przycisku -->
+          <details style="margin-top:20px;">
+            <summary style="cursor:pointer;font-size:0.88rem;color:var(--text-medium);user-select:none;">+ Uwagi / specjalne życzenia (opcjonalnie)</summary>
+            <div class="form-group" style="margin-top:12px;">
+              <textarea name="uwagi" placeholder="Np. podróżujemy ze zwierzęciem, potrzebujemy łóżeczka dla dziecka…"></textarea>
+            </div>
+          </details>
+
+          <!-- Metoda płatności -->
+          <div class="payment-info" style="margin-top:20px;">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              Płatność — przelew tradycyjny
+            </h4>
+            <p>Po złożeniu rezerwacji wyślemy Ci numer konta do wpłaty. Termin zostaje zarezerwowany po zaksięgowaniu <strong>100% kwoty pobytu</strong> w ciągu 48h.</p>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside>
+        <div class="sidebar-card">
+          <h3>Willa Słońce</h3>
+
+          <div class="sidebar-info-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div><strong>Lokalizacja</strong>Brenna, Beskid Śląski</div>
+          </div>
+          <div class="sidebar-info-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div><strong>Pojemność</strong>Do 6 osób</div>
+          </div>
+          <div class="sidebar-info-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <div><strong>Standard</strong>1 sypialnia + aneks, 2 tarasy, balkon</div>
+          </div>
+          <div class="sidebar-info-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div><strong>Check-in / Check-out</strong>od 15:00 / do 12:00</div>
+          </div>
+
+          <hr class="sidebar-divider">
+
+          <ul class="sidebar-amenities">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Prywatna sauna fińska
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              2 tarasy + balkon z widokiem
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Ogród, grill, parking
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              WiFi bezprzewodowe
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              W pełni wyposażona kuchnia
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Blisko szlaków na Błatnią
+            </li>
+          </ul>
+
+          <div class="booking-guarantee">
+            <strong>Rezerwacja bezpośrednia</strong><br>
+            Bez prowizji portalu. Taniej niż Booking.com.
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </section>
+
+  <!-- OVERLAY SUKCESU -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+      <div class="success-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h2>Rezerwacja przyjęta!</h2>
+      <p>Termin jest zarezerwowany dla Ciebie. Dokonaj wpłaty w ciągu <strong>48 godzin</strong> — po zaksięgowaniu wyślemy potwierdzenie.</p>
+
+      <div class="transfer-details">
+        <h4>Dane do przelewu:</h4>
+        <div class="transfer-row">
+          <span>Odbiorca</span>
+          <strong>Willa Słońce — właściciel</strong>
+        </div>
+        <div class="transfer-row">
+          <span>Numer konta</span>
+          <strong>13 1050 1214 1000 0023 1765 9577</strong>
+        </div>
+        <div class="transfer-row">
+          <span>Kwota do wpłaty</span>
+          <strong id="transferAmount">—</strong>
+        </div>
+        <div class="transfer-row">
+          <span>Tytuł przelewu</span>
+          <strong class="transfer-title" id="transferTitle">—</strong>
+        </div>
+      </div>
+
+      <p style="font-size:0.85rem;">Po zaksięgowaniu wpłaty wyślemy Ci potwierdzenie rezerwacji na podany adres email.</p>
+      <a href="index.html" class="btn btn-outline" style="margin-top:20px;display:inline-block;">Wróć na stronę główną</a>
+    </div>
+  </div>
+
+  <!-- STOPKA -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4 class="footer-heading">O nas</h4>
+          <p class="footer-text">Willa Słońce to klimatyczny dom w Beskidzie Śląskim. Cisza, natura i komfort — wszystko, czego potrzebujesz na górski wypoczynek.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading">Nawigacja</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#o-domku">Domek</a></li>
+            <li><a href="galeria.html">Galeria</a></li>
+            <li><a href="rezerwacje.html">Rezerwacje</a></li>
+            <li><a href="index.html#sklep">Sklep</a></li>
+            <li><a href="index.html#blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading">Kontakt</h4>
+          <ul class="footer-links">
+            <li>ul. Markówka 26, 43-438 Brenna</li>
+            <li><a href="tel:+48690300359">+48 690 300 359</a></li>
+            <li><a href="mailto:marcelhoffman@gmail.com">marcelhoffman@gmail.com</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading">Social</h4>
+          <ul class="footer-links">
+            <li><a href="https://instagram.com/willa_slonce" target="_blank" rel="noopener">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Willa Słońce. Wszelkie prawa zastrzeżone.</p>
+        <div class="footer-bottom-links">
+          <a href="#">Polityka prywatności</a>
+          <a href="#">Regulamin</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pl.js"></script>
+
+  <script>
+  (function() {
+    var WEBHOOK_URL = 'https://n8n.marcelhoffman.pl/webhook/N8LA2zPOksuXPntB/webhook/brenna-book';
+
+    // Domyślne ceny — nadpisywane przez prices.json
+    var PRICES = {
+      by_guests: {'1': 350, '2': 420, '3': 480, '4': 520, '5': 570, '6': 620},
+      date_ranges: []
+    };
+
+    var blockedDates = [];
+
+    // Pobierz ceny i dostępność równolegle
+    Promise.all([
+      fetch('/brenna/prices.json').then(function(r) { return r.json(); }).catch(function() { return {}; }),
+      fetch('/brenna/availability.json').then(function(r) { return r.json(); }).catch(function() { return {}; })
+    ]).then(function(results) {
+      var prices = results[0];
+      var avail  = results[1];
+      // Obsługuj stary format (per_night: 500) i nowy (by_guests, date_ranges)
+      if (prices.by_guests) {
+        PRICES.by_guests = prices.by_guests;
+        PRICES.date_ranges = prices.date_ranges || [];
+      } else if (prices.per_night) {
+        // Stary format — ustaw tę samą cenę dla wszystkich gości
+        var p = prices.per_night;
+        PRICES.by_guests = {'1':p,'2':p,'3':p,'4':p,'5':p,'6':p};
+      }
+      blockedDates = avail.blocked || [];
+      initCalendar();
+    });
+
+    function getPriceForNight(isoDate, guests) {
+      var g = String(guests);
+      // Sprawdź zakresy dat (mają pierwszeństwo)
+      for (var i = 0; i < PRICES.date_ranges.length; i++) {
+        var r = PRICES.date_ranges[i];
+        if (isoDate >= r.from && isoDate <= r.to) {
+          // Nowy format: by_guests per zakres
+          if (r.by_guests) {
+            return r.by_guests[g] || r.by_guests['2'] || 500;
+          }
+          // Stary format: jedna cena dla wszystkich
+          if (r.price) return r.price;
+        }
+      }
+      // Cena bazowa per liczba gości
+      return PRICES.by_guests[g] || PRICES.by_guests['2'] || 500;
+    }
+
+    var checkinFp, checkoutFp;
+
+    function initCalendar() {
+      var tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      checkinFp = flatpickr('#checkin', {
+        locale: 'pl',
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd.m.Y',
+        minDate: 'today',
+        disable: blockedDates,
+        disableMobile: false,
+        onChange: function(selectedDates) {
+          if (selectedDates[0]) {
+            var minCheckout = new Date(selectedDates[0]);
+            minCheckout.setDate(minCheckout.getDate() + 1);
+            checkoutFp.set('minDate', minCheckout);
+            checkoutFp.clear();
+            checkoutFp.open();
+          }
+          updatePrice();
+        }
+      });
+
+      checkoutFp = flatpickr('#checkout', {
+        locale: 'pl',
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd.m.Y',
+        minDate: tomorrow,
+        disable: blockedDates,
+        disableMobile: false,
+        onChange: function() {
+          updatePrice();
+        }
+      });
+
+      // Pre-fill z URL params (np. po przekierowaniu z index.html)
+      var params = new URLSearchParams(window.location.search);
+      var pCheckin  = params.get('checkin');
+      var pCheckout = params.get('checkout');
+      var pGoscie   = params.get('goscie');
+
+      if (pCheckin) {
+        checkinFp.setDate(pCheckin, false);
+        var minCo = new Date(pCheckin);
+        minCo.setDate(minCo.getDate() + 1);
+        checkoutFp.set('minDate', minCo);
+      }
+      if (pCheckout) {
+        checkoutFp.setDate(pCheckout, false);
+      }
+      if (pCheckin && pCheckout) {
+        updatePrice();
+      }
+      if (pGoscie) {
+        var goscEl = document.getElementById('goscie');
+        if (goscEl) goscEl.value = pGoscie;
+      }
+    }
+
+    function getNights() {
+      var ci = document.getElementById('checkin').value;
+      var co = document.getElementById('checkout').value;
+      if (!ci || !co) return 0;
+      var d1 = new Date(ci), d2 = new Date(co);
+      return Math.round((d2 - d1) / 86400000);
+    }
+
+    function formatDate(str) {
+      if (!str) return '';
+      var parts = str.split('-');
+      return parts[2] + '.' + parts[1] + '.' + parts[0];
+    }
+
+    function updatePrice() {
+      var nights = getNights();
+      var summary = document.getElementById('priceSummary');
+      if (nights < 1) {
+        summary.style.display = 'none';
+        document.getElementById('noceHidden').value = '';
+        document.getElementById('kwotaHidden').value = '';
+        return;
+      }
+
+      var guests = parseInt(document.getElementById('goscie').value) || 2;
+      var ci = document.getElementById('checkin').value;
+
+      // Sumuj ceny dla każdej nocy (mogą być różne wg zakresu dat)
+      var total = 0;
+      var firstPrice = null;
+      var allSame = true;
+      var d = new Date(ci + 'T12:00:00'); // noon żeby uniknąć DST
+
+      for (var i = 0; i < nights; i++) {
+        var isoDate = d.toISOString().substring(0, 10);
+        var p = getPriceForNight(isoDate, guests);
+        if (firstPrice === null) firstPrice = p;
+        else if (p !== firstPrice) allSame = false;
+        total += p;
+        d.setDate(d.getDate() + 1);
+      }
+
+      var nightsLabel = nights + (nights === 1 ? ' noc' : nights < 5 ? ' noce' : ' nocy');
+      document.getElementById('priceNightsLabel').textContent = nightsLabel;
+
+      if (allSame) {
+        document.getElementById('priceNightsVal').textContent = nights + ' × ' + firstPrice + ' zł';
+        document.getElementById('pricePerNight').textContent = firstPrice + ' zł';
+      } else {
+        document.getElementById('priceNightsVal').textContent = nightsLabel;
+        document.getElementById('pricePerNight').textContent = 'zróżnicowane';
+      }
+
+      document.getElementById('priceTotal').textContent = total + ' zł';
+      document.getElementById('noceHidden').value = nights;
+      document.getElementById('kwotaHidden').value = total;
+      summary.style.display = 'block';
+    }
+
+    // Przelicz cenę gdy zmieni się liczba gości
+    document.getElementById('goscie').addEventListener('change', updatePrice);
+
+    // Submit formularza
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      var form = e.target;
+      var btn = document.getElementById('submitBtn');
+
+      // Prosta walidacja
+      var required = form.querySelectorAll('[required]');
+      var valid = true;
+      required.forEach(function(el) {
+        if (!el.value.trim() || (el.type === 'checkbox' && !el.checked)) {
+          el.style.borderColor = '#e53935';
+          valid = false;
+        } else {
+          el.style.borderColor = '';
+        }
+      });
+
+      if (!valid) {
+        alert('Wypełnij wszystkie wymagane pola.');
+        return;
+      }
+
+      if (!document.getElementById('checkin').value || !document.getElementById('checkout').value) {
+        alert('Wybierz daty przyjazdu i wyjazdu.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Wysyłanie…';
+
+      var formData = new FormData(form);
+      var body = {};
+      formData.forEach(function(val, key) { body[key] = val; });
+      // Kwota do wpłaty = 100%
+      body.zaliczka = parseInt(body.kwota) || 0;
+
+      fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function() {
+        showSuccess(body);
+      })
+      .catch(function(err) {
+        console.error(err);
+        // Nawet jeśli webhook zwróci błąd, pokaż sukces (n8n mógł przetworzyć)
+        showSuccess(body);
+      });
+    });
+
+    function showSuccess(data) {
+      var kwota = parseInt(data.kwota) || 0;
+
+      var title = 'Willa Slonce ' + formatDate(data.checkin) + '-' + formatDate(data.checkout) + ' ' + (data.imie || '') + ' ' + (data.nazwisko || '');
+
+      document.getElementById('transferAmount').textContent = kwota ? kwota + ' zł' : '—';
+      document.getElementById('transferTitle').textContent = title;
+
+      document.getElementById('successOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+  })();
+  </script>
+
+</body>
+</html>

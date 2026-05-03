@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Willa Słońce</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f4f0;
+      min-height: 100vh;
+      padding: 24px;
+      margin: 0;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 40px;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .card h1 { font-size: 1.5rem; margin: 0 0 4px; color: #1a1a1a; }
+    .card h2 { font-size: 1.1rem; margin: 0 0 16px; color: #333; border-bottom: 1.5px solid #eee; padding-bottom: 10px; }
+    .card > p { color: #888; font-size: 0.9rem; margin: 0 0 28px; }
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    input[type="password"],
+    input[type="number"],
+    input[type="text"],
+    input[type="date"] {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fff;
+    }
+    input:focus { border-color: #4a5d42; }
+
+    /* Siatka cen per gość */
+    .guests-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .guest-cell label { font-size: 0.78rem; margin-bottom: 4px; }
+    .guest-cell input { margin-bottom: 0; }
+
+    /* Tabela zakresów dat */
+    .ranges-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-bottom: 20px;
+    }
+    .ranges-table th {
+      text-align: left;
+      padding: 8px 10px;
+      background: #f5f4f0;
+      font-size: 0.78rem;
+      color: #666;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .ranges-table td {
+      padding: 10px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+    .ranges-table tr:last-child td { border-bottom: none; }
+    .ranges-table .empty { color: #aaa; font-style: italic; padding: 16px 10px; }
+    .btn-del {
+      background: none;
+      border: 1.5px solid #e57373;
+      color: #e57373;
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.15s;
+    }
+    .btn-del:hover { background: #ffebee; }
+
+    /* Formularz dodawania zakresu */
+    .add-range-form {
+      background: #f9f9f7;
+      border: 1.5px solid #e8e8e4;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .add-range-form h3 { font-size: 0.9rem; margin: 0 0 14px; color: #333; }
+    .range-grid-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr 2fr;
+      gap: 10px;
+      align-items: end;
+    }
+    .range-grid-top label { font-size: 0.75rem; margin-bottom: 3px; }
+    .range-grid-top input { margin-bottom: 0; }
+    /* Tabela z wieloma kolumnami — scroll na mobile */
+    .ranges-table-wrap { overflow-x: auto; }
+    .ranges-table th, .ranges-table td { white-space: nowrap; }
+    @media (max-width: 600px) {
+      .range-grid-top { grid-template-columns: 1fr 1fr; }
+      .guests-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Przyciski */
+    button.btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: #4a5d42;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    button.btn-primary:hover { background: #8b6914; transform: translateY(-1px); }
+    button.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    button.btn-add {
+      padding: 11px 18px;
+      background: #4a5d42;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    button.btn-add:hover { background: #3a4d34; }
+
+    .msg {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      display: none;
+    }
+    .msg.ok  { background: #e8f5e9; color: #2e7d32; display: block; }
+    .msg.err { background: #ffebee; color: #c62828; display: block; }
+
+    #loginCard, #adminPanel { display: none; }
+    #loginCard.active, #adminPanel.active { display: block; }
+
+    .section-hint { font-size: 0.83rem; color: #888; margin: -8px 0 14px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<!-- LOGOWANIE -->
+<div class="card" id="loginCard" class="active">
+  <h1>Panel admina</h1>
+  <p>Willa Słońce — Brenna</p>
+  <label for="pwd">Hasło</label>
+  <input type="password" id="pwd" placeholder="••••••••" autocomplete="current-password">
+  <button class="btn-primary" onclick="login()">Zaloguj</button>
+  <div class="msg" id="loginErr">Nieprawidłowe hasło.</div>
+</div>
+
+<!-- PANEL ADMINA -->
+<div id="adminPanel">
+
+  <!-- Ceny per liczba gości -->
+  <div class="card">
+    <h2>Ceny bazowe — liczba gości</h2>
+    <p class="section-hint">Cena za noc w zależności od liczby osób. Zakresy dat mają pierwszeństwo nad ceną bazową.</p>
+
+    <div class="guests-grid">
+      <div class="guest-cell">
+        <label>1 osoba</label>
+        <input type="number" id="g1" min="50" max="9999" step="10" placeholder="np. 350">
+      </div>
+      <div class="guest-cell">
+        <label>2 osoby</label>
+        <input type="number" id="g2" min="50" max="9999" step="10" placeholder="np. 420">
+      </div>
+      <div class="guest-cell">
+        <label>3 osoby</label>
+        <input type="number" id="g3" min="50" max="9999" step="10" placeholder="np. 480">
+      </div>
+      <div class="guest-cell">
+        <label>4 osoby</label>
+        <input type="number" id="g4" min="50" max="9999" step="10" placeholder="np. 520">
+      </div>
+      <div class="guest-cell">
+        <label>5 osób</label>
+        <input type="number" id="g5" min="50" max="9999" step="10" placeholder="np. 570">
+      </div>
+      <div class="guest-cell">
+        <label>6 osób</label>
+        <input type="number" id="g6" min="50" max="9999" step="10" placeholder="np. 620">
+      </div>
+    </div>
+  </div>
+
+  <!-- Zakresy dat -->
+  <div class="card">
+    <h2>Ceny sezonowe — zakresy dat</h2>
+    <p class="section-hint">Specjalna cena za noc dla konkretnego okresu (np. wakacje, sylwester). Każdy zakres ma własne ceny per liczba gości — nadpisują ceny bazowe.</p>
+
+    <div class="ranges-table-wrap">
+    <table class="ranges-table" id="rangesTable">
+      <thead>
+        <tr>
+          <th>Okres</th>
+          <th>Opis</th>
+          <th>1 os.</th>
+          <th>2 os.</th>
+          <th>3 os.</th>
+          <th>4 os.</th>
+          <th>5 os.</th>
+          <th>6 os.</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="rangesBody">
+        <tr><td colspan="9" class="empty">Brak zakresów. Dodaj poniżej.</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- Formularz dodawania zakresu -->
+    <div class="add-range-form">
+      <h3>+ Dodaj zakres</h3>
+      <div class="range-grid-top">
+        <div>
+          <label>Od</label>
+          <input type="text" id="rFrom" placeholder="DD.MM.RRRR" readonly>
+        </div>
+        <div>
+          <label>Do</label>
+          <input type="text" id="rTo" placeholder="DD.MM.RRRR" readonly>
+        </div>
+        <div>
+          <label>Opis (opcjonalnie)</label>
+          <input type="text" id="rLabel" placeholder="np. Wakacje letnie">
+        </div>
+      </div>
+      <div class="guests-grid" style="margin-top:12px;margin-bottom:0;">
+        <div class="guest-cell">
+          <label>1 osoba</label>
+          <input type="number" id="rg1" min="50" max="9999" step="10" placeholder="np. 500">
+        </div>
+        <div class="guest-cell">
+          <label>2 osoby</label>
+          <input type="number" id="rg2" min="50" max="9999" step="10" placeholder="np. 600">
+        </div>
+        <div class="guest-cell">
+          <label>3 osoby</label>
+          <input type="number" id="rg3" min="50" max="9999" step="10" placeholder="np. 680">
+        </div>
+        <div class="guest-cell">
+          <label>4 osoby</label>
+          <input type="number" id="rg4" min="50" max="9999" step="10" placeholder="np. 750">
+        </div>
+        <div class="guest-cell">
+          <label>5 osób</label>
+          <input type="number" id="rg5" min="50" max="9999" step="10" placeholder="np. 820">
+        </div>
+        <div class="guest-cell">
+          <label>6 osób</label>
+          <input type="number" id="rg6" min="50" max="9999" step="10" placeholder="np. 900">
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn-add" onclick="addRange()">Dodaj zakres</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zapisz ceny -->
+  <div class="card">
+    <button class="btn-primary" onclick="saveAll()" id="saveBtn">Zapisz wszystkie ceny</button>
+    <div class="msg" id="saveMsg"></div>
+  </div>
+
+  <!-- ===== PRODUKTY ===== -->
+  <div class="card">
+    <h2>Produkty — Sklep</h2>
+    <p class="section-hint">Zarządzaj produktami wyświetlanymi w sklepie. Kliknij „Zapisz produkty" aby opublikować zmiany.</p>
+
+    <!-- Tabela produktów -->
+    <div class="ranges-table-wrap">
+      <table class="ranges-table" id="productsTable">
+        <thead>
+          <tr>
+            <th style="width:64px;">Foto</th>
+            <th>Nazwa / opis</th>
+            <th>Cena</th>
+            <th>Widoczny</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="productsBody">
+          <tr><td colspan="5" class="empty">Ładowanie produktów…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Panel edycji (ukryty, pojawia się po kliknięciu Edytuj) -->
+    <div id="editPanel" class="add-range-form" style="display:none;margin-top:16px;border:2px solid #8b6914;">
+      <h3 style="color:#8b6914;">&#9998; Edytujesz produkt</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label>Nazwa produktu *</label>
+          <input type="text" id="eName" placeholder="np. Miód beskidzki">
+        </div>
+        <div>
+          <label>Cena (zł) *</label>
+          <input type="number" id="ePrice" min="1" max="9999">
+        </div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label>Skąd / jednostka</label>
+        <input type="text" id="eOrigin" placeholder="np. Pasieka Dolina Brennicy · 250 ml">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label>Opis (wyświetlany na karcie produktu)</label>
+        <input type="text" id="eDescription" placeholder="np. Wielokwiatowy, gęsty, pachnący łąkami.">
+      </div>
+      <div style="margin-bottom:8px;">
+        <label>URL zdjęcia</label>
+        <input type="text" id="eImage" placeholder="https://images.unsplash.com/..." oninput="updatePreview('eImage','ePreview')">
+      </div>
+      <img id="ePreview" style="display:none;width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-bottom:12px;" onerror="this.style.display='none'">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-add" onclick="saveEdit()">Zapisz zmiany</button>
+        <button class="btn-del" style="padding:11px 18px;" onclick="closeEdit()">Anuluj</button>
+      </div>
+    </div>
+
+    <!-- Formularz dodawania produktu -->
+    <div class="add-range-form" style="margin-top:20px;">
+      <h3>+ Dodaj nowy produkt</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label>Nazwa produktu *</label>
+          <input type="text" id="pName" placeholder="np. Dżem śliwkowy">
+        </div>
+        <div>
+          <label>Cena (zł) *</label>
+          <input type="number" id="pPrice" min="1" max="9999" placeholder="np. 25">
+        </div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label>Skąd / jednostka</label>
+        <input type="text" id="pOrigin" placeholder="np. Sad Kowalskich · 300 g">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label>Opis (wyświetlany na karcie produktu)</label>
+        <input type="text" id="pDescription" placeholder="np. Tradycyjny przepis, bez konserwantów.">
+      </div>
+      <div style="margin-bottom:8px;">
+        <label>URL zdjęcia</label>
+        <input type="text" id="pImage" placeholder="https://images.unsplash.com/..." oninput="updatePreview('pImage','pPreview')">
+      </div>
+      <img id="pPreview" style="display:none;width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-bottom:12px;" onerror="this.style.display='none'">
+      <button class="btn-add" onclick="addProduct()">Dodaj produkt</button>
+    </div>
+  </div>
+
+  <!-- Zapisz produkty -->
+  <div class="card">
+    <button class="btn-primary" onclick="saveProducts()" id="saveProductsBtn">Zapisz produkty</button>
+    <div class="msg" id="saveProductsMsg"></div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pl.js"></script>
+<script>
+  // SHA-256 hash hasła "brenna2026"
+  var PASSWORD_HASH = '1c61aaba342510eb3b74436b4d24eb48839c2f2b79d43654e3354b2a08669967';
+  var SAVE_ENDPOINT = 'save-data.php';
+
+  // Aktualnie załadowane zakresy
+  var dateRanges = [];
+
+  // Aktualnie załadowane produkty
+  var products = [];
+
+  async function sha256(msg) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  async function login() {
+    var pwd = document.getElementById('pwd').value;
+    var hash = await sha256(pwd);
+    if (hash === PASSWORD_HASH) {
+      document.getElementById('loginCard').classList.remove('active');
+      document.getElementById('adminPanel').classList.add('active');
+      sessionStorage.setItem('adminPwd', pwd);
+      loadPrices();
+      loadProducts();
+    } else {
+      document.getElementById('loginErr').className = 'msg err';
+    }
+  }
+
+  document.getElementById('pwd').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') login();
+  });
+
+  // Inicjalizacja flatpickr dla pól dat zakresu
+  var fpFrom = flatpickr('#rFrom', {
+    locale: 'pl',
+    dateFormat: 'd.m.Y',
+    disableMobile: false,
+    onChange: function(dates) {
+      if (dates[0]) {
+        var minTo = new Date(dates[0]);
+        minTo.setDate(minTo.getDate() + 1);
+        fpTo.set('minDate', minTo);
+      }
+    }
+  });
+
+  var fpTo = flatpickr('#rTo', {
+    locale: 'pl',
+    dateFormat: 'd.m.Y',
+    disableMobile: false
+  });
+
+  function loadPrices() {
+    fetch('prices.json?_=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.by_guests) {
+          document.getElementById('g1').value = data.by_guests['1'] || '';
+          document.getElementById('g2').value = data.by_guests['2'] || '';
+          document.getElementById('g3').value = data.by_guests['3'] || '';
+          document.getElementById('g4').value = data.by_guests['4'] || '';
+          document.getElementById('g5').value = data.by_guests['5'] || '';
+          document.getElementById('g6').value = data.by_guests['6'] || '';
+        } else if (data.per_night) {
+          // Stary format — wstaw tę samą cenę wszędzie
+          var p = data.per_night;
+          for (var i = 1; i <= 6; i++) {
+            document.getElementById('g' + i).value = p;
+          }
+        }
+        dateRanges = data.date_ranges || [];
+        renderRanges();
+      })
+      .catch(function() {
+        // Domyślne ceny gdy nie ma pliku
+        var defaults = {1:350,2:420,3:480,4:520,5:570,6:620};
+        for (var i = 1; i <= 6; i++) {
+          document.getElementById('g' + i).value = defaults[i];
+        }
+      });
+  }
+
+  // ISO date z formatu dd.mm.yyyy
+  function toISO(dmy) {
+    var parts = dmy.split('.');
+    return parts[2] + '-' + parts[1] + '-' + parts[0];
+  }
+
+  // Formatuj ISO do czytelnego dd.mm.yyyy
+  function fromISO(iso) {
+    if (!iso) return '';
+    var p = iso.split('-');
+    return p[2] + '.' + p[1] + '.' + p[0];
+  }
+
+  function renderRanges() {
+    var tbody = document.getElementById('rangesBody');
+    if (dateRanges.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty">Brak zakresów. Dodaj poniżej.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = '';
+    dateRanges.forEach(function(r, idx) {
+      var bg = r.by_guests || {};
+      var period = fromISO(r.from) + ' – ' + fromISO(r.to);
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + period + '</td>'
+        + '<td>' + (r.label || '—') + '</td>'
+        + '<td>' + (bg['1'] || '—') + '</td>'
+        + '<td>' + (bg['2'] || '—') + '</td>'
+        + '<td>' + (bg['3'] || '—') + '</td>'
+        + '<td>' + (bg['4'] || '—') + '</td>'
+        + '<td>' + (bg['5'] || '—') + '</td>'
+        + '<td>' + (bg['6'] || '—') + '</td>'
+        + '<td><button class="btn-del" onclick="removeRange(' + idx + ')">Usuń</button></td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  function getRangePrices() {
+    var prices = {};
+    for (var i = 1; i <= 6; i++) {
+      var val = parseInt(document.getElementById('rg' + i).value);
+      if (!val || val < 50 || val > 9999) {
+        alert('Podaj prawidłową cenę dla ' + i + (i === 1 ? ' osoby' : ' osób') + ' w zakresie (50–9999 zł).');
+        return null;
+      }
+      prices[String(i)] = val;
+    }
+    return prices;
+  }
+
+  function addRange() {
+    var from  = document.getElementById('rFrom').value;
+    var to    = document.getElementById('rTo').value;
+    var label = document.getElementById('rLabel').value.trim();
+
+    if (!from || !to) { alert('Wybierz daty zakresu.'); return; }
+
+    var byGuests = getRangePrices();
+    if (!byGuests) return;
+
+    dateRanges.push({
+      from: toISO(from),
+      to: toISO(to),
+      label: label,
+      by_guests: byGuests
+    });
+
+    dateRanges.sort(function(a, b) { return a.from.localeCompare(b.from); });
+    renderRanges();
+
+    // Wyczyść formularz
+    fpFrom.clear();
+    fpTo.clear();
+    document.getElementById('rLabel').value = '';
+    for (var i = 1; i <= 6; i++) { document.getElementById('rg' + i).value = ''; }
+  }
+
+  function removeRange(idx) {
+    dateRanges.splice(idx, 1);
+    renderRanges();
+  }
+
+  function getGuestPrices() {
+    var prices = {};
+    for (var i = 1; i <= 6; i++) {
+      var val = parseInt(document.getElementById('g' + i).value);
+      if (!val || val < 50 || val > 9999) {
+        alert('Cena dla ' + i + ' ' + (i === 1 ? 'osoby' : 'osób') + ' jest nieprawidłowa (50–9999 zł).');
+        return null;
+      }
+      prices[String(i)] = val;
+    }
+    return prices;
+  }
+
+  async function saveAll() {
+    var byGuests = getGuestPrices();
+    if (!byGuests) return;
+
+    var btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Zapisywanie…';
+
+    var pwd = sessionStorage.getItem('adminPwd') || '';
+
+    var payload = {
+      type: 'prices',
+      by_guests: byGuests,
+      date_ranges: dateRanges,
+      password: pwd
+    };
+
+    try {
+      var r = await fetch(SAVE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      showMsg('ok', 'Ceny zapisane pomyślnie (' + new Date().toLocaleTimeString('pl-PL') + ')');
+    } catch(err) {
+      showMsg('err', 'Błąd zapisywania. Sprawdź połączenie lub spróbuj ponownie.');
+      console.error(err);
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Zapisz wszystkie ceny';
+  }
+
+  function showMsg(type, text) {
+    var el = document.getElementById('saveMsg');
+    el.className = 'msg ' + type;
+    el.textContent = text;
+  }
+
+  // ===== PRODUKTY =====
+
+  function loadProducts() {
+    fetch('products.json?_=' + Date.now())
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        products = data.products || [];
+        renderProducts();
+      })
+      .catch(function() {
+        products = [];
+        renderProducts();
+      });
+  }
+
+  var editingIdx = -1;
+
+  function renderProducts() {
+    var tbody = document.getElementById('productsBody');
+    if (products.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">Brak produktów. Dodaj poniżej.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = '';
+    products.forEach(function(p, idx) {
+      var thumb = p.image
+        ? '<img src="' + escHtml(p.image) + '" style="width:56px;height:44px;object-fit:cover;border-radius:6px;display:block;" onerror="this.style.opacity=\'0\'">'
+        : '<div style="width:56px;height:44px;background:#f0ebe3;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:1.2rem;">&#128247;</div>';
+
+      var nameHtml = '<strong>' + escHtml(p.name) + '</strong>';
+      if (p.description) {
+        nameHtml += '<br><span style="font-size:0.78rem;color:#aaa;font-style:italic;">'
+          + escHtml(p.description.length > 55 ? p.description.substring(0, 55) + '…' : p.description)
+          + '</span>';
+      }
+
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + thumb + '</td>'
+        + '<td>' + nameHtml + '</td>'
+        + '<td>' + p.price + ' zł</td>'
+        + '<td style="color:' + (p.available ? '#2e7d32' : '#c62828') + ';font-weight:600;">' + (p.available ? '✓' : '✗') + '</td>'
+        + '<td style="display:flex;gap:5px;flex-wrap:nowrap;align-items:center;">'
+        + '<button class="btn-add" style="font-size:0.75rem;padding:5px 10px;background:#8b6914;" onclick="openEdit(' + idx + ')">Edytuj</button>'
+        + '<button class="btn-del" onclick="toggleAvailable(' + idx + ')">' + (p.available ? 'Ukryj' : 'Pokaż') + '</button>'
+        + '<button class="btn-del" onclick="removeProduct(' + idx + ')">Usuń</button>'
+        + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  function openEdit(idx) {
+    editingIdx = idx;
+    var p = products[idx];
+    document.getElementById('eName').value        = p.name        || '';
+    document.getElementById('ePrice').value       = p.price       || '';
+    document.getElementById('eOrigin').value      = p.origin      || '';
+    document.getElementById('eDescription').value = p.description || '';
+    document.getElementById('eImage').value       = p.image       || '';
+    updatePreview('eImage', 'ePreview');
+    var panel = document.getElementById('editPanel');
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function saveEdit() {
+    if (editingIdx < 0) return;
+    var name  = document.getElementById('eName').value.trim();
+    var price = parseInt(document.getElementById('ePrice').value);
+    if (!name)         { alert('Podaj nazwę produktu.');      return; }
+    if (!price || price < 1) { alert('Podaj cenę produktu.'); return; }
+    products[editingIdx].name        = name;
+    products[editingIdx].price       = price;
+    products[editingIdx].origin      = document.getElementById('eOrigin').value.trim();
+    products[editingIdx].description = document.getElementById('eDescription').value.trim();
+    products[editingIdx].image       = document.getElementById('eImage').value.trim();
+    renderProducts();
+    closeEdit();
+  }
+
+  function closeEdit() {
+    editingIdx = -1;
+    document.getElementById('editPanel').style.display = 'none';
+  }
+
+  function updatePreview(inputId, previewId) {
+    var url = document.getElementById(inputId).value.trim();
+    var img = document.getElementById(previewId);
+    if (url) {
+      img.src = url;
+      img.style.display = 'block';
+    } else {
+      img.style.display = 'none';
+    }
+  }
+
+  function escHtml(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function addProduct() {
+    var name = document.getElementById('pName').value.trim();
+    var price = parseInt(document.getElementById('pPrice').value);
+    var origin = document.getElementById('pOrigin').value.trim();
+    var description = document.getElementById('pDescription').value.trim();
+    var image = document.getElementById('pImage').value.trim();
+
+    if (!name) { alert('Podaj nazwę produktu.'); return; }
+    if (!price || price < 1) { alert('Podaj cenę produktu (min. 1 zł).'); return; }
+
+    var id = name.toLowerCase()
+      .replace(/ą/g,'a').replace(/ć/g,'c').replace(/ę/g,'e')
+      .replace(/ł/g,'l').replace(/ń/g,'n').replace(/ó/g,'o')
+      .replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z')
+      .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+    products.push({
+      id: id,
+      name: name,
+      origin: origin,
+      description: description,
+      price: price,
+      image: image,
+      available: true
+    });
+
+    renderProducts();
+
+    document.getElementById('pName').value = '';
+    document.getElementById('pPrice').value = '';
+    document.getElementById('pOrigin').value = '';
+    document.getElementById('pDescription').value = '';
+    document.getElementById('pImage').value = '';
+  }
+
+  function toggleAvailable(idx) {
+    products[idx].available = !products[idx].available;
+    renderProducts();
+  }
+
+  function removeProduct(idx) {
+    if (!confirm('Na pewno usunąć produkt „' + products[idx].name + '"?')) return;
+    products.splice(idx, 1);
+    renderProducts();
+  }
+
+  async function saveProducts() {
+    var btn = document.getElementById('saveProductsBtn');
+    btn.disabled = true;
+    btn.textContent = 'Zapisywanie…';
+
+    var pwd = sessionStorage.getItem('adminPwd') || '';
+
+    var payload = {
+      type: 'products',
+      products: products,
+      password: pwd
+    };
+
+    try {
+      var r = await fetch(SAVE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      showProductsMsg('ok', 'Produkty zapisane (' + new Date().toLocaleTimeString('pl-PL') + ')');
+    } catch(err) {
+      showProductsMsg('err', 'Błąd zapisywania. Sprawdź połączenie lub spróbuj ponownie.');
+      console.error(err);
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Zapisz produkty';
+  }
+
+  function showProductsMsg(type, text) {
+    var el = document.getElementById('saveProductsMsg');
+    el.className = 'msg ' + type;
+    el.textContent = text;
+  }
+
+  // Auto-login jeśli hasło w sesji
+  window.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loginCard').classList.add('active');
+    var savedPwd = sessionStorage.getItem('adminPwd');
+    if (savedPwd) {
+      document.getElementById('pwd').value = savedPwd;
+      login();
+    }
+  });
+</script>
+
+</body>
+</html>

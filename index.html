@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Willa Słońce — Nocleg z Sauną w Beskidzie Śląskim</title>
+    <meta name="description" content="Willa Słońce — klimatyczny domek w Beschidzie Śląskim. Sauna, 2 tarasy, balkon z widokiem na góry. Do 6 osób. Rezerwuj bezpośrednio i zapłać 10% mniej.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Willa Słońce — Nocleg z Sauną w Beskidzie Śląskim">
+    <meta property="og:description" content="Klimatyczny domek w Beskidzie Śląskim. Sauna, 2 tarasy, balkon z widokiem na góry. Do 6 osób. Rezerwuj bezpośrednio i zapłać 10% mniej.">
+    <meta property="og:image" content="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0d91be96-fbdf-4d94-add3-287ccc658817.jpeg">
+    <meta property="og:url" content="https://willaslonce.pl">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pl_PL">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Schema.org LodgingBusiness -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LodgingBusiness",
+        "name": "Willa Słońce",
+        "description": "Klimatyczny domek w Beskidzie Śląskim. Sauna, 2 tarasy, balkon z widokiem na góry. Do 6 osób.",
+        "url": "https://willaslonce.pl",
+        "image": "https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0d91be96-fbdf-4d94-add3-287ccc658817.jpeg",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "ul. Markówka 26",
+            "addressLocality": "Brenna",
+            "postalCode": "43-438",
+            "addressRegion": "śląskie",
+            "addressCountry": "PL"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 49.7167,
+            "longitude": 18.9000
+        },
+        "telephone": "+48 690 300 359",
+        "email": "marcelhoffman@gmail.com",
+        "priceRange": "350-550 PLN/noc",
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "9.1",
+            "bestRating": "10",
+            "ratingCount": "87"
+        },
+        "amenityFeature": [
+            {"@type": "LocationFeatureSpecification", "name": "Sauna fińska", "value": true},
+            {"@type": "LocationFeatureSpecification", "name": "WiFi", "value": true},
+            {"@type": "LocationFeatureSpecification", "name": "Parking", "value": true},
+            {"@type": "LocationFeatureSpecification", "name": "Ogród", "value": true},
+            {"@type": "LocationFeatureSpecification", "name": "Grill", "value": true}
+        ],
+        "numberOfRooms": 1,
+        "checkinTime": "15:00",
+        "checkoutTime": "11:00"
+    }
+    </script>
+
+    <!-- Schema.org FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Ile kosztuje nocleg w Willi Słońce?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Ceny zaczynają się od 350 zł/noc w niskim sezonie (pon-czw, IX-V). W weekendy 450 zł/noc, w wysokim sezonie (ferie, święta, VII-VIII) 550 zł/noc. Rezerwując bezpośrednio płacisz 10% mniej niż na Booking.com."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Czy domek ma saunę?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Tak, domek posiada saunę fińską dostępną dla gości bez dodatkowych opłat."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Ile osób może nocować w domku?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Domek posiada sypialnię z dwoma łóżkami podwójnymi oraz kanapę rozkładaną na parterze. Może pomieścić do 6 osób."
+                }
+            }
+        ]
+    }
+    </script>
+</head>
+<body>
+
+    <!-- Pasek postępu przewijania -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- NAWIGACJA -->
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <a href="#hero" class="nav-logo">Willa Słońce</a>
+
+            <div class="nav-links" id="navLinks">
+                <a href="#o-domku" class="nav-link">Domek</a>
+                <a href="#galeria" class="nav-link">Galeria</a>
+                <a href="#rezerwacje" class="nav-link">Rezerwacje</a>
+                <a href="#sklep" class="nav-link">Sklep</a>
+                <a href="#blog" class="nav-link">Blog</a>
+            </div>
+
+            <a href="#rezerwacje" class="nav-cta">Rezerwuj</a>
+
+            <button class="hamburger" id="hamburger" aria-label="Otwórz menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Menu mobilne -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="#o-domku" class="mobile-menu-link">Domek</a>
+            <a href="#galeria" class="mobile-menu-link">Galeria</a>
+            <a href="#rezerwacje" class="mobile-menu-link">Rezerwacje</a>
+            <a href="#sklep" class="mobile-menu-link">Sklep</a>
+            <a href="#blog" class="mobile-menu-link">Blog</a>
+            <a href="#rezerwacje" class="mobile-menu-cta">Rezerwuj</a>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="hero-bg" style="background-image: url('https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0d91be96-fbdf-4d94-add3-287ccc658817.jpeg')"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="hero-label">Beskid Śląski &middot; Brenna</span>
+            <h1 class="hero-title">Twój kawałek<br>ciszy w <em class="accent">Beskidach</em></h1>
+            <p class="hero-subtitle">Sauna &middot; 2 tarasy &middot; Balkon z widokiem na góry &middot; Do 6 osób</p>
+            <div class="hero-buttons">
+                <a href="#rezerwacje" class="btn btn-primary">Sprawdź dostępność</a>
+                <a href="#o-domku" class="btn btn-outline-white">Poznaj domek</a>
+            </div>
+        </div>
+        <div class="hero-scroll-indicator">
+            <div class="scroll-line"></div>
+        </div>
+        <div class="hero-dots">
+            <a href="#hero" class="dot active" data-section="hero"></a>
+            <a href="#o-domku" class="dot" data-section="o-domku"></a>
+            <a href="#cytat" class="dot" data-section="cytat"></a>
+            <a href="#udogodnienia" class="dot" data-section="udogodnienia"></a>
+            <a href="#galeria" class="dot" data-section="galeria"></a>
+            <a href="#rezerwacje" class="dot" data-section="rezerwacje"></a>
+        </div>
+    </section>
+
+    <!-- O DOMKU -->
+    <section class="section section-light" id="o-domku">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text animate-on-scroll">
+                    <span class="section-label">O miejscu</span>
+                    <h2 class="section-heading">Miejsce, które<br>pamięta <em class="accent">ciszę</em></h2>
+                    <p>Są takie miejsca, do których wraca się nie dlatego, że trzeba, ale dlatego, że ciało samo o nich przypomina. Domek w Brennej jest właśnie taki.</p>
+                    <p>Stoi w dolinie Brennicy, w cieniu starych świerków. Wystarczająco blisko szlaków, żeby ruszyć na Błatnią przed śniadaniem. Wystarczająco daleko od drogi, żeby zapomnieć, że gdzieś tam istnieje reszta świata.</p>
+                    <p>Kiedy otworzysz drzwi, poczujesz to od razu — zapach drewna, światło wpadające przez duże okna, ciszę, która nie jest pusta, tylko pełna.</p>
+                </div>
+                <div class="about-image animate-on-scroll delay-2">
+                    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/d402f7d7-7d2a-4953-8fc4-aac90db4993e.jpeg" alt="Taras z leżakami w słońcu" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WIELKI CYTAT -->
+    <section class="section section-light section-quote" id="cytat">
+        <div class="container">
+            <blockquote class="big-quote animate-on-scroll">
+                <p>Nie obiecujemy luksusu<br>z <em class="accent">katalogu</em>.<br>Obiecujemy coś lepszego —<br><em class="accent">czas, który znowu<br>należy do Ciebie.</em></p>
+                <cite>— Ocena 9.1/10 na Booking.com</cite>
+            </blockquote>
+        </div>
+    </section>
+
+    <!-- UDOGODNIENIA -->
+    <section class="section section-dark" id="udogodnienia">
+        <div class="container">
+            <span class="section-label section-label-light animate-on-scroll">Co oferujemy</span>
+            <div class="amenities-grid">
+                <div class="amenity-item animate-on-scroll delay-1">
+                    <h3>Sauna fińska</h3>
+                    <p>Relaks po całym dniu w górach</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-2">
+                    <h3>Sypialnia</h3>
+                    <p>Duże łóżko podwójne + drugie łóżko podwójne</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-3">
+                    <h3>Kanapa rozkładana</h3>
+                    <p>2-osobowa, na parterze</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-1">
+                    <h3>Balkon</h3>
+                    <p>Panoramiczny widok na góry</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-2">
+                    <h3>2 Tarasy</h3>
+                    <p>Słoneczne, z meblami ogrodowymi</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-3">
+                    <h3>1 Łazienka</h3>
+                    <p>Prysznic, pralka, suszarka</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-1">
+                    <h3>Kuchnia</h3>
+                    <p>W pełni wyposażona, zmywarka</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-2">
+                    <h3>Grill i ognisko</h3>
+                    <p>Wieczory przy ogniu, pod gwiazdami</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-3">
+                    <h3>WiFi</h3>
+                    <p>Szybkie łącze, idealne do pracy zdalnej</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-1">
+                    <h3>Parking</h3>
+                    <p>Bezpłatny, na terenie posesji</p>
+                </div>
+                <div class="amenity-item animate-on-scroll delay-2">
+                    <h3>Ogród</h3>
+                    <p>Przestronny, z widokiem na las</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALERIA -->
+    <section class="section section-light" id="galeria">
+        <div class="container">
+            <span class="section-label animate-on-scroll">Galeria</span>
+            <h2 class="section-heading animate-on-scroll">Zobacz <em class="accent">domek</em></h2>
+            <div class="gallery-grid animate-on-scroll delay-1">
+                <div class="gallery-item gallery-item-large">
+                    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0d91be96-fbdf-4d94-add3-287ccc658817.jpeg" alt="Willa Słońce — drewniany dom z bali, widok z zewnątrz" loading="lazy">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/3ab1ca4a-262e-478d-9b60-e61e2f05c4cb.jpeg" alt="Przytulny salon z kanapą i drewnianymi ścianami" loading="lazy">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/0735ea0d-a7eb-4d52-a0ec-09de3f29df08.jpeg" alt="Sypialnia na poddaszu z rzeźbionym łóżkiem" loading="lazy">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/89c67bf2-6090-4387-be7e-7057de50fedd.jpeg" alt="Balkon z rzeźbioną balustradą i widokiem na góry" loading="lazy">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/d402f7d7-7d2a-4953-8fc4-aac90db4993e.jpeg" alt="Taras z żółtymi leżakami w słońcu" loading="lazy">
+                </div>
+            </div>
+            <a href="galeria.html" class="link-arrow animate-on-scroll delay-2">Zobacz wszystkie zdjęcia &rarr;</a>
+        </div>
+    </section>
+
+    <!-- PRZERWA — ZDJĘCIE NA CAŁĄ SZEROKOŚĆ -->
+    <section class="parallax-break parallax" id="parallax-break">
+        <div class="parallax-bg" style="background-image: url('https://a0.muscache.com/im/pictures/hosting/Hosting-1235657528535677832/original/3d8f7c0b-b641-4830-b3a6-f7a1aa600ec3.jpeg')"></div>
+        <div class="parallax-overlay"></div>
+        <div class="parallax-text">
+            <p>W Brennej czas płynie <em class="accent">wolniej</em></p>
+        </div>
+    </section>
+
+    <!-- REZERWACJE -->
+    <section class="section section-light" id="rezerwacje">
+        <div class="container">
+            <span class="section-label animate-on-scroll">Rezerwacje</span>
+            <h2 class="section-heading animate-on-scroll">Zarezerwuj <em class="accent">bezpośrednio</em></h2>
+            <p class="section-subtext animate-on-scroll">Płacisz 10% mniej niż na Booking.com. Bez pośredników.</p>
+
+            <!-- BOOKING WIDGET: kalendarz + panel rezerwacji obok siebie -->
+            <div class="booking-widget animate-on-scroll delay-1">
+
+                <!-- LEWA: Kalendarz dostępności -->
+                <div class="calendar-section">
+                    <h3 class="calendar-title">Dostępność</h3>
+                    <div class="calendar-legend">
+                        <span class="legend-item"><span class="legend-dot legend-free"></span> Wolne</span>
+                        <span class="legend-item"><span class="legend-dot legend-booked"></span> Zarezerwowane</span>
+                        <span class="legend-item"><span class="legend-dot legend-selected"></span> Twój wybór</span>
+                    </div>
+                    <div class="calendar-nav">
+                        <button class="calendar-nav-btn" id="calPrev" aria-label="Poprzedni miesiąc">&larr;</button>
+                        <span class="calendar-month-label" id="calMonthLabel"></span>
+                        <button class="calendar-nav-btn" id="calNext" aria-label="Następny miesiąc">&rarr;</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <div class="calendar-header">
+                            <span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span>Sob</span><span>Nd</span>
+                        </div>
+                        <div class="calendar-days" id="calendarDays"></div>
+                    </div>
+                </div>
+
+                <!-- PRAWA: Panel rezerwacji -->
+                <div class="booking-panel">
+                    <h3 class="booking-panel-title">Twoja rezerwacja</h3>
+                    <p class="booking-panel-hint">Kliknij daty w kalendarzu lub wpisz ręcznie.</p>
+
+                    <p class="booking-panel-step" id="bookingStep">&#8592; Kliknij datę przyjazdu w kalendarzu</p>
+
+                    <form id="bookingForm" novalidate>
+                        <div class="form-group booking-panel-field">
+                            <label for="checkIn">Przyjazd</label>
+                            <input type="text" id="checkIn" name="checkIn" placeholder="— nie wybrano —" readonly>
+                        </div>
+                        <div class="form-group booking-panel-field">
+                            <label for="checkOut">Wyjazd</label>
+                            <input type="text" id="checkOut" name="checkOut" placeholder="— nie wybrano —" readonly>
+                        </div>
+                        <div class="form-group booking-panel-field">
+                            <label for="guests">Liczba gości</label>
+                            <select id="guests" name="guests">
+                                <option value="" disabled selected>Wybierz</option>
+                                <option value="1">1 osoba</option>
+                                <option value="2">2 osoby</option>
+                                <option value="3">3 osoby</option>
+                                <option value="4">4 osoby</option>
+                                <option value="5">5 osób</option>
+                                <option value="6">6 osób</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary booking-panel-btn" id="bookingBtn" disabled>Przejdź do rezerwacji &rarr;</button>
+                    </form>
+
+                    <div class="booking-panel-note">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        Rezerwacja bezpośrednia — bez prowizji portalu
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SKLEP -->
+    <section class="section section-dark" id="sklep">
+        <div class="container">
+            <span class="section-label section-label-light animate-on-scroll">Lokalne smaki</span>
+            <h2 class="section-heading section-heading-light animate-on-scroll">Beskidy na <em class="accent">talerzu</em></h2>
+            <div class="shop-grid animate-on-scroll delay-1">
+                <div class="shop-card">
+                    <h3>Miód beskidzki</h3>
+                    <p class="shop-desc">Wielokwiatowy, prosto z pasieki w dolinie Brennicy</p>
+                    <span class="shop-price">39 zł</span>
+                </div>
+                <div class="shop-card">
+                    <h3>Nalewka „Brennicówka"</h3>
+                    <p class="shop-desc">Domowa, na beskidzkich ziołach i owocach</p>
+                    <span class="shop-price">59 zł</span>
+                </div>
+                <div class="shop-card">
+                    <h3>Kosz powitalny</h3>
+                    <p class="shop-desc">Miód, nalewka, ser góralski i regionalne przysmaki</p>
+                    <span class="shop-price">od 89 zł</span>
+                </div>
+            </div>
+            <a href="sklep.html" class="link-arrow link-arrow-light animate-on-scroll delay-2">Zobacz cały sklep &rarr;</a>
+        </div>
+    </section>
+
+    <!-- PROGRAM LOJALNOŚCIOWY + BLOG -->
+    <section class="section section-light" id="blog">
+        <div class="container">
+            <div class="split-grid">
+                <div class="split-left animate-on-scroll">
+                    <span class="section-label">Program lojalnościowy</span>
+                    <h2 class="section-heading">Klub Przyjaciół<br><em class="accent">Domku</em></h2>
+                    <div class="loyalty-timeline">
+                        <div class="loyalty-step">
+                            <div class="loyalty-dot"></div>
+                            <div class="loyalty-content">
+                                <strong>2. pobyt</strong>
+                                <p>Upominek powitalny od nas</p>
+                            </div>
+                        </div>
+                        <div class="loyalty-step">
+                            <div class="loyalty-dot"></div>
+                            <div class="loyalty-content">
+                                <strong>3. pobyt</strong>
+                                <p>10% rabatu na nocleg</p>
+                            </div>
+                        </div>
+                        <div class="loyalty-step">
+                            <div class="loyalty-dot"></div>
+                            <div class="loyalty-content">
+                                <strong>5. pobyt</strong>
+                                <p>20% rabatu + kosz powitalny gratis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="split-right animate-on-scroll delay-2">
+                    <span class="section-label">Z Brennej</span>
+                    <h2 class="section-heading">Z <em class="accent">Brennej</em> — blog</h2>
+                    <div class="blog-cards">
+                        <article class="blog-card">
+                            <span class="blog-date">8 marca 2026</span>
+                            <h3 class="blog-title"><a href="blog.html">5 szlaków w Brennej, które musisz przejść</a></h3>
+                            <p class="blog-excerpt">Od łatwych spacerów po ambitne trasy — przewodnik po najlepszych szlakach w okolicy domku.</p>
+                        </article>
+                        <article class="blog-card">
+                            <span class="blog-date">22 lutego 2026</span>
+                            <h3 class="blog-title"><a href="blog.html">Brenna zimą — dlaczego warto przyjechać poza sezonem</a></h3>
+                            <p class="blog-excerpt">Cisza, niższe ceny i sauna po całym dniu na szlaku. Zimowa Brenna ma swój niepowtarzalny urok.</p>
+                        </article>
+                    </div>
+                    <a href="blog.html" class="link-arrow">Czytaj więcej &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section section-dark section-cta" id="cta">
+        <div class="container">
+            <h2 class="cta-heading animate-on-scroll">Dołącz do<br>świata <em class="accent">Willi Słońce</em></h2>
+            <p class="cta-subtext animate-on-scroll delay-1">Rezerwuj online, telefonicznie lub mailowo — wybierz swoją formę wypoczynku.</p>
+            <div class="cta-buttons animate-on-scroll delay-2">
+                <a href="#rezerwacje" class="btn btn-primary">Rezerwuj</a>
+                <a href="#footer" class="btn btn-outline-white">Kontakt</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STOPKA -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4 class="footer-heading">O nas</h4>
+                    <p class="footer-text">Willa Słońce to klimatyczny dom w Beskidzie Śląskim. Cisza, natura i komfort — wszystko, czego potrzebujesz na górski wypoczynek.</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Nawigacja</h4>
+                    <ul class="footer-links">
+                        <li><a href="#o-domku">Domek</a></li>
+                        <li><a href="#galeria">Galeria</a></li>
+                        <li><a href="#rezerwacje">Rezerwacje</a></li>
+                        <li><a href="#sklep">Sklep</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Kontakt</h4>
+                    <ul class="footer-links">
+                        <li>ul. Markówka 26, 43-438 Brenna</li>
+                        <li><a href="tel:+48690300359">+48 690 300 359</a></li>
+                        <li><a href="mailto:marcelhoffman@gmail.com">marcelhoffman@gmail.com</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Social</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://instagram.com/willa_slonce" target="_blank" rel="noopener">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Willa Słońce. Wszelkie prawa zastrzeżone.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Polityka prywatności</a>
+                    <a href="#">Regulamin</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

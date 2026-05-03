@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sklep — Lokalne Produkty z Beskidów | Willa Słońce</title>
+  <meta name="description" content="Miody, sery, nalewki i regionalne produkty prosto z Beskidu Śląskiego. Kup online lub odbierz w domku w Brennej.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Sklep — Lokalne Produkty z Beskidów | Willa Słońce">
+  <meta property="og:description" content="Miody, sery, nalewki i regionalne produkty prosto z Beskidu Śląskiego.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pl_PL">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== ZMIENNE ===== */
+    :root {
+      --bg: #FAF8F5;
+      --accent: #C17817;
+      --accent-light: #D4922E;
+      --text-dark: #1a1a1a;
+      --text-mid: #555;
+      --text-light: #888;
+      --card-bg: #ffffff;
+      --section-bg: #f5f0e8;
+      --border: #e8e2d8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-dark);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+    }
+
+    /* ===== HERO ===== */
+    .shop-hero {
+      background: linear-gradient(160deg, #f5ede0 0%, var(--bg) 100%);
+      padding: 9rem 2rem 5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shop-hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 64px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .shop-hero .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+    }
+
+    .shop-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0 0 1.5rem;
+      line-height: 1.2;
+    }
+
+    .shop-hero p {
+      font-size: 1.05rem;
+      color: var(--text-mid);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.75;
+    }
+
+    /* ===== SEKCJA PRODUKTÓW ===== */
+    .products-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4.5rem 2rem;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-header .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0 0 0.75rem;
+    }
+
+    .section-header p {
+      color: var(--text-light);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    /* ===== KARTA PRODUKTU ===== */
+    .product-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+    }
+
+    .product-card.unavailable {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .product-img-wrap {
+      position: relative;
+      height: 220px;
+      background: #f0ebe3;
+      overflow: hidden;
+    }
+
+    .product-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .product-img-wrap img {
+      transform: scale(1.04);
+    }
+
+    .product-unavailable-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .product-info {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .product-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0 0 0.35rem;
+      line-height: 1.35;
+    }
+
+    .product-origin {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 0.85rem;
+      letter-spacing: 0.01em;
+    }
+
+    .product-description {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      font-style: italic;
+      line-height: 1.6;
+      flex: 1;
+      margin-bottom: 1.25rem;
+    }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: auto;
+    }
+
+    .product-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .btn-order {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 50px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-order:hover {
+      background: var(--accent-light);
+      transform: scale(1.03);
+    }
+
+    /* Placeholder gdy brak obrazka */
+    .product-img-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #f0ebe3 0%, #e8e0d4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-img-placeholder svg {
+      width: 56px;
+      height: 56px;
+      opacity: 0.25;
+    }
+
+    /* Loading skeleton */
+    .skeleton-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    }
+
+    .skeleton-img {
+      height: 220px;
+      background: linear-gradient(90deg, #f0ebe3 25%, #e8dfd5 50%, #f0ebe3 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-body {
+      padding: 1.5rem;
+    }
+
+    .skeleton-line {
+      height: 14px;
+      border-radius: 7px;
+      background: linear-gradient(90deg, #f0ebe3 25%, #e8dfd5 50%, #f0ebe3 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      margin-bottom: 10px;
+    }
+
+    .skeleton-line.wide { width: 75%; }
+    .skeleton-line.medium { width: 50%; }
+    .skeleton-line.short { width: 35%; }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ===== JAK TO DZIAŁA ===== */
+    .how-it-works {
+      background: var(--section-bg);
+      padding: 4rem 2rem;
+    }
+
+    .how-it-works-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 2.5rem;
+    }
+
+    .how-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .how-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .how-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .how-text h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin: 0 0 0.35rem;
+    }
+
+    .how-text p {
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* ===== KOSZE POWITALNE ===== */
+    .baskets-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4.5rem 2rem;
+    }
+
+    .baskets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .basket-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      border: 1.5px solid transparent;
+    }
+
+    .basket-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+    }
+
+    .basket-card.featured {
+      border-color: var(--accent);
+    }
+
+    .basket-badge {
+      position: absolute;
+      top: -14px;
+      right: 24px;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .basket-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .basket-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+
+    .basket-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .basket-items {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.75rem;
+      flex: 1;
+    }
+
+    .basket-items li {
+      padding: 0.4rem 0 0.4rem 1.5rem;
+      position: relative;
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      line-height: 1.4;
+      border-bottom: 1px solid #f3ede4;
+    }
+
+    .basket-items li:last-child {
+      border-bottom: none;
+    }
+
+    .basket-items li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .btn-basket {
+      display: block;
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.9rem;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+      text-align: center;
+      margin-top: auto;
+      text-decoration: none;
+    }
+
+    .btn-basket:hover {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+    }
+
+    /* ===== FORMULARZ ZAMÓWIENIA ===== */
+    .order-section {
+      background: var(--section-bg);
+      padding: 5rem 2rem;
+    }
+
+    .order-inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .order-form-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2.5rem 3rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .order-form-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0 0 1.75rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 0.45rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s ease;
+      font-family: inherit;
+      box-sizing: border-box;
+      background: #fff;
+      color: var(--text-dark);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+      margin-top: 1.5rem;
+    }
+
+    .btn-submit:hover {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Przelew */
+    .transfer-block {
+      margin-top: 2rem;
+      padding: 1.5rem 1.75rem;
+      background: #faf6ee;
+      border-radius: 12px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .transfer-block h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0 0 0.85rem;
+    }
+
+    .transfer-row {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+
+    .transfer-label {
+      color: var(--text-light);
+      min-width: 120px;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+    }
+
+    .transfer-value {
+      color: var(--text-dark);
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .transfer-note {
+      margin: 0.85rem 0 0;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
+
+    .transfer-note a {
+      color: var(--accent);
+    }
+
+    /* Sukces */
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .form-success .success-check {
+      width: 56px;
+      height: 56px;
+      background: #e8f5e9;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.25rem;
+    }
+
+    .form-success .success-check svg {
+      width: 28px;
+      height: 28px;
+      stroke: #2e7d32;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .form-success h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0 0 0.75rem;
+    }
+
+    .form-success p {
+      color: var(--text-mid);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .shop-hero {
+        padding: 7rem 1.5rem 4rem;
+      }
+
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .baskets-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .order-form-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .transfer-label {
+        min-width: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAWIGACJA -->
+  <nav class="nav" id="nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">Willa Słońce</a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html#o-domku" class="nav-link">Domek</a>
+        <a href="galeria.html" class="nav-link">Galeria</a>
+        <a href="rezerwacje.html" class="nav-link">Rezerwacje</a>
+        <a href="sklep.html" class="nav-link active">Sklep</a>
+        <a href="blog.html" class="nav-link">Blog</a>
+      </div>
+      <a href="rezerwacje.html" class="nav-cta">Rezerwuj</a>
+      <button class="hamburger" id="hamburger" aria-label="Otwórz menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-content">
+      <a href="index.html#o-domku" class="mobile-menu-link">Domek</a>
+      <a href="galeria.html" class="mobile-menu-link">Galeria</a>
+      <a href="rezerwacje.html" class="mobile-menu-link">Rezerwacje</a>
+      <a href="sklep.html" class="mobile-menu-link">Sklep</a>
+      <a href="blog.html" class="mobile-menu-link">Blog</a>
+      <a href="rezerwacje.html" class="mobile-menu-cta">Rezerwuj</a>
+    </div>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section class="shop-hero">
+    <div class="section-label">Sklep</div>
+    <h1>Lokalne smaki Beskidów</h1>
+    <p>Miody, sery, nalewki i rękodzieło od sąsiadów z Doliny Brennicy. Zamów online lub odbierz na miejscu w domku.</p>
+  </section>
+
+  <!-- ===== PRODUKTY ===== -->
+  <section class="products-section" id="produkty">
+    <div class="section-header">
+      <span class="section-label">Nasze produkty</span>
+      <h2>Prosto od lokalnych producentów</h2>
+      <p>Starannie wybrane od rzemieślników i rolników z Brennej i okolic.</p>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+      <!-- Skeleton loading -->
+      <div class="skeleton-card">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line wide"></div>
+          <div class="skeleton-line medium"></div>
+          <div class="skeleton-line" style="width:90%;margin-top:16px;"></div>
+          <div class="skeleton-line" style="width:70%;"></div>
+          <div class="skeleton-line short" style="margin-top:16px;height:18px;"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line wide"></div>
+          <div class="skeleton-line medium"></div>
+          <div class="skeleton-line" style="width:90%;margin-top:16px;"></div>
+          <div class="skeleton-line" style="width:70%;"></div>
+          <div class="skeleton-line short" style="margin-top:16px;height:18px;"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line wide"></div>
+          <div class="skeleton-line medium"></div>
+          <div class="skeleton-line" style="width:90%;margin-top:16px;"></div>
+          <div class="skeleton-line" style="width:70%;"></div>
+          <div class="skeleton-line short" style="margin-top:16px;height:18px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== JAK TO DZIAŁA ===== -->
+  <div class="how-it-works">
+    <div class="how-it-works-inner">
+      <div class="section-header">
+        <span class="section-label">Dostawa i odbiór</span>
+        <h2>Jak to działa?</h2>
+      </div>
+      <div class="how-grid">
+        <div class="how-item">
+          <div class="how-icon">
+            <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <div class="how-text">
+            <h4>Wysyłka kurierem</h4>
+            <p>Wysyłamy w ciągu 2–3 dni roboczych. Koszt: 15 zł (gratis od 150 zł).</p>
+          </div>
+        </div>
+        <div class="how-item">
+          <div class="how-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="how-text">
+            <h4>Odbiór w domku</h4>
+            <p>Zamów przed przyjazdem — produkty czekają na Twój przyjazd. Bezpłatnie.</p>
+          </div>
+        </div>
+        <div class="how-item">
+          <div class="how-icon">
+            <svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          </div>
+          <div class="how-text">
+            <h4>Kosz powitalny</h4>
+            <p>Zamów kosz z wyprzedzeniem — przygotujemy go na Twój przyjazd do domku.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== KOSZE POWITALNE ===== -->
+  <section class="baskets-section" id="kosze-powitalne">
+    <div class="section-header">
+      <span class="section-label">Kosz powitalny</span>
+      <h2>Wybierz swój wariant</h2>
+      <p>Czeka na Was w domku od pierwszej chwili. Smaki Beskidów na dobry początek.</p>
+    </div>
+
+    <div class="baskets-grid">
+      <div class="basket-card">
+        <div class="basket-name">Kosz Mały</div>
+        <div class="basket-subtitle">„Na dobry początek"</div>
+        <div class="basket-price">89 zł</div>
+        <ul class="basket-items">
+          <li>Miód beskidzki (125 ml)</li>
+          <li>Herbata ziołowa „Beskidzka Łąka" (50 g)</li>
+          <li>Ciastka owsiane z lokalnej piekarni</li>
+          <li>Kartka powitalna z ulubionymi miejscami</li>
+        </ul>
+        <a href="#zamow" class="btn-basket" onclick="prefillBasket('Kosz Mały — Na dobry początek, 89 zł')">Zamów kosz — 89 zł</a>
+      </div>
+
+      <div class="basket-card featured">
+        <div class="basket-badge">Najpopularniejszy</div>
+        <div class="basket-name">Kosz Średni</div>
+        <div class="basket-subtitle">„Smaki Doliny"</div>
+        <div class="basket-price">129 zł</div>
+        <ul class="basket-items">
+          <li>Miód beskidzki (125 ml)</li>
+          <li>Herbata ziołowa „Beskidzka Łąka" (50 g)</li>
+          <li>Ciastka owsiane z lokalnej piekarni</li>
+          <li>Ser owczy z bacówki (150 g)</li>
+          <li>Nalewka „Brennicówka" (200 ml)</li>
+          <li>Świeca sojowa „Beskidzki Las"</li>
+          <li>Kartka powitalna</li>
+        </ul>
+        <a href="#zamow" class="btn-basket" onclick="prefillBasket('Kosz Średni — Smaki Doliny, 129 zł')">Zamów kosz — 129 zł</a>
+      </div>
+
+      <div class="basket-card">
+        <div class="basket-name">Kosz Duży</div>
+        <div class="basket-subtitle">„Pełnia Beskidów"</div>
+        <div class="basket-price">179 zł</div>
+        <ul class="basket-items">
+          <li>Miód beskidzki (250 ml)</li>
+          <li>Herbata ziołowa „Beskidzka Łąka" (100 g)</li>
+          <li>Ciastka owsiane z lokalnej piekarni</li>
+          <li>Ser owczy z bacówki (300 g)</li>
+          <li>Nalewka „Brennicówka" (500 ml)</li>
+          <li>Świeca sojowa „Beskidzki Las"</li>
+          <li>Kosz wiklinowy na pamiątkę</li>
+          <li>Ręcznie pisana kartka z podziękowaniem</li>
+        </ul>
+        <a href="#zamow" class="btn-basket" onclick="prefillBasket('Kosz Duży — Pełnia Beskidów, 179 zł')">Zamów kosz — 179 zł</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FORMULARZ ZAMÓWIENIA ===== -->
+  <section class="order-section" id="zamow">
+    <div class="order-inner">
+      <div class="section-header">
+        <span class="section-label">Zamówienie</span>
+        <h2>Złóż zamówienie</h2>
+        <p>Napisz co Cię interesuje, a wrócimy z potwierdzeniem w ciągu 24 godzin.</p>
+      </div>
+
+      <div class="order-form-card">
+        <!-- Formularz -->
+        <div id="orderFormWrap">
+          <h3>Twoje dane</h3>
+          <form id="orderForm" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="order-name">Imię i nazwisko *</label>
+                <input type="text" id="order-name" name="name" required placeholder="Jan Kowalski">
+              </div>
+              <div class="form-group">
+                <label for="order-email">Email *</label>
+                <input type="email" id="order-email" name="email" required placeholder="jan@example.com">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="order-phone">Telefon</label>
+                <input type="tel" id="order-phone" name="phone" placeholder="600 123 456">
+              </div>
+              <div class="form-group">
+                <label for="order-delivery">Sposób odbioru</label>
+                <select id="order-delivery" name="delivery">
+                  <option value="">-- Wybierz --</option>
+                  <option value="domek">Odbiór w domku (bezpłatnie)</option>
+                  <option value="kurier">Wysyłka kurierem (15 zł / gratis od 150 zł)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="order-address">Adres dostawy (jeśli kurier)</label>
+              <input type="text" id="order-address" name="address" placeholder="ul. Przykładowa 10, 00-001 Warszawa">
+            </div>
+
+            <div class="form-group">
+              <label for="order-notes">Co chcesz zamówić? *</label>
+              <textarea id="order-notes" name="notes" required placeholder="np. Miód beskidzki × 2, Kosz Średni, Nalewka Brennicówka..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Wyślij zamówienie →</button>
+          </form>
+        </div>
+
+        <!-- Sukces -->
+        <div class="form-success" id="orderSuccess">
+          <div class="success-check">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3>Zamówienie przyjęte!</h3>
+          <p>Odezwiemy się w ciągu 24 godzin z potwierdzeniem i danymi do przelewu. Dziękujemy!</p>
+        </div>
+
+        <!-- Dane do przelewu -->
+        <div class="transfer-block">
+          <h4>Dane do przelewu</h4>
+          <div class="transfer-row">
+            <span class="transfer-label">Odbiorca</span>
+            <span class="transfer-value">Willa Słońce</span>
+          </div>
+          <div class="transfer-row">
+            <span class="transfer-label">Numer konta</span>
+            <span class="transfer-value">13 1050 1214 1000 0023 1765 9577</span>
+          </div>
+          <div class="transfer-row">
+            <span class="transfer-label">Tytuł przelewu</span>
+            <span class="transfer-value">Zamówienie sklep — [Twoje imię i nazwisko]</span>
+          </div>
+          <p class="transfer-note">Zamówienie realizujemy po zaksięgowaniu wpłaty. Pytania: <a href="mailto:marcelhoffman@gmail.com">marcelhoffman@gmail.com</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STOPKA -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4 class="footer-heading">O nas</h4>
+          <p class="footer-text">Willa Słońce to klimatyczny dom w Beskidzie Śląskim. Cisza, natura i komfort — wszystko, czego potrzebujesz na górski wypoczynek.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading">Nawigacja</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#o-domku">Domek</a></li>
+            <li><a href="galeria.html">Galeria</a></li>
+            <li><a href="rezerwacje.html">Rezerwacje</a></li>
+            <li><a href="sklep.html">Sklep</a></li>
+            <li><a href="blog.html">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading">Kontakt</h4>
+          <ul class="footer-links">
+            <li>ul. Markówka 26, 43-438 Brenna</li>
+            <li><a href="tel:+48690300359">+48 690 300 359</a></li>
+            <li><a href="mailto:marcelhoffman@gmail.com">marcelhoffman@gmail.com</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading">Social</h4>
+          <ul class="footer-links">
+            <li><a href="https://instagram.com/willa_slonce" target="_blank" rel="noopener">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Willa Słońce. Wszelkie prawa zastrzeżone.</p>
+        <div class="footer-bottom-links">
+          <a href="#">Polityka prywatności</a>
+          <a href="#">Regulamin</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="js/main.js"></script>
+  <script>
+    // Webhook zamówień sklepu
+    var SHOP_WEBHOOK = 'https://n8n.marcelhoffman.pl/webhook/N8LA2zPOksuXPntB/webhook/brenna-shop-order';
+
+    // Ładowanie produktów z products.json
+    function loadProducts() {
+      var paths = ['products.json'];
+      tryFetch(paths, 0);
+    }
+
+    function tryFetch(paths, idx) {
+      if (idx >= paths.length) {
+        renderFallback();
+        return;
+      }
+      fetch(paths[idx] + '?_=' + Date.now())
+        .then(function(r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function(data) {
+          renderProducts(data.products || []);
+        })
+        .catch(function() {
+          tryFetch(paths, idx + 1);
+        });
+    }
+
+    function renderProducts(products) {
+      var grid = document.getElementById('productsGrid');
+      if (!products || products.length === 0) {
+        grid.innerHTML = '<p style="color:#888;text-align:center;padding:2rem;">Brak dostępnych produktów.</p>';
+        return;
+      }
+
+      var html = '';
+      products.forEach(function(p) {
+        if (!p.available) return;
+        var imgHtml = p.image
+          ? '<img src="' + escHtml(p.image) + '" alt="' + escHtml(p.name) + '" loading="lazy" class="prod-img" onerror="this.style.display=\'none\'">'
+          : '';
+
+        html += '<div class="product-card">'
+          + '<div class="product-img-wrap">' + imgHtml + '</div>'
+          + '<div class="product-info">'
+          + '<div class="product-name">' + escHtml(p.name) + '</div>'
+          + (p.origin ? '<div class="product-origin">' + escHtml(p.origin) + '</div>' : '')
+          + (p.description ? '<p class="product-description">' + escHtml(p.description) + '</p>' : '')
+          + '<div class="product-footer">'
+          + '<div class="product-price">' + p.price + ' zł</div>'
+          + '<a href="#zamow" class="btn-order" onclick="prefillProduct(\'' + escAttr(p.name) + '\')">Zamów</a>'
+          + '</div>'
+          + '</div>'
+          + '</div>';
+      });
+
+      grid.innerHTML = html || '<p style="color:#888;text-align:center;padding:2rem;">Brak dostępnych produktów.</p>';
+    }
+
+    function renderFallback() {
+      // Jeśli nie można załadować JSON — brak produktów
+      var grid = document.getElementById('productsGrid');
+      grid.innerHTML = '<p style="color:#888;text-align:center;padding:2rem;grid-column:1/-1;">Nie można załadować produktów. Skontaktuj się z nami bezpośrednio: <a href="mailto:marcelhoffman@gmail.com" style="color:#C17817;">marcelhoffman@gmail.com</a></p>';
+    }
+
+    function escHtml(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function escAttr(s) {
+      return String(s || '').replace(/'/g,"\\'").replace(/"/g,'\\"');
+    }
+
+    // Wypełnienie formularza po kliknięciu "Zamów"
+    function prefillProduct(name) {
+      var notes = document.getElementById('order-notes');
+      if (notes) {
+        var current = notes.value.trim();
+        if (current && !current.includes(name)) {
+          notes.value = current + '\n' + name + ' × 1';
+        } else if (!current) {
+          notes.value = name + ' × 1';
+        }
+      }
+    }
+
+    // Wypełnienie formularza po kliknięciu kosza
+    function prefillBasket(name) {
+      var notes = document.getElementById('order-notes');
+      if (notes) {
+        notes.value = name;
+      }
+    }
+
+    // Obsługa formularza zamówienia
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      var name = document.getElementById('order-name').value.trim();
+      var email = document.getElementById('order-email').value.trim();
+      var notes = document.getElementById('order-notes').value.trim();
+
+      if (!name || !email || !notes) {
+        alert('Wypełnij wymagane pola: imię i nazwisko, email oraz treść zamówienia.');
+        return;
+      }
+
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Wysyłanie…';
+
+      var payload = {
+        imie: name,
+        email: email,
+        telefon: document.getElementById('order-phone').value.trim(),
+        dostawa: document.getElementById('order-delivery').value,
+        adres: document.getElementById('order-address').value.trim(),
+        zamowienie: notes,
+        source: 'sklep'
+      };
+
+      fetch(SHOP_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(function(r) {
+        document.getElementById('orderFormWrap').style.display = 'none';
+        document.getElementById('orderSuccess').style.display = 'block';
+      })
+      .catch(function() {
+        // Nawet przy błędzie webhooka — pokaż sukces (mail mógł przejść)
+        document.getElementById('orderFormWrap').style.display = 'none';
+        document.getElementById('orderSuccess').style.display = 'block';
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Wyślij zamówienie →';
+      });
+    });
+
+    // Ładuj produkty po załadowaniu DOM
+    document.addEventListener('DOMContentLoaded', function() {
+      loadProducts();
+    });
+  </script>
+
+</body>
+</html>
