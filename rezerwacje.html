@@ -453,12 +453,22 @@
           </details>
 
           <!-- Metoda płatności -->
-          <div class="payment-info" style="margin-top:20px;">
-            <h4>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              Płatność — przelew tradycyjny
-            </h4>
-            <p>Po złożeniu rezerwacji wyślemy Ci numer konta do wpłaty. Termin zostaje zarezerwowany po zaksięgowaniu <strong>100% kwoty pobytu</strong> w ciągu 48h.</p>
+          <div style="margin-bottom:24px;">
+            <div style="font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text-dark);margin-bottom:12px;">Metoda płatności *</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <label class="pay-card" id="payBankCard" style="border:2px solid var(--green-dark);border-radius:12px;padding:14px;cursor:pointer;text-align:center;background:rgba(74,93,66,.04);">
+                <input type="radio" name="payment_method" value="bank" checked style="display:none;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green-dark)" stroke-width="1.8" style="display:block;margin:0 auto 6px;"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <span style="font-size:.82rem;font-weight:700;color:var(--text-dark);display:block;">Przelew bankowy</span>
+                <span style="font-size:.72rem;color:var(--text-light);display:block;margin-top:2px;">Dane po złożeniu</span>
+              </label>
+              <label class="pay-card" id="payP24Card" style="border:2px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;text-align:center;">
+                <input type="radio" name="payment_method" value="p24" style="display:none;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--copper)" stroke-width="1.8" style="display:block;margin:0 auto 6px;"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>
+                <span style="font-size:.82rem;font-weight:700;color:var(--text-dark);display:block;">Przelewy24</span>
+                <span style="font-size:.72rem;color:var(--text-light);display:block;margin-top:2px;">Szybka płatność online</span>
+              </label>
+            </div>
           </div>
 
         </form>
@@ -610,7 +620,7 @@
 
   <script>
   (function() {
-    var WEBHOOK_URL = 'https://n8n.marcelhoffman.pl/webhook/N8LA2zPOksuXPntB/webhook/brenna-book';
+    var BOOKING_BANK_URL = 'payment/booking-bank.php';
 
     // Domyślne ceny — nadpisywane przez prices.json
     var PRICES = {
@@ -783,12 +793,26 @@
     // Przelicz cenę gdy zmieni się liczba gości
     document.getElementById('goscie').addEventListener('change', updatePrice);
 
+    // Logika kart wyboru płatności
+    var payBankCard = document.getElementById('payBankCard');
+    var payP24Card  = document.getElementById('payP24Card');
+
+    function selectPayCard(selected, other) {
+      selected.style.borderColor = 'var(--green-dark)';
+      selected.style.background  = 'rgba(74,93,66,.04)';
+      other.style.borderColor    = 'var(--border)';
+      other.style.background     = '';
+    }
+
+    payBankCard.addEventListener('click', function() { selectPayCard(payBankCard, payP24Card); });
+    payP24Card.addEventListener('click',  function() { selectPayCard(payP24Card, payBankCard); });
+
     // Submit formularza
     document.getElementById('bookingForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
       var form = e.target;
-      var btn = document.getElementById('submitBtn');
+      var btn  = document.getElementById('submitBtn');
 
       // Prosta walidacja
       var required = form.querySelectorAll('[required]');
@@ -812,41 +836,59 @@
         return;
       }
 
+      var payMethod = (document.querySelector('input[name="payment_method"]:checked') || {}).value || 'bank';
+
       btn.disabled = true;
-      btn.textContent = 'Wysyłanie…';
+      btn.textContent = payMethod === 'p24' ? 'Przekierowuję do płatności…' : 'Wysyłanie…';
 
       var formData = new FormData(form);
       var body = {};
       formData.forEach(function(val, key) { body[key] = val; });
-      // Kwota do wpłaty = 100%
       body.zaliczka = parseInt(body.kwota) || 0;
 
-      fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      })
-      .then(function(r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function() {
-        showSuccess(body);
-      })
-      .catch(function(err) {
-        console.error(err);
-        // Nawet jeśli webhook zwróci błąd, pokaż sukces (n8n mógł przetworzyć)
-        showSuccess(body);
-      });
+      if (payMethod === 'p24') {
+        // Przelewy24
+        fetch('payment/booking-init.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.ok && data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+          } else {
+            alert((data.error || 'Błąd płatności.') + '\n\nWybierz przelew bankowy lub spróbuj ponownie.');
+            btn.disabled = false;
+            btn.textContent = 'Rezerwuj termin →';
+          }
+        })
+        .catch(function() {
+          alert('Błąd połączenia. Spróbuj ponownie lub wybierz przelew bankowy.');
+          btn.disabled = false;
+          btn.textContent = 'Rezerwuj termin →';
+        });
+
+      } else {
+        // Przelew bankowy — PHP (mail + zapis)
+        fetch(BOOKING_BANK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        })
+        .then(function(r) { return r.json(); })
+        .catch(function() { return {}; })
+        .then(function() { showSuccess(body); });
+      }
     });
 
     function showSuccess(data) {
       var kwota = parseInt(data.kwota) || 0;
-
-      var title = 'Willa Slonce ' + formatDate(data.checkin) + '-' + formatDate(data.checkout) + ' ' + (data.imie || '') + ' ' + (data.nazwisko || '');
+      var title = 'Willa Slonce ' + formatDate(data.checkin) + '-' + formatDate(data.checkout)
+                + ' ' + (data.imie || '') + ' ' + (data.nazwisko || '');
 
       document.getElementById('transferAmount').textContent = kwota ? kwota + ' zł' : '—';
-      document.getElementById('transferTitle').textContent = title;
+      document.getElementById('transferTitle').textContent  = title;
 
       document.getElementById('successOverlay').classList.add('active');
       document.body.style.overflow = 'hidden';

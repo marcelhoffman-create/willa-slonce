@@ -9,6 +9,8 @@ Thumbs.db
 # Env / secrets
 .env
 *.env
+payment/p24-credentials.php
+payment/orders/
 
 # Logs
 *.log
