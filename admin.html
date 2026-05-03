@@ -771,12 +771,14 @@
   function toggleAvailable(idx) {
     products[idx].available = !products[idx].available;
     renderProducts();
+    saveProducts();
   }
 
   function removeProduct(idx) {
     if (!confirm('Na pewno usunąć produkt „' + products[idx].name + '"?')) return;
     products.splice(idx, 1);
     renderProducts();
+    saveProducts();
   }
 
   async function saveProducts() {
