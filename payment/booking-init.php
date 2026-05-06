@@ -1,4 +1,12 @@
 <?php
+register_shutdown_function(function () {
+    $err = error_get_last();
+    if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        if (!headers_sent()) { header('Content-Type: application/json; charset=utf-8'); }
+        echo json_encode(['ok' => false, 'error' => 'PHP fatal', 'debug' => $err]);
+    }
+});
+
 /**
  * Inicjalizacja platnosci P24 dla rezerwacji domku
  * POST /payment/booking-init.php
