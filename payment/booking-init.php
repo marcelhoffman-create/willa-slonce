@@ -118,7 +118,12 @@ $token = p24_register($sessionId, $amountGrosze, $description, $email, $urlRetur
 
 if (!$token) {
     http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => 'Błąd inicjalizacji płatności. Spróbuj ponownie lub wybierz przelew bankowy.']);
+    $p24err = $GLOBALS['p24_last_error'] ?? null;
+    echo json_encode([
+        'ok'    => false,
+        'error' => 'Błąd inicjalizacji płatności. Spróbuj ponownie lub wybierz przelew bankowy.',
+        'debug' => $p24err,
+    ]);
     exit;
 }
 

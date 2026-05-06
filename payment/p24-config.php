@@ -55,6 +55,9 @@ function p24_configured(): bool
     return P24_MERCHANT_ID !== '' && P24_CRC !== '' && P24_API_KEY !== '';
 }
 
+/** Ostatni blad P24 — dostepny po nieudanej rejestracji */
+$GLOBALS['p24_last_error'] = null;
+
 /**
  * Rejestracja transakcji w P24
  * @return string|null token do przekierowania, lub null przy bledzie
@@ -96,8 +99,7 @@ function p24_register(string $sessionId, int $amount, string $description, strin
 
     if ($httpCode !== 201) {
         error_log("P24 register error HTTP $httpCode | session=$sessionId | response=$response");
-        // Tymczasowo: zwroc blad do debugowania
-        header('X-P24-Debug: HTTP=' . $httpCode . ' | ' . $response);
+        $GLOBALS['p24_last_error'] = ['httpCode' => $httpCode, 'body' => $response];
         return null;
     }
 
