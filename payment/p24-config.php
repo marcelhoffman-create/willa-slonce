@@ -96,6 +96,8 @@ function p24_register(string $sessionId, int $amount, string $description, strin
 
     if ($httpCode !== 201) {
         error_log("P24 register error HTTP $httpCode | session=$sessionId | response=$response");
+        // Tymczasowo: zwroc blad do debugowania
+        header('X-P24-Debug: HTTP=' . $httpCode . ' | ' . $response);
         return null;
     }
 
