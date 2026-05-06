@@ -351,8 +351,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var bookedSet = {};
 
-        // Pobierz zajęte daty z Booking.com (przez availability.json generowany co godzinę)
-        fetch('/brenna/availability.json')
+        // Pobierz zajęte daty z Booking.com (iCal, cache 1h)
+        fetch('/brenna/availability.php')
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 (data.blocked || []).forEach(function(d) { bookedSet[d] = true; });
