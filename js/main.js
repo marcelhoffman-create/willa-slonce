@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var bookedSet = {};
 
         // Pobierz zajęte daty z Booking.com (iCal, cache 1h)
-        fetch('/brenna/availability.php')
+        fetch('/availability.php')
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 (data.blocked || []).forEach(function(d) { bookedSet[d] = true; });

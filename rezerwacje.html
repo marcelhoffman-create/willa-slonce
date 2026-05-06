@@ -633,7 +633,7 @@
     // Pobierz ceny i dostępność równolegle
     Promise.all([
       fetch('/brenna/prices.json').then(function(r) { return r.json(); }).catch(function() { return {}; }),
-      fetch('/brenna/availability.php').then(function(r) { return r.json(); }).catch(function() { return {}; })
+      fetch('/availability.php').then(function(r) { return r.json(); }).catch(function() { return {}; })
     ]).then(function(results) {
       var prices = results[0];
       var avail  = results[1];
