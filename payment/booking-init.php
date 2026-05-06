@@ -7,19 +7,6 @@ register_shutdown_function(function () {
     }
 });
 
-/**
- * Inicjalizacja platnosci P24 dla rezerwacji domku
- * POST /payment/booking-init.php
- *
- * Body JSON (te same pola co formularz rezerwacji):
- * {
- *   "imie": "Jan", "nazwisko": "Kowalski",
- *   "email": "jan@example.com", "telefon": "600123456",
- *   "checkin": "2026-07-01", "checkout": "2026-07-05",
- *   "goscie": "4", "kwota": 2080, "noce": 4
- * }
- */
-
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -32,13 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-require __DIR__ . '/p24-config.php';
-
-if (!p24_configured()) {
-    http_response_code(503);
-    echo json_encode(['ok' => false, 'error' => 'Platnosci online sa tymczasowo niedostepne. Prosimy o przelew bankowy.']);
-    exit;
-}
+require __DIR__ . '/autopay-config.php';
 
 $body = json_decode(file_get_contents('php://input'), true);
 if (!$body) {
@@ -47,7 +28,6 @@ if (!$body) {
     exit;
 }
 
-// Walidacja
 $imie     = trim($body['imie']     ?? '');
 $nazwisko = trim($body['nazwisko'] ?? '');
 $email    = trim($body['email']    ?? '');
@@ -61,82 +41,65 @@ $uwagi    = trim($body['uwagi']    ?? '');
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Nieprawidłowy adres email.']);
+    echo json_encode(['ok' => false, 'error' => 'Nieprawidlowy adres email.']);
     exit;
 }
-
 if (empty($imie) || empty($nazwisko)) {
     http_response_code(400);
     echo json_encode(['ok' => false, 'error' => 'Brakuje imienia i nazwiska.']);
     exit;
 }
-
 if (empty($checkin) || empty($checkout)) {
     http_response_code(400);
     echo json_encode(['ok' => false, 'error' => 'Brakuje dat rezerwacji.']);
     exit;
 }
-
 if ($kwota < 1) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Nieprawidłowa kwota.']);
+    echo json_encode(['ok' => false, 'error' => 'Nieprawidlowa kwota.']);
     exit;
 }
 
-// Formatuj daty
-function fmt($d) {
-    if (!$d) return '';
-    $p = explode('-', $d);
-    return isset($p[2]) ? ($p[2] . '.' . $p[1] . '.' . $p[0]) : $d;
-}
-
-$sessionId = 'BOOK-' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
-
-$nights    = $noce > 0 ? $noce : 1;
-$nightsStr = $nights . ($nights === 1 ? ' noc' : ($nights < 5 ? ' noce' : ' nocy'));
-$description = "Rezerwacja Willa Slonce {$checkin}/{$checkout} — $imie $nazwisko, {$goscie}os., $nightsStr";
-
-$urlReturn = SITE_URL . '/payment/return.php?type=booking&session=' . urlencode($sessionId);
-$urlNotify = SITE_URL . '/payment/notify.php';
-
-$amountGrosze = $kwota * 100;
+$sessionId   = 'BOOK-' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
+$nights      = $noce > 0 ? $noce : 1;
+$nightsStr   = $nights . ($nights === 1 ? ' noc' : ($nights < 5 ? ' noce' : ' nocy'));
+$description = "Willa Slonce {$checkin}/{$checkout} {$imie} {$nazwisko} {$goscie}os. $nightsStr";
+$urlReturn   = SITE_URL . '/payment/return.php?type=booking&session=' . urlencode($sessionId);
 
 save_order($sessionId, [
-    'type'         => 'booking',
-    'sessionId'    => $sessionId,
-    'imie'         => $imie,
-    'nazwisko'     => $nazwisko,
-    'email'        => $email,
-    'telefon'      => $telefon,
-    'checkin'      => $checkin,
-    'checkout'     => $checkout,
-    'goscie'       => $goscie,
-    'noce'         => $noce,
-    'kwota'        => $kwota,
-    'zaliczka'     => $kwota,
-    'uwagi'        => $uwagi,
-    'godzina'      => trim($body['godzina'] ?? ''),
-    'amountGrosze' => $amountGrosze,
-    'description'  => $description,
-    'created'      => date('Y-m-d H:i:s'),
-    'status'       => 'pending',
+    'type'        => 'booking',
+    'sessionId'   => $sessionId,
+    'imie'        => $imie,
+    'nazwisko'    => $nazwisko,
+    'email'       => $email,
+    'telefon'     => $telefon,
+    'checkin'     => $checkin,
+    'checkout'    => $checkout,
+    'goscie'      => $goscie,
+    'noce'        => $noce,
+    'kwota'       => $kwota,
+    'uwagi'       => $uwagi,
+    'godzina'     => trim($body['godzina'] ?? ''),
+    'description' => $description,
+    'created'     => date('Y-m-d H:i:s'),
+    'status'      => 'pending',
+    'payment'     => 'autopay',
 ]);
 
-$token = p24_register($sessionId, $amountGrosze, $description, $email, $urlReturn, $urlNotify);
+$redirectUrl = autopay_create($sessionId, (float)$kwota, $description, $email, $urlReturn);
 
-if (!$token) {
+if (!$redirectUrl) {
     http_response_code(500);
-    $p24err = $GLOBALS['p24_last_error'] ?? null;
     echo json_encode([
         'ok'    => false,
-        'error' => 'Błąd inicjalizacji płatności. Spróbuj ponownie lub wybierz przelew bankowy.',
-        'debug' => $p24err,
+        'error' => 'Blad inicjalizacji platnosci. Sprobuj ponownie lub wybierz przelew bankowy.',
+        'debug' => $GLOBALS['autopay_last_error'] ?? null,
     ]);
     exit;
 }
 
 echo json_encode([
     'ok'          => true,
-    'redirectUrl' => P24_PAYMENT_URL . $token,
+    'redirectUrl' => $redirectUrl,
     'sessionId'   => $sessionId,
 ]);
