@@ -11,7 +11,7 @@ header('Cache-Control: no-store');
 define('ICAL_URL',   'https://ical.booking.com/v1/export?t=fa532493-1bdd-43f2-ac70-b148ec4296e3');
 define('CACHE_FILE', __DIR__ . '/availability_cache.json');
 define('MANUAL_FILE',__DIR__ . '/blocked-manual.json');
-define('CACHE_TTL',  3600);
+define('CACHE_TTL',  900); // 15 minut
 
 // --- 1. Daty z iCal (z cache 1h) ---
 $icalBlocked = [];
