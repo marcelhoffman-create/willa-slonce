@@ -1,79 +1,75 @@
 <?php
 /**
- * Pobiera rezerwacje z Booking.com (iCal) i zwraca zablokowane daty jako JSON.
- * Cache: 1 godzina.
+ * Zwraca zablokowane daty jako JSON.
+ * Źródła: (1) iCal Booking.com  (2) ręczne bloki z blocked-manual.json
+ * Cache iCal: 1 godzina.
  */
 
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: public, max-age=3600');
+header('Cache-Control: no-store');
 
-define('ICAL_URL', 'https://ical.booking.com/v1/export?t=fa532493-1bdd-43f2-ac70-b148ec4296e3');
+define('ICAL_URL',   'https://ical.booking.com/v1/export?t=fa532493-1bdd-43f2-ac70-b148ec4296e3');
 define('CACHE_FILE', __DIR__ . '/availability_cache.json');
-define('CACHE_TTL', 3600);
+define('MANUAL_FILE',__DIR__ . '/blocked-manual.json');
+define('CACHE_TTL',  3600);
 
-// Zwroc z cache jesli swiezy
+// --- 1. Daty z iCal (z cache 1h) ---
+$icalBlocked = [];
+
 if (file_exists(CACHE_FILE) && (time() - filemtime(CACHE_FILE)) < CACHE_TTL) {
-    echo file_get_contents(CACHE_FILE);
-    exit;
-}
+    $cached = json_decode(file_get_contents(CACHE_FILE), true);
+    $icalBlocked = $cached['blocked'] ?? [];
+} else {
+    $ctx  = stream_context_create(['http' => ['timeout' => 10, 'user_agent' => 'WillaSlonce/1.0']]);
+    $ical = @file_get_contents(ICAL_URL, false, $ctx);
 
-// Pobierz iCal z Booking.com
-$ctx = stream_context_create([
-    'http' => [
-        'timeout' => 10,
-        'user_agent' => 'Mozilla/5.0 (compatible; WillaSlonce/1.0)',
-    ]
-]);
-
-$ical = @file_get_contents(ICAL_URL, false, $ctx);
-
-if ($ical === false) {
-    // Jesli nie mozna pobrac, zwroc stary cache lub pusty wynik
-    if (file_exists(CACHE_FILE)) {
-        echo file_get_contents(CACHE_FILE);
-    } else {
-        echo json_encode(['blocked' => []]);
-    }
-    exit;
-}
-
-// Parsuj VEVENT — wyciagnij DTSTART i DTEND
-$blocked = [];
-preg_match_all('/BEGIN:VEVENT.*?END:VEVENT/s', $ical, $events);
-
-foreach ($events[0] as $event) {
-    $start = parseIcalDate($event, 'DTSTART');
-    $end   = parseIcalDate($event, 'DTEND');
-
-    if (!$start || !$end) continue;
-
-    // Zablokuj kazdy dzien od DTSTART do DTEND-1
-    // (dzien wymeldowania jest wolny pod nowy check-in)
-    $current = clone $start;
-    while ($current < $end) {
-        $blocked[] = $current->format('Y-m-d');
-        $current->modify('+1 day');
+    if ($ical !== false) {
+        preg_match_all('/BEGIN:VEVENT.*?END:VEVENT/s', $ical, $events);
+        foreach ($events[0] as $event) {
+            $start = parseIcalDate($event, 'DTSTART');
+            $end   = parseIcalDate($event, 'DTEND');
+            if (!$start || !$end) continue;
+            $cur = clone $start;
+            while ($cur < $end) {
+                $icalBlocked[] = $cur->format('Y-m-d');
+                $cur->modify('+1 day');
+            }
+        }
+        $icalBlocked = array_values(array_unique($icalBlocked));
+        file_put_contents(CACHE_FILE, json_encode(['blocked' => $icalBlocked]));
+    } elseif (file_exists(CACHE_FILE)) {
+        $cached = json_decode(file_get_contents(CACHE_FILE), true);
+        $icalBlocked = $cached['blocked'] ?? [];
     }
 }
 
-$blocked = array_values(array_unique($blocked));
-sort($blocked);
+// --- 2. Ręczne bloki z blocked-manual.json ---
+$manualBlocked = [];
 
-$result = json_encode(['blocked' => $blocked], JSON_UNESCAPED_UNICODE);
+if (file_exists(MANUAL_FILE)) {
+    $manual = json_decode(file_get_contents(MANUAL_FILE), true);
+    foreach ($manual['ranges'] ?? [] as $range) {
+        try {
+            $start = new DateTime($range['from']);
+            $end   = new DateTime($range['to']);
+            $cur   = clone $start;
+            while ($cur <= $end) {
+                $manualBlocked[] = $cur->format('Y-m-d');
+                $cur->modify('+1 day');
+            }
+        } catch (Exception $e) {}
+    }
+}
 
-// Zapisz cache
-file_put_contents(CACHE_FILE, $result);
+// --- 3. Scal i zwróć ---
+$all = array_values(array_unique(array_merge($icalBlocked, $manualBlocked)));
+sort($all);
 
-echo $result;
-
-// --- Pomocnicze ---
+echo json_encode(['blocked' => $all], JSON_UNESCAPED_UNICODE);
 
 function parseIcalDate(string $event, string $prop): ?DateTime
 {
-    // Obsluguje formaty: DTSTART;VALUE=DATE:20260510 i DTSTART:20260510T150000Z
-    if (!preg_match('/' . $prop . '[^:]*:(\d{8})(T\d{6}Z?)?/', $event, $m)) {
-        return null;
-    }
-    $date = DateTime::createFromFormat('Ymd', $m[1], new DateTimeZone('UTC'));
-    return $date ?: null;
+    if (!preg_match('/' . $prop . '[^:]*:(\d{8})(T\d{6}Z?)?/', $event, $m)) return null;
+    $d = DateTime::createFromFormat('Ymd', $m[1], new DateTimeZone('UTC'));
+    return $d ?: null;
 }

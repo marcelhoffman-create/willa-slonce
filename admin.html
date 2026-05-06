@@ -387,6 +387,40 @@
     <div class="msg" id="saveProductsMsg"></div>
   </div>
 
+  <!-- Ręczne blokowanie dat -->
+  <div class="card">
+    <h2>Zablokowane terminy</h2>
+    <p style="color:#888;font-size:0.88rem;margin:-8px 0 16px;">Daty zablokowane tu będą widoczne w kalendarzu na stronie, niezależnie od Booking.com.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;margin-bottom:16px;">
+      <div>
+        <label>Od</label>
+        <input type="date" id="blockFrom">
+      </div>
+      <div>
+        <label>Do</label>
+        <input type="date" id="blockTo">
+      </div>
+      <div>
+        <label>Notatka (opcjonalna)</label>
+        <input type="text" id="blockNote" placeholder="np. Sprzątanie">
+      </div>
+      <button class="btn-add" style="margin-bottom:16px;" onclick="addBlockedRange()">Zablokuj</button>
+    </div>
+
+    <div id="blockedMsg" class="msg"></div>
+
+    <table class="ranges-table" id="blockedTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>Od</th><th>Do</th><th>Notatka</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="blockedTbody"></tbody>
+    </table>
+    <p id="blockedEmpty" style="color:#aaa;font-size:0.9rem;">Brak ręcznie zablokowanych terminów.</p>
+  </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -440,6 +474,7 @@
       sessionStorage.setItem('adminPwd', pwd);
       loadPrices();
       loadProducts();
+      loadBlockedDates();
     } else {
       document.getElementById('loginErr').className = 'msg err';
     }
@@ -815,6 +850,88 @@
     var el = document.getElementById('saveProductsMsg');
     el.className = 'msg ' + type;
     el.textContent = text;
+  }
+
+  // --- Ręczne bloki dat ---
+
+  function loadBlockedDates() {
+    var pwd = sessionStorage.getItem('adminPwd') || '';
+    sha256(pwd).then(function(hash) {
+      fetch(SAVE_ENDPOINT, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({password: pwd, type: 'blocked-list'})
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) { renderBlockedTable(data.ranges || []); })
+      .catch(function() {});
+    });
+  }
+
+  function renderBlockedTable(ranges) {
+    var tbody  = document.getElementById('blockedTbody');
+    var table  = document.getElementById('blockedTable');
+    var empty  = document.getElementById('blockedEmpty');
+    tbody.innerHTML = '';
+    if (ranges.length === 0) {
+      table.style.display = 'none';
+      empty.style.display = '';
+      return;
+    }
+    table.style.display = '';
+    empty.style.display = 'none';
+    ranges.forEach(function(r) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + r.from + '</td><td>' + r.to + '</td><td>' + (r.note || '-') + '</td>'
+        + '<td><button class="btn-del" style="padding:6px 12px;" onclick="deleteBlockedRange(\'' + r.id + '\')">Usuń</button></td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  function addBlockedRange() {
+    var from = document.getElementById('blockFrom').value;
+    var to   = document.getElementById('blockTo').value;
+    var note = document.getElementById('blockNote').value;
+    if (!from || !to) { showBlockedMsg('error', 'Wybierz daty od i do.'); return; }
+    var pwd = sessionStorage.getItem('adminPwd') || '';
+    fetch(SAVE_ENDPOINT, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password: pwd, type: 'blocked-add', from: from, to: to, note: note})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.ok) {
+        showBlockedMsg('ok', 'Zablokowano ' + from + ' – ' + to);
+        document.getElementById('blockFrom').value = '';
+        document.getElementById('blockTo').value   = '';
+        document.getElementById('blockNote').value = '';
+        loadBlockedDates();
+      } else {
+        showBlockedMsg('error', data.error || 'Błąd zapisu');
+      }
+    })
+    .catch(function() { showBlockedMsg('error', 'Błąd połączenia'); });
+  }
+
+  function deleteBlockedRange(id) {
+    if (!confirm('Usunąć ten blok?')) return;
+    var pwd = sessionStorage.getItem('adminPwd') || '';
+    fetch(SAVE_ENDPOINT, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password: pwd, type: 'blocked-delete', id: id})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function() { loadBlockedDates(); })
+    .catch(function() {});
+  }
+
+  function showBlockedMsg(type, text) {
+    var el = document.getElementById('blockedMsg');
+    el.className = 'msg ' + type;
+    el.textContent = text;
+    setTimeout(function() { el.textContent = ''; el.className = 'msg'; }, 4000);
   }
 
   // Auto-login jeśli hasło w sesji

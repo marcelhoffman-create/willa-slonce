@@ -83,6 +83,42 @@ if ($type === 'products') {
     $data = ['by_guests' => $byGuests, 'date_ranges' => $ranges, 'updated' => date('Y-m-d')];
     $file = __DIR__ . '/prices.json';
 
+// ===== RĘCZNE BLOKI DAT =====
+} elseif ($type === 'blocked-add') {
+    $from = trim($body['from'] ?? '');
+    $to   = trim($body['to']   ?? '');
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'error' => 'Nieprawidlowy format daty']);
+        exit;
+    }
+    if ($to < $from) { $tmp = $from; $from = $to; $to = $tmp; }
+    $file   = __DIR__ . '/blocked-manual.json';
+    $manual = file_exists($file) ? json_decode(file_get_contents($file), true) : ['ranges' => []];
+    $id     = bin2hex(random_bytes(6));
+    $manual['ranges'][] = ['id' => $id, 'from' => $from, 'to' => $to, 'note' => trim($body['note'] ?? '')];
+    $manual['updated']  = date('Y-m-d');
+    file_put_contents($file, json_encode($manual, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n");
+    echo json_encode(['ok' => true, 'id' => $id]);
+    exit;
+
+} elseif ($type === 'blocked-delete') {
+    $id   = trim($body['id'] ?? '');
+    $file = __DIR__ . '/blocked-manual.json';
+    if (!$id || !file_exists($file)) { echo json_encode(['ok' => true]); exit; }
+    $manual = json_decode(file_get_contents($file), true);
+    $manual['ranges'] = array_values(array_filter($manual['ranges'] ?? [], fn($r) => $r['id'] !== $id));
+    $manual['updated'] = date('Y-m-d');
+    file_put_contents($file, json_encode($manual, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n");
+    echo json_encode(['ok' => true]);
+    exit;
+
+} elseif ($type === 'blocked-list') {
+    $file   = __DIR__ . '/blocked-manual.json';
+    $manual = file_exists($file) ? json_decode(file_get_contents($file), true) : ['ranges' => []];
+    echo json_encode(['ok' => true, 'ranges' => $manual['ranges'] ?? []]);
+    exit;
+
 } else {
     http_response_code(400);
     echo json_encode(['ok' => false, 'error' => 'Nieznany typ: ' . htmlspecialchars($type)]);
