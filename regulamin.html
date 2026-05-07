@@ -42,11 +42,8 @@
     .info-box p { margin: 0; }
 
     /* Logotypy kart */
-    .card-logos { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0; align-items: center; }
-    .card-logo { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 8px 18px; font-weight: 600; font-size: .88rem; color: var(--dark); }
-    .card-logo.visa { color: #1A1F71; }
-    .card-logo.mc { color: #EB001B; }
-    .card-logo.maestro { color: #0099DF; }
+    .card-logos { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; align-items: center; }
+    .card-logos svg { display: block; }
 
     footer { text-align: center; padding: 32px; color: var(--light); font-size: .82rem; border-top: 1px solid var(--border); }
     footer a { color: var(--copper); text-decoration: none; }
@@ -81,7 +78,7 @@
     Jednoosobowa dzialalnosc gospodarcza<br>
     ul. Kaliny Jedrusik 6/70, 01-748 Warszawa<br>
     NIP: 6342639783<br>
-    REGON: [uzupelnic]</p>
+    REGON: 364963156</p>
   </div>
 
   <!-- §3 -->
@@ -131,11 +128,39 @@
 
   <h3>Dostepne karty platnicze</h3>
   <div class="card-logos">
-    <span class="card-logo visa">VISA</span>
-    <span class="card-logo visa">Visa Electron</span>
-    <span class="card-logo mc">Mastercard</span>
-    <span class="card-logo mc">Mastercard Electronic</span>
-    <span class="card-logo maestro">Maestro</span>
+    <!-- Visa -->
+    <svg width="64" height="40" viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="40" rx="5" fill="#fff" stroke="#ddd" stroke-width="1.2"/>
+      <text x="32" y="27" text-anchor="middle" font-family="'Times New Roman',Georgia,serif" font-weight="900" font-size="22" fill="#1A1F71" letter-spacing="1">VISA</text>
+    </svg>
+    <!-- Visa Electron -->
+    <svg width="80" height="40" viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="40" rx="5" fill="#fff" stroke="#ddd" stroke-width="1.2"/>
+      <text x="40" y="22" text-anchor="middle" font-family="'Times New Roman',Georgia,serif" font-weight="900" font-size="16" fill="#1A1F71" letter-spacing="1">VISA</text>
+      <text x="40" y="33" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#1A1F71" font-style="italic" letter-spacing="1.5">electron</text>
+    </svg>
+    <!-- Mastercard -->
+    <svg width="64" height="40" viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="40" rx="5" fill="#fff" stroke="#ddd" stroke-width="1.2"/>
+      <circle cx="26" cy="20" r="12" fill="#EB001B"/>
+      <circle cx="38" cy="20" r="12" fill="#F79E1B"/>
+      <path d="M32 9.6a12 12 0 0 1 0 20.8 12 12 0 0 1 0-20.8z" fill="#FF5F00"/>
+    </svg>
+    <!-- Mastercard Electronic -->
+    <svg width="80" height="40" viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="40" rx="5" fill="#fff" stroke="#ddd" stroke-width="1.2"/>
+      <circle cx="28" cy="18" r="10" fill="#EB001B"/>
+      <circle cx="40" cy="18" r="10" fill="#F79E1B"/>
+      <path d="M34 9a10 10 0 0 1 0 18 10 10 0 0 1 0-18z" fill="#FF5F00"/>
+      <text x="40" y="35" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" fill="#333" letter-spacing="0.5">Electronic</text>
+    </svg>
+    <!-- Maestro -->
+    <svg width="64" height="40" viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="40" rx="5" fill="#fff" stroke="#ddd" stroke-width="1.2"/>
+      <circle cx="26" cy="18" r="11" fill="#0099DF"/>
+      <circle cx="38" cy="18" r="11" fill="#CC0000" opacity="0.9"/>
+      <text x="32" y="35" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#333" letter-spacing="0.5">maestro</text>
+    </svg>
   </div>
 
   <p>Karty platnicze:
