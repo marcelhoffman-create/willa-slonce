@@ -1236,12 +1236,18 @@
                     <path d="M8 12h8M12 8l4 4-4 4"/>
                   </svg>
                 </div>
-                <span class="pm-label">Przelewy24</span>
-                <span class="pm-sub">Szybka płatność online</span>
+                <span class="pm-label">Autopay</span>
+                <span class="pm-sub">Karta / szybki przelew</span>
               </label>
             </div>
           </div>
 
+          <div style="margin-bottom:16px;">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.88rem;color:#555;line-height:1.5;">
+              <input type="checkbox" id="coRegulamin" name="regulamin" required style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:#C17817;">
+              <span>Akceptuję <a href="regulamin.html" target="_blank" style="color:#C17817;">Regulamin serwisu</a> i potwierdzam zapoznanie się z jego treścią. *</span>
+            </label>
+          </div>
           <button type="submit" class="btn-checkout-submit" id="coSubmitBtn">Złóż zamówienie →</button>
           <div id="coError" style="display:none;color:#e53935;font-size:.85rem;margin-top:8px;text-align:center;"></div>
         </form>
@@ -1567,6 +1573,10 @@
       }
       if (cart.items.length === 0) {
         showCoError('Koszyk jest pusty.');
+        return;
+      }
+      if (!document.getElementById('coRegulamin').checked) {
+        showCoError('Zaakceptuj Regulamin serwisu.');
         return;
       }
 
