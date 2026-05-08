@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /payment/
+Disallow: /save-data.php
+Disallow: /availability.php
+
+Sitemap: https://willaslonce.pl/sitemap.xml
