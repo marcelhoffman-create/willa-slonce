@@ -546,14 +546,6 @@ em.accent,
     color: var(--color-text-dark);
 }
 
-.section-light + .section-light {
-    padding-top: 0;
-}
-
-.section-light:has(+ .section-light) {
-    padding-bottom: 60px;
-}
-
 .section-dark {
     background: var(--color-bg-dark);
     color: var(--color-text-light);
