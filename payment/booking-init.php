@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 require __DIR__ . '/autopay-config.php';
+require_once __DIR__ . '/pricing.php';
 
 $body = json_decode(file_get_contents('php://input'), true);
 if (!$body) {
@@ -35,8 +36,6 @@ $telefon  = trim($body['telefon']  ?? '');
 $checkin  = trim($body['checkin']  ?? '');
 $checkout = trim($body['checkout'] ?? '');
 $goscie   = intval($body['goscie'] ?? 0);
-$kwota    = intval($body['kwota']  ?? 0);
-$noce     = intval($body['noce']   ?? 0);
 $uwagi    = trim($body['uwagi']    ?? '');
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -54,17 +53,25 @@ if (empty($checkin) || empty($checkout)) {
     echo json_encode(['ok' => false, 'error' => 'Brakuje dat rezerwacji.']);
     exit;
 }
-if ($kwota < 1) {
-    http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Nieprawidlowa kwota.']);
+
+if (!autopay_configured()) {
+    http_response_code(503);
+    echo json_encode(['ok' => false, 'error' => 'Platnosci online sa chwilowo niedostepne. Wybierz przelew bankowy.']);
     exit;
 }
 
+$priced = calc_booking_amount($goscie, $checkin, $checkout, __DIR__ . '/../prices.json');
+if (!$priced['ok']) {
+    http_response_code(400);
+    echo json_encode(['ok' => false, 'error' => $priced['error']]);
+    exit;
+}
+$kwota = $priced['amount'];
+$noce  = $priced['nights'];
+
 $sessionId   = 'BOOK-' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
-$nights      = $noce > 0 ? $noce : 1;
-$nightsStr   = $nights . ($nights === 1 ? ' noc' : ($nights < 5 ? ' noce' : ' nocy'));
+$nightsStr   = $noce . ($noce === 1 ? ' noc' : ($noce < 5 ? ' noce' : ' nocy'));
 $description = "Willa Slonce {$checkin}/{$checkout} {$imie} {$nazwisko} {$goscie}os. $nightsStr";
-$urlReturn   = SITE_URL . '/payment/return.php?type=booking&session=' . urlencode($sessionId);
 
 save_order($sessionId, [
     'type'        => 'booking',
@@ -86,20 +93,11 @@ save_order($sessionId, [
     'payment'     => 'autopay',
 ]);
 
-$redirectUrl = autopay_create($sessionId, (float)$kwota, $description, $email, $urlReturn);
-
-if (!$redirectUrl) {
-    http_response_code(500);
-    echo json_encode([
-        'ok'    => false,
-        'error' => 'Blad inicjalizacji platnosci. Sprobuj ponownie lub wybierz przelew bankowy.',
-        'debug' => $GLOBALS['autopay_last_error'] ?? null,
-    ]);
-    exit;
-}
+$pay = autopay_payment($sessionId, (float) $kwota, $email, $description);
 
 echo json_encode([
-    'ok'          => true,
-    'redirectUrl' => $redirectUrl,
-    'sessionId'   => $sessionId,
+    'ok'         => true,
+    'gatewayUrl' => $pay['gatewayUrl'],
+    'fields'     => $pay['fields'],
+    'sessionId'  => $sessionId,
 ]);
