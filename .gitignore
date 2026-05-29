@@ -10,6 +10,7 @@ Thumbs.db
 .env
 *.env
 payment/p24-credentials.php
+payment/autopay-credentials.php
 payment/orders/
 
 # Logs
