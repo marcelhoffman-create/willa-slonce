@@ -13,12 +13,7 @@ define('CACHE_FILE', __DIR__ . '/availability_cache.json');
 define('MANUAL_FILE',__DIR__ . '/blocked-manual.json');
 define('CACHE_TTL',  900); // 15 minut
 
-// Wymuś odswiezenie cache (tylko z adminem)
-if (isset($_GET['purge']) && $_GET['purge'] === 'brenna2026') {
-    @unlink(CACHE_FILE);
-}
-
-// --- 1. Daty z iCal (z cache 1h) ---
+// --- 1. Daty z iCal (cache odswiezany automatycznie wg CACHE_TTL) ---
 $icalBlocked = [];
 
 if (file_exists(CACHE_FILE) && (time() - filemtime(CACHE_FILE)) < CACHE_TTL) {
