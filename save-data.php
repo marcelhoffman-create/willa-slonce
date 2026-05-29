@@ -19,8 +19,8 @@ if (!$body) {
     exit;
 }
 
-define('ADMIN_PASSWORD', 'brenna2026');
-if (($body['password'] ?? '') !== ADMIN_PASSWORD) {
+require_once __DIR__ . '/admin-auth.php';
+if (!admin_password_valid($body['password'] ?? '')) {
     http_response_code(403);
     echo json_encode(['ok' => false, 'error' => 'Unauthorized']);
     exit;
