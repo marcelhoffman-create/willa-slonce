@@ -1345,6 +1345,21 @@
   var SHOP_INIT_URL = 'payment/shop-init.php';
   var CART_KEY = 'brennaCart';
 
+  function submitGatewayForm(gatewayUrl, fields) {
+    var f = document.createElement('form');
+    f.method = 'POST';
+    f.action = gatewayUrl;
+    Object.keys(fields).forEach(function (k) {
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = k;
+      input.value = fields[k];
+      f.appendChild(input);
+    });
+    document.body.appendChild(f);
+    f.submit();
+  }
+
   /* ---------- KOSZYK (localStorage) ---------- */
   var cart = { items: [] };
 
@@ -1622,12 +1637,12 @@
         })
         .then(function(r) { return r.json(); })
         .then(function(data) {
-          if (data.ok && data.redirectUrl) {
+          if (data.ok && data.gatewayUrl && data.fields) {
             cart = { items: [] };
             saveCart();
-            window.location.href = data.redirectUrl;
+            submitGatewayForm(data.gatewayUrl, data.fields);
           } else {
-            showCoError(data.error || 'Błąd płatności. Wybierz przelew bankowy.');
+            alert((data.error || 'Błąd płatności.') + '\n\nWybierz przelew bankowy lub spróbuj ponownie.');
             btn.disabled = false;
             btn.textContent = 'Złóż zamówienie →';
           }
