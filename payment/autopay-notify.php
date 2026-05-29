@@ -1,77 +1,79 @@
 <?php
 /**
- * Autopay ITN — notyfikacja o platnosci
- * POST /payment/autopay-notify.php
- *
- * Autopay wysyla ten request po potwierdzeniu platnosci.
- * Nalezy skonfigurowac ten URL w panelu Autopay:
- * panel.autopay.eu → Uslugi → [usługa] → Adres powiadomien
+ * Autopay ITN — notyfikacja o platnosci.
+ * POST /payment/autopay-notify.php  (pole `transactions` = base64(XML))
+ * URL skonfigurowac w panel.autopay.eu -> usluga -> adres powiadomien.
  */
 
 require __DIR__ . '/autopay-config.php';
 
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: application/xml; charset=utf-8');
 
-$raw  = file_get_contents('php://input');
-$data = json_decode($raw, true);
-
-if (!$data || !is_array($data)) {
+$transactionsParam = $_POST['transactions'] ?? '';
+if ($transactionsParam === '') {
+    error_log('Autopay ITN: brak pola transactions | ' . file_get_contents('php://input'));
     http_response_code(400);
-    echo json_encode(['error' => 'invalid body']);
+    echo '<error>missing transactions</error>';
     exit;
 }
 
-// Weryfikuj hash
-if (!autopay_verify_itn($data)) {
-    error_log('Autopay ITN: invalid hash | ' . $raw);
+$parsed = autopay_parse_itn($transactionsParam);
+if ($parsed === null) {
+    error_log('Autopay ITN: nie udalo sie sparsowac | ' . $transactionsParam);
     http_response_code(400);
-    echo json_encode(['error' => 'invalid hash']);
+    echo '<error>invalid xml</error>';
     exit;
 }
 
-$orderId       = $data['orderID']       ?? '';
-$paymentStatus = $data['paymentStatus'] ?? '';
+$confirmations = [];
+foreach ($parsed['transactions'] as $tx) {
+    $orderId = $tx['orderID'] ?? '';
+    if ($orderId === '') continue;
 
-if (!$orderId) {
+    if (!autopay_verify_tx_hash($tx, AUTOPAY_HASH_KEY, AUTOPAY_HASH_ALGO, AUTOPAY_HASH_SEP)) {
+        error_log("Autopay ITN: zly hash | orderId=$orderId | " . json_encode($tx));
+        $confirmations[$orderId] = 'NOTCONFIRMED';
+        continue;
+    }
+
+    $order = load_order($orderId);
+    if (!$order) {
+        error_log("Autopay ITN: brak zamowienia | orderId=$orderId");
+        $confirmations[$orderId] = 'NOTCONFIRMED';
+        continue;
+    }
+
+    $status = $tx['paymentStatus'] ?? '';
+
+    // Idempotentnosc — juz oplacone
+    if (($order['status'] ?? '') === 'paid') {
+        $confirmations[$orderId] = 'CONFIRMED';
+        continue;
+    }
+
+    if ($status === 'SUCCESS') {
+        $order['status']      = 'paid';
+        $order['paidAt']      = date('Y-m-d H:i:s');
+        $order['autopayData'] = $tx;
+        save_order($orderId, $order);
+
+        $webhookUrl = ($order['type'] ?? '') === 'booking' ? N8N_BOOKING_WEBHOOK : N8N_SHOP_WEBHOOK;
+        send_webhook($webhookUrl, array_merge($order, ['payment_method' => 'autopay', 'source' => 'autopay_itn']));
+        $confirmations[$orderId] = 'CONFIRMED';
+    } elseif ($status === 'FAILURE') {
+        $order['status'] = 'failed';
+        save_order($orderId, $order);
+        $confirmations[$orderId] = 'CONFIRMED'; // potwierdzamy odbior notyfikacji (porazka tez)
+    } else {
+        // PENDING — potwierdzamy odbior, status bez zmian
+        $confirmations[$orderId] = 'CONFIRMED';
+    }
+}
+
+if (empty($confirmations)) {
     http_response_code(400);
-    echo json_encode(['error' => 'missing orderID']);
+    echo '<error>no transactions</error>';
     exit;
 }
 
-$order = load_order($orderId);
-if (!$order) {
-    error_log("Autopay ITN: order not found | orderId=$orderId");
-    http_response_code(400);
-    echo json_encode(['error' => 'order not found']);
-    exit;
-}
-
-// Idempotentnosc — jesli juz oplacone, tylko potwierdz
-if (($order['status'] ?? '') === 'paid') {
-    echo json_encode([
-        'serviceID' => (int) AUTOPAY_SERVICE_ID,
-        'orderID'   => $orderId,
-        'hash'      => autopay_confirm_hash($orderId),
-    ]);
-    exit;
-}
-
-if ($paymentStatus === 'SUCCESS') {
-    $order['status']      = 'paid';
-    $order['paidAt']      = date('Y-m-d H:i:s');
-    $order['autopayData'] = $data;
-    save_order($orderId, $order);
-
-    $webhookUrl = ($order['type'] ?? '') === 'booking' ? N8N_BOOKING_WEBHOOK : N8N_SHOP_WEBHOOK;
-    send_webhook($webhookUrl, array_merge($order, [
-        'payment_method' => 'autopay',
-        'source'         => 'autopay_itn',
-    ]));
-}
-
-// Potwierdzenie odbioru do Autopay
-echo json_encode([
-    'serviceID' => (int) AUTOPAY_SERVICE_ID,
-    'orderID'   => $orderId,
-    'hash'      => autopay_confirm_hash($orderId),
-]);
+echo autopay_confirmation_xml((string) AUTOPAY_SERVICE_ID, $confirmations, AUTOPAY_HASH_KEY, AUTOPAY_HASH_ALGO, AUTOPAY_HASH_SEP);
