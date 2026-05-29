@@ -3,12 +3,13 @@ register_shutdown_function(function () {
     $err = error_get_last();
     if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
         if (!headers_sent()) { header('Content-Type: application/json; charset=utf-8'); }
-        echo json_encode(['ok' => false, 'error' => 'PHP fatal', 'debug' => $err]);
+        error_log('booking-init fatal: ' . json_encode($err));
+        echo json_encode(['ok' => false, 'error' => 'Wystapil blad serwera. Sprobuj ponownie lub wybierz przelew bankowy.']);
     }
 });
 
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: https://willaslonce.pl');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 

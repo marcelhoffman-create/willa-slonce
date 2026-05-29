@@ -25,6 +25,14 @@ if ($parsed === null) {
     exit;
 }
 
+// Notyfikacja musi dotyczyc naszej uslugi
+if ((string) AUTOPAY_SERVICE_ID !== '' && $parsed['serviceID'] !== (string) AUTOPAY_SERVICE_ID) {
+    error_log('Autopay ITN: niezgodny serviceID | otrzymano=' . $parsed['serviceID']);
+    http_response_code(400);
+    echo '<error>service mismatch</error>';
+    exit;
+}
+
 $confirmations = [];
 foreach ($parsed['transactions'] as $tx) {
     $orderId = $tx['orderID'] ?? '';
@@ -52,6 +60,15 @@ foreach ($parsed['transactions'] as $tx) {
     }
 
     if ($status === 'SUCCESS') {
+        // Kwota z ITN musi zgadzac sie z kwota zamowienia (obrona w glab)
+        $expected  = ($order['type'] ?? '') === 'booking' ? ($order['kwota'] ?? 0) : ($order['total'] ?? 0);
+        $itnAmount = number_format((float) ($tx['amount'] ?? 0), 2, '.', '');
+        if ($itnAmount !== number_format((float) $expected, 2, '.', '')) {
+            error_log("Autopay ITN: niezgodna kwota | orderId=$orderId | ITN=$itnAmount oczekiwano=" . number_format((float) $expected, 2, '.', ''));
+            $confirmations[$orderId] = 'NOTCONFIRMED';
+            continue;
+        }
+
         $order['status']      = 'paid';
         $order['paidAt']      = date('Y-m-d H:i:s');
         $order['autopayData'] = $tx;
