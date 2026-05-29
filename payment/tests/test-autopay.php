@@ -1,6 +1,7 @@
 <?php
 // Harness testowy logiki platnosci. Uruchom: php payment/tests/test-autopay.php
 require __DIR__ . '/../pricing.php';
+require __DIR__ . '/../autopay-lib.php';
 
 $pass = 0; $fail = 0;
 function check(string $name, $cond): void {
@@ -39,6 +40,22 @@ check('shop: produkt niedostepny = blad', $r['ok'] === false);
 
 $r = calc_shop_items([], "$FX/products.json");
 check('shop: pusty koszyk = blad', $r['ok'] === false);
+
+// --- autopay_hash_raw (przyklad z dokumentacji Autopay: SHA256("2|100|1.50|2test2")) ---
+check('hash: przyklad z dokumentacji',
+    autopay_hash_raw(['2','100','1.50'], '2test2', 'sha256', '|') === hash('sha256', '2|100|1.50|2test2'));
+
+check('hash: puste pola pomijane (bez separatora)',
+    autopay_hash_raw(['2','', '1.50'], 'k', 'sha256', '|') === hash('sha256', '2|1.50|k'));
+
+// --- autopay_payment_fields ---
+$pf = autopay_payment_fields('211642', 'KLUCZTESTOWY', 'sha256', '|',
+    'https://testpay.autopay.eu/payment', 'BOOK-1', 29.0, 'jan@example.com', 'Test zakup');
+check('fields: komplet wymaganych pol', isset($pf['fields']['ServiceID'],$pf['fields']['OrderID'],$pf['fields']['Amount'],$pf['fields']['CustomerEmail'],$pf['fields']['Hash']));
+check('fields: Amount sformatowany 0.00', $pf['fields']['Amount'] === '29.00');
+check('fields: gatewayUrl przekazany', $pf['gatewayUrl'] === 'https://testpay.autopay.eu/payment');
+check('fields: hash policzony nad wartosciami w kolejnosci',
+    $pf['fields']['Hash'] === autopay_hash_raw(['211642','BOOK-1','29.00','Test zakup','PLN','jan@example.com'], 'KLUCZTESTOWY', 'sha256', '|'));
 
 echo "\n$pass PASS, $fail FAIL\n";
 exit($fail === 0 ? 0 : 1);
