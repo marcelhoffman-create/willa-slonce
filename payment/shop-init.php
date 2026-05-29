@@ -1,6 +1,6 @@
 <?php
 /**
- * Inicjalizacja platnosci P24 dla zamówienia ze sklepu
+ * Inicjalizacja platnosci Autopay dla zamowienia ze sklepu
  * POST /payment/shop-init.php
  *
  * Body JSON:
@@ -9,12 +9,12 @@
  *   "name": "Jan Kowalski",
  *   "phone": "600123456",
  *   "delivery": "domek|kurier",
- *   "address": "ul. Przykładowa 1, 00-001 Warszawa",
- *   "items": [{"id":"...", "name":"...", "price":49, "qty":2}]
+ *   "address": "ul. Przykladowa 1, 00-001 Warszawa",
+ *   "items": [{"id":"...", "qty":2}]
  * }
  *
- * Odpowiedź 200:
- * { "ok": true, "redirectUrl": "https://secure.przelewy24.pl/trnRequest/TOKEN", "sessionId": "..." }
+ * Odpowiedz 200:
+ * { "ok": true, "gatewayUrl": "https://pay.autopay.eu/payment", "fields": {...}, "sessionId": "..." }
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -29,12 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-require __DIR__ . '/p24-config.php';
+require __DIR__ . '/autopay-config.php';
+require_once __DIR__ . '/pricing.php';
 
-// Sprawdz czy P24 jest skonfigurowane
-if (!p24_configured()) {
+if (!autopay_configured()) {
     http_response_code(503);
-    echo json_encode(['ok' => false, 'error' => 'Platnoci online sa tymczasowo niedostepne. Prosimy o przelew bankowy.']);
+    echo json_encode(['ok' => false, 'error' => 'Platnosci online sa chwilowo niedostepne. Prosimy o przelew bankowy.']);
     exit;
 }
 
@@ -55,7 +55,7 @@ $items    = $body['items']         ?? [];
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Nieprawidłowy adres email.']);
+    echo json_encode(['ok' => false, 'error' => 'Nieprawidlowy adres email.']);
     exit;
 }
 
@@ -73,81 +73,49 @@ if (empty($items) || !is_array($items)) {
 
 if ($delivery === 'kurier' && empty($address)) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Podaj adres dostawy dla wysyłki kurierskiej.']);
+    echo json_encode(['ok' => false, 'error' => 'Podaj adres dostawy dla wysylki kurierskiej.']);
     exit;
 }
 
-// Oblicz sume z items
-$subtotal = 0;
-$cleanItems = [];
-foreach ($items as $item) {
-    $price = intval($item['price'] ?? 0);
-    $qty   = max(1, min(99, intval($item['qty'] ?? 1)));
-    $iname = mb_substr(trim($item['name'] ?? 'Produkt'), 0, 200);
-
-    if ($price < 1 || $price > 99999) {
-        http_response_code(400);
-        echo json_encode(['ok' => false, 'error' => 'Nieprawidłowa cena produktu: ' . htmlspecialchars($iname)]);
-        exit;
-    }
-
-    $subtotal += $price * $qty;
-    $cleanItems[] = [
-        'id'    => mb_substr(trim($item['id'] ?? ''), 0, 100),
-        'name'  => $iname,
-        'price' => $price,
-        'qty'   => $qty,
-    ];
+// Ceny z katalogu serwera (nie od klienta)
+$priced = calc_shop_items($items, __DIR__ . '/../products.json');
+if (!$priced['ok']) {
+    http_response_code(400);
+    echo json_encode(['ok' => false, 'error' => $priced['error']]);
+    exit;
 }
+$cleanItems = $priced['items'];
+$subtotal   = $priced['subtotal'];
+$shipping   = ($delivery === 'kurier' && $subtotal < 150) ? 15 : 0;
+$total      = $subtotal + $shipping;
 
-// Koszt wysylki
-$shipping = ($delivery === 'kurier' && $subtotal < 150) ? 15 : 0;
-$total    = $subtotal + $shipping;
+$sessionId   = 'SHOP-' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
+$itemsLabels = array_map(fn($i) => $i['name'] . ' x' . $i['qty'], $cleanItems);
+$description = 'Sklep Willa Slonce: ' . implode(', ', $itemsLabels);
 
-// Session ID
-$sessionId = 'SHOP-' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
-
-// Opis dla P24
-$itemsLabels = array_map(function($i) { return $i['name'] . ' ×' . $i['qty']; }, $cleanItems);
-$description = 'Sklep Willa Słońce: ' . implode(', ', $itemsLabels);
-
-// URL-e
-$urlReturn = SITE_URL . '/payment/return.php?type=shop&session=' . urlencode($sessionId);
-$urlNotify = SITE_URL . '/payment/notify.php';
-
-// Kwota w groszach
-$amountGrosze = $total * 100;
-
-// Zapisz zamowienie (zanim przekierujemy, zeby notify moglo je odczytac)
 save_order($sessionId, [
-    'type'         => 'shop',
-    'sessionId'    => $sessionId,
-    'email'        => $email,
-    'name'         => $name,
-    'phone'        => $phone,
-    'delivery'     => $delivery,
-    'address'      => $address,
-    'items'        => $cleanItems,
-    'subtotal'     => $subtotal,
-    'shipping'     => $shipping,
-    'total'        => $total,
-    'amountGrosze' => $amountGrosze,
-    'description'  => $description,
-    'created'      => date('Y-m-d H:i:s'),
-    'status'       => 'pending',
+    'type'        => 'shop',
+    'sessionId'   => $sessionId,
+    'email'       => $email,
+    'name'        => $name,
+    'phone'       => $phone,
+    'delivery'    => $delivery,
+    'address'     => $address,
+    'items'       => $cleanItems,
+    'subtotal'    => $subtotal,
+    'shipping'    => $shipping,
+    'total'       => $total,
+    'description' => $description,
+    'created'     => date('Y-m-d H:i:s'),
+    'status'      => 'pending',
+    'payment'     => 'autopay',
 ]);
 
-// Zarejestruj w P24
-$token = p24_register($sessionId, $amountGrosze, $description, $email, $urlReturn, $urlNotify);
-
-if (!$token) {
-    http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => 'Błąd inicjalizacji płatności. Spróbuj ponownie lub wybierz przelew bankowy.']);
-    exit;
-}
+$pay = autopay_payment($sessionId, (float) $total, $email, $description);
 
 echo json_encode([
-    'ok'          => true,
-    'redirectUrl' => P24_PAYMENT_URL . $token,
-    'sessionId'   => $sessionId,
+    'ok'         => true,
+    'gatewayUrl' => $pay['gatewayUrl'],
+    'fields'     => $pay['fields'],
+    'sessionId'  => $sessionId,
 ]);
