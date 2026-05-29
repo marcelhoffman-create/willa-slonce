@@ -1,0 +1,5 @@
+{ "products": [
+  { "id": "miod-beskidzki", "name": "Miód beskidzki", "price": 39, "available": true },
+  { "id": "ser-owczy", "name": "Ser owczy", "price": 35, "available": true },
+  { "id": "swieca-niedostepna", "name": "Świeca", "price": 45, "available": false }
+] }
