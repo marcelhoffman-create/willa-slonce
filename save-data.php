@@ -54,7 +54,7 @@ if ($type === 'products') {
     $byGuests = $body['by_guests'] ?? [];
     for ($i = 1; $i <= 6; $i++) {
         $p = intval($byGuests[(string)$i] ?? 0);
-        if ($p < 50 || $p > 9999) {
+        if ($p < 1 || $p > 9999) {
             http_response_code(400);
             echo json_encode(['ok' => false, 'error' => 'Nieprawidlowa cena dla ' . $i . ' gosci']);
             exit;
@@ -68,7 +68,7 @@ if ($type === 'products') {
         $valid = true;
         for ($i = 1; $i <= 6; $i++) {
             $p = intval($r['by_guests'][(string)$i] ?? 0);
-            if ($p < 50 || $p > 9999) { $valid = false; break; }
+            if ($p < 1 || $p > 9999) { $valid = false; break; }
             $bg[(string)$i] = $p;
         }
         if (!$valid) continue;
