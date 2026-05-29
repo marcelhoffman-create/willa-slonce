@@ -916,20 +916,28 @@
     var map = { paid:   ['Opłacone', '#e8f5e9', '#2e7d32'],
                 pending:['Oczekuje', '#fff8e1', '#f57c00'],
                 failed: ['Nieudane', '#ffebee', '#c62828'] };
-    var v = map[s] || [s || '—', '#eee', '#555'];
+    var v = map[s] || [s || '-', '#eee', '#555'];
     return '<span style="background:' + v[1] + ';color:' + v[2] + ';padding:2px 8px;border-radius:10px;font-size:0.8rem;white-space:nowrap;">' + escHtml(v[0]) + '</span>';
   }
 
   function orderDetails(o) {
-    if (o.type === 'booking') {
-      var d = escHtml(o.checkin) + '-' + escHtml(o.checkout);
-      if (o.noce) d += ' (' + o.noce + ' ' + nocWord(o.noce) + ')';
-      if (o.goscie) d += ', ' + o.goscie + ' os.';
+    var isBooking = o.type === 'booking' || o.type === 'booking_bank';
+    if (isBooking) {
+      var d = escHtml(o.checkin) + ' - ' + escHtml(o.checkout);
+      var noce = parseInt(o.noce) || 0;
+      if (noce) d += ' (' + noce + ' ' + nocWord(noce) + ')';
+      var goscie = parseInt(o.goscie) || 0;
+      if (goscie) d += ', ' + goscie + ' os.';
       return d;
     }
-    var items = (o.items || []).map(function(i) { return escHtml(i.name) + ' \xd7' + i.qty; }).join(', ');
+    var items;
+    if (o.items && o.items.length) {
+      items = o.items.map(function(i) { return escHtml(i.name) + ' \xd7' + (parseInt(i.qty) || 1); }).join(', ');
+    } else {
+      items = escHtml(o.order || '-');
+    }
     var dost = o.delivery === 'kurier' ? ('kurier' + (o.address ? ': ' + escHtml(o.address) : '')) : 'odbi\xf3r w domku';
-    return items + ' — ' + dost;
+    return items + ' - ' + dost;
   }
 
   function renderOrders() {
@@ -943,9 +951,9 @@
     if (rows.length === 0) { table.style.display = 'none'; empty.style.display = 'block'; return; }
     table.style.display = ''; empty.style.display = 'none';
     rows.forEach(function(o) {
-      var klient = o.type === 'booking' ? (escHtml(o.imie) + ' ' + escHtml(o.nazwisko)) : escHtml(o.name || '');
+      var klient = (o.type === 'booking' || o.type === 'booking_bank') ? (escHtml(o.imie) + ' ' + escHtml(o.nazwisko)) : escHtml(o.name || '');
       var kontakt = escHtml(o.email || '') + (o.telefon ? '<br>' + escHtml(o.telefon) : '');
-      var typ = o.type === 'booking' ? 'Nocleg' : 'Sklep';
+      var typ = (o.type === 'booking' || o.type === 'booking_bank') ? 'Nocleg' : 'Sklep';
       var tr = document.createElement('tr');
       tr.innerHTML = '<td style="white-space:nowrap;">' + escHtml((o.created || '').slice(0, 16)) + '</td>'
         + '<td>' + typ + '</td>'

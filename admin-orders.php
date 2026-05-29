@@ -45,6 +45,7 @@ foreach (glob(__DIR__ . '/payment/orders/*.json') ?: [] as $file) {
         'noce'      => $o['noce']      ?? 0,
         'goscie'    => $o['goscie']    ?? 0,
         'items'     => $o['items']     ?? [],
+        'order'     => $o['order']     ?? '',
         'delivery'  => $o['delivery']  ?? '',
         'address'   => $o['address']   ?? '',
     ];
