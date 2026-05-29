@@ -57,5 +57,36 @@ check('fields: gatewayUrl przekazany', $pf['gatewayUrl'] === 'https://testpay.au
 check('fields: hash policzony nad wartosciami w kolejnosci',
     $pf['fields']['Hash'] === autopay_hash_raw(['211642','BOOK-1','29.00','Test zakup','PLN','jan@example.com'], 'KLUCZTESTOWY', 'sha256', '|'));
 
+// --- ITN: budujemy probke XML, kodujemy base64, parsujemy, weryfikujemy ---
+$KEY = 'KLUCZTESTOWY';
+$txHash = autopay_hash_raw(['211642','BOOK-1','29.00','PLN','SUCCESS'], $KEY, 'sha256', '|');
+$xml = '<?xml version="1.0" encoding="UTF-8"?>'
+     . '<transactionList><serviceID>211642</serviceID><transactions><transaction>'
+     . '<serviceID>211642</serviceID><orderID>BOOK-1</orderID><amount>29.00</amount>'
+     . '<currency>PLN</currency><paymentStatus>SUCCESS</paymentStatus>'
+     . '<hash>' . $txHash . '</hash>'
+     . '</transaction></transactions></transactionList>';
+$b64 = base64_encode($xml);
+
+$parsed = autopay_parse_itn($b64);
+check('itn: parsuje serviceID', $parsed['serviceID'] === '211642');
+check('itn: parsuje 1 transakcje', count($parsed['transactions']) === 1);
+check('itn: pola transakcji', $parsed['transactions'][0]['orderID'] === 'BOOK-1' && $parsed['transactions'][0]['paymentStatus'] === 'SUCCESS');
+
+check('itn: weryfikacja hash poprawna',
+    autopay_verify_tx_hash($parsed['transactions'][0], $KEY, 'sha256', '|') === true);
+
+$tampered = $parsed['transactions'][0];
+$tampered['amount'] = '1.00';
+check('itn: weryfikacja hash wykrywa manipulacje',
+    autopay_verify_tx_hash($tampered, $KEY, 'sha256', '|') === false);
+
+check('itn: zly base64 = null', autopay_parse_itn('@@@niepoprawne@@@') === null);
+
+// --- XML potwierdzenia ---
+$conf = autopay_confirmation_xml('211642', ['BOOK-1' => 'CONFIRMED'], $KEY, 'sha256', '|');
+check('confirm: zawiera CONFIRMED i orderID', str_contains($conf, '<confirmation>CONFIRMED</confirmation>') && str_contains($conf, '<orderID>BOOK-1</orderID>'));
+check('confirm: zawiera hash', str_contains($conf, '<hash>'));
+
 echo "\n$pass PASS, $fail FAIL\n";
 exit($fail === 0 ? 0 : 1);
