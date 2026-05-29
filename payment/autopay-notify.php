@@ -76,6 +76,7 @@ foreach ($parsed['transactions'] as $tx) {
 
         $webhookUrl = ($order['type'] ?? '') === 'booking' ? N8N_BOOKING_WEBHOOK : N8N_SHOP_WEBHOOK;
         send_webhook($webhookUrl, array_merge($order, ['payment_method' => 'autopay', 'source' => 'autopay_itn']));
+        autopay_admin_paid_email($order);
         $confirmations[$orderId] = 'CONFIRMED';
     } elseif ($status === 'FAILURE') {
         $order['status'] = 'failed';
@@ -94,3 +95,55 @@ if (empty($confirmations)) {
 }
 
 echo autopay_confirmation_xml((string) AUTOPAY_SERVICE_ID, $confirmations, AUTOPAY_HASH_KEY, AUTOPAY_HASH_ALGO, AUTOPAY_HASH_SEP);
+
+
+/**
+ * Mail do admina po zaksięgowaniu płatności Autopay (analogicznie do przelewu).
+ */
+function autopay_admin_paid_email(array $o): void
+{
+    $adminEmail = 'marcelhoffman@gmail.com';
+    $isBooking  = ($o['type'] ?? '') === 'booking';
+    $e = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+    if ($isBooking) {
+        $who   = trim(($o['imie'] ?? '') . ' ' . ($o['nazwisko'] ?? ''));
+        $title = 'Opłacona rezerwacja - ' . $who . ' - ' . ($o['checkin'] ?? '');
+        $rows  = '<tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;width:40%;">Gość</td><td style="padding:6px 12px;">' . $e($who) . '</td></tr>'
+               . '<tr><td style="padding:6px 12px;font-weight:bold;">Email</td><td style="padding:6px 12px;">' . $e($o['email'] ?? '') . '</td></tr>'
+               . '<tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;">Telefon</td><td style="padding:6px 12px;">' . $e($o['telefon'] ?? '') . '</td></tr>'
+               . '<tr><td style="padding:6px 12px;font-weight:bold;">Przyjazd</td><td style="padding:6px 12px;">' . $e($o['checkin'] ?? '') . '</td></tr>'
+               . '<tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;">Wyjazd</td><td style="padding:6px 12px;">' . $e($o['checkout'] ?? '') . '</td></tr>'
+               . '<tr><td style="padding:6px 12px;font-weight:bold;">Noce / goście</td><td style="padding:6px 12px;">' . ((int) ($o['noce'] ?? 0)) . ' / ' . ((int) ($o['goscie'] ?? 0)) . '</td></tr>';
+        $kwota = (int) ($o['kwota'] ?? 0);
+    } else {
+        $who   = $o['name'] ?? '';
+        $title = 'Opłacone zamówienie (sklep) - ' . $who;
+        $items = '';
+        foreach (($o['items'] ?? []) as $it) {
+            $items .= $e($it['name'] ?? '') . ' x' . ((int) ($it['qty'] ?? 1)) . '<br>';
+        }
+        $rows  = '<tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;width:40%;">Klient</td><td style="padding:6px 12px;">' . $e($who) . '</td></tr>'
+               . '<tr><td style="padding:6px 12px;font-weight:bold;">Email</td><td style="padding:6px 12px;">' . $e($o['email'] ?? '') . '</td></tr>'
+               . '<tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;">Telefon</td><td style="padding:6px 12px;">' . $e($o['phone'] ?? '') . '</td></tr>'
+               . '<tr><td style="padding:6px 12px;font-weight:bold;">Produkty</td><td style="padding:6px 12px;">' . ($items ?: '-') . '</td></tr>'
+               . '<tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;">Dostawa</td><td style="padding:6px 12px;">' . $e($o['delivery'] ?? '') . (!empty($o['address']) ? ' / ' . $e($o['address']) : '') . '</td></tr>';
+        $kwota = (int) ($o['total'] ?? 0);
+    }
+
+    $subject = '=?UTF-8?B?' . base64_encode($title) . '?=';
+    $html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:sans-serif;color:#222;max-width:600px;margin:0 auto;padding:20px;">'
+          . '<h2 style="color:#C17817;">Płatność zaksięgowana - Willa Słońce</h2>'
+          . '<table style="border-collapse:collapse;width:100%;">' . $rows
+          . '<tr><td style="padding:6px 12px;font-weight:bold;font-size:1.1em;">Kwota</td><td style="padding:6px 12px;font-size:1.1em;color:#C17817;font-weight:bold;">' . $kwota . ' zł</td></tr>'
+          . '</table>'
+          . '<p style="margin-top:20px;color:#888;font-size:.85em;">Płatność: Autopay (online) | Ref: ' . $e($o['sessionId'] ?? '') . ' | ' . date('d.m.Y H:i') . '</p>'
+          . '</body></html>';
+
+    $headers  = 'MIME-Version: 1.0' . "\r\n";
+    $headers .= 'Content-Type: text/html; charset=UTF-8' . "\r\n";
+    $headers .= 'From: Willa Slonce <noreply@willaslonce.pl>' . "\r\n";
+
+    @mail($adminEmail, $subject, $html, $headers);
+}
+
