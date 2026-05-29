@@ -421,13 +421,40 @@
     <p id="blockedEmpty" style="color:#aaa;font-size:0.9rem;">Brak ręcznie zablokowanych terminów.</p>
   </div>
 
+  <!-- Rezerwacje i zamówienia -->
+  <div class="card">
+    <h2>Rezerwacje i zamówienia</h2>
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+      <label>Status:
+        <select id="ordersFilter" onchange="renderOrders()">
+          <option value="all">Wszystkie</option>
+          <option value="paid">Opłacone</option>
+          <option value="pending">Oczekujące</option>
+          <option value="failed">Nieudane</option>
+        </select>
+      </label>
+      <button class="btn-add" onclick="refreshOrders()">Odśwież</button>
+      <span id="ordersCount" style="color:#888;font-size:0.9rem;"></span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="ranges-table" id="ordersTable">
+        <thead>
+          <tr>
+            <th>Data</th><th>Typ</th><th>Klient</th><th>Kontakt</th>
+            <th>Szczegóły</th><th>Kwota</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTbody"></tbody>
+      </table>
+    </div>
+    <p id="ordersEmpty" style="color:#aaa;font-size:0.9rem;">Brak zamówień.</p>
+  </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pl.js"></script>
 <script>
-  // SHA-256 hash hasła "brenna2026"
-  var PASSWORD_HASH = '1c61aaba342510eb3b74436b4d24eb48839c2f2b79d43654e3354b2a08669967';
   var SAVE_ENDPOINT = 'save-data.php';
 
   // Aktualnie załadowane zakresy
@@ -436,46 +463,28 @@
   // Aktualnie załadowane produkty
   var products = [];
 
-  // SHA-256: używa crypto.subtle (HTTPS) lub czystego JS (HTTP)
-  async function sha256(msg) {
-    if (window.crypto && window.crypto.subtle) {
-      try {
-        var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
-        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-      } catch(e) {}
-    }
-    return sha256js(msg);
-  }
-
-  function sha256js(s) {
-    function rr(v,a){return(v>>>a)|(v<<(32-a));}
-    var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
-    var H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
-    var b=[];for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c<128)b.push(c);else if(c<2048)b.push(192|(c>>6),128|(c&63));else b.push(224|(c>>12),128|((c>>6)&63),128|(c&63));}
-    var L=b.length*8;b.push(128);while((b.length%64)!==56)b.push(0);
-    for(var i=0;i<8;i++)b.push(0);
-    b[b.length-4]=(L>>24)&255;b[b.length-3]=(L>>16)&255;b[b.length-2]=(L>>8)&255;b[b.length-1]=L&255;
-    for(var chunk=0;chunk<b.length;chunk+=64){
-      var w=[];for(var i=0;i<16;i++)w[i]=(b[chunk+i*4]<<24)|(b[chunk+i*4+1]<<16)|(b[chunk+i*4+2]<<8)|b[chunk+i*4+3];
-      for(var i=16;i<64;i++){var s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3);var s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)|0;}
-      var a=H[0],b2=H[1],c2=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
-      for(var i=0;i<64;i++){var S1=rr(e,6)^rr(e,11)^rr(e,25);var ch=(e&f)^(~e&g);var t1=(h+S1+ch+K[i]+w[i])|0;var S0=rr(a,2)^rr(a,13)^rr(a,22);var maj=(a&b2)^(a&c2)^(b2&c2);var t2=(S0+maj)|0;h=g;g=f;f=e;e=(d+t1)|0;d=c2;c2=b2;b2=a;a=(t1+t2)|0;}
-      H[0]=(H[0]+a)|0;H[1]=(H[1]+b2)|0;H[2]=(H[2]+c2)|0;H[3]=(H[3]+d)|0;H[4]=(H[4]+e)|0;H[5]=(H[5]+f)|0;H[6]=(H[6]+g)|0;H[7]=(H[7]+h)|0;
-    }
-    return H.map(function(v){return('00000000'+(v>>>0).toString(16)).slice(-8);}).join('');
-  }
-
   async function login() {
     var pwd = document.getElementById('pwd').value;
-    var hash = await sha256(pwd);
-    if (hash === PASSWORD_HASH) {
-      document.getElementById('loginCard').classList.remove('active');
-      document.getElementById('adminPanel').classList.add('active');
-      sessionStorage.setItem('adminPwd', pwd);
-      loadPrices();
-      loadProducts();
-      loadBlockedDates();
-    } else {
+    try {
+      var r = await fetch('admin-orders.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pwd })
+      });
+      if (r.status === 200) {
+        var data = await r.json();
+        sessionStorage.setItem('adminPwd', pwd);
+        document.getElementById('loginCard').classList.remove('active');
+        document.getElementById('adminPanel').classList.add('active');
+        loadPrices();
+        loadProducts();
+        loadBlockedDates();
+        allOrders = (data && data.orders) ? data.orders : [];
+        renderOrders();
+      } else {
+        document.getElementById('loginErr').className = 'msg err';
+      }
+    } catch (e) {
       document.getElementById('loginErr').className = 'msg err';
     }
   }
@@ -856,16 +865,14 @@
 
   function loadBlockedDates() {
     var pwd = sessionStorage.getItem('adminPwd') || '';
-    sha256(pwd).then(function(hash) {
-      fetch(SAVE_ENDPOINT, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({password: pwd, type: 'blocked-list'})
-      })
-      .then(function(r) { return r.json(); })
-      .then(function(data) { renderBlockedTable(data.ranges || []); })
-      .catch(function() {});
-    });
+    fetch(SAVE_ENDPOINT, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password: pwd, type: 'blocked-list'})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { renderBlockedTable(data.ranges || []); })
+    .catch(function() {});
   }
 
   function renderBlockedTable(ranges) {
@@ -884,6 +891,69 @@
       var tr = document.createElement('tr');
       tr.innerHTML = '<td>' + r.from + '</td><td>' + r.to + '</td><td>' + (r.note || '-') + '</td>'
         + '<td><button class="btn-del" style="padding:6px 12px;" onclick="deleteBlockedRange(\'' + r.id + '\')">Usuń</button></td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  // --- Rezerwacje i zamówienia ---
+  var allOrders = [];
+
+  function refreshOrders() {
+    var pwd = sessionStorage.getItem('adminPwd') || '';
+    fetch('admin-orders.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { allOrders = (data && data.orders) ? data.orders : []; renderOrders(); })
+    .catch(function() {});
+  }
+
+  function nocWord(n) { return n === 1 ? 'noc' : (n >= 2 && n <= 4 ? 'noce' : 'nocy'); }
+
+  function orderStatusBadge(s) {
+    var map = { paid:   ['Opłacone', '#e8f5e9', '#2e7d32'],
+                pending:['Oczekuje', '#fff8e1', '#f57c00'],
+                failed: ['Nieudane', '#ffebee', '#c62828'] };
+    var v = map[s] || [s || '—', '#eee', '#555'];
+    return '<span style="background:' + v[1] + ';color:' + v[2] + ';padding:2px 8px;border-radius:10px;font-size:0.8rem;white-space:nowrap;">' + escHtml(v[0]) + '</span>';
+  }
+
+  function orderDetails(o) {
+    if (o.type === 'booking') {
+      var d = escHtml(o.checkin) + '-' + escHtml(o.checkout);
+      if (o.noce) d += ' (' + o.noce + ' ' + nocWord(o.noce) + ')';
+      if (o.goscie) d += ', ' + o.goscie + ' os.';
+      return d;
+    }
+    var items = (o.items || []).map(function(i) { return escHtml(i.name) + ' \xd7' + i.qty; }).join(', ');
+    var dost = o.delivery === 'kurier' ? ('kurier' + (o.address ? ': ' + escHtml(o.address) : '')) : 'odbi\xf3r w domku';
+    return items + ' — ' + dost;
+  }
+
+  function renderOrders() {
+    var filter = document.getElementById('ordersFilter').value;
+    var rows = allOrders.filter(function(o) { return filter === 'all' || o.status === filter; });
+    var tbody = document.getElementById('ordersTbody');
+    var table = document.getElementById('ordersTable');
+    var empty = document.getElementById('ordersEmpty');
+    document.getElementById('ordersCount').textContent = rows.length + ' z ' + allOrders.length;
+    tbody.innerHTML = '';
+    if (rows.length === 0) { table.style.display = 'none'; empty.style.display = 'block'; return; }
+    table.style.display = ''; empty.style.display = 'none';
+    rows.forEach(function(o) {
+      var klient = o.type === 'booking' ? (escHtml(o.imie) + ' ' + escHtml(o.nazwisko)) : escHtml(o.name || '');
+      var kontakt = escHtml(o.email || '') + (o.telefon ? '<br>' + escHtml(o.telefon) : '');
+      var typ = o.type === 'booking' ? 'Nocleg' : 'Sklep';
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td style="white-space:nowrap;">' + escHtml((o.created || '').slice(0, 16)) + '</td>'
+        + '<td>' + typ + '</td>'
+        + '<td>' + klient + '<br><span style="color:#bbb;font-size:0.75rem;">' + escHtml(o.sessionId || '') + '</span></td>'
+        + '<td style="font-size:0.85rem;">' + kontakt + '</td>'
+        + '<td style="font-size:0.85rem;">' + orderDetails(o) + '</td>'
+        + '<td style="white-space:nowrap;">' + (parseInt(o.kwota) || 0) + ' zł</td>'
+        + '<td>' + orderStatusBadge(o.status) + '</td>';
       tbody.appendChild(tr);
     });
   }
