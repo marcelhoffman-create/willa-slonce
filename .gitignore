@@ -11,6 +11,7 @@ Thumbs.db
 *.env
 payment/p24-credentials.php
 payment/autopay-credentials.php
+admin-credentials.php
 payment/orders/
 
 # Logs
