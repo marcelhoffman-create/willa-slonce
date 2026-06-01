@@ -441,7 +441,7 @@
         <thead>
           <tr>
             <th>Data</th><th>Typ</th><th>Klient</th><th>Kontakt</th>
-            <th>Szczegóły</th><th>Kwota</th><th>Status</th>
+            <th>Szczegóły</th><th>Kwota</th><th>Status</th><th>Akcje</th>
           </tr>
         </thead>
         <tbody id="ordersTbody"></tbody>
@@ -940,6 +940,23 @@
     return items + ' - ' + dost;
   }
 
+  function orderAction(id, action) {
+    var pwd = sessionStorage.getItem('adminPwd') || '';
+    fetch('admin-orders.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd, action: action, id: id })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d && d.ok) { refreshOrders(); }
+      else { alert('Błąd: ' + ((d && d.error) || 'nieznany')); }
+    })
+    .catch(function() { alert('Błąd połączenia.'); });
+  }
+  function markPaid(id) { orderAction(id, 'mark-paid'); }
+  function archiveOrder(id) { orderAction(id, 'archive'); }
+
   function renderOrders() {
     var filter = document.getElementById('ordersFilter').value;
     var rows = allOrders.filter(function(o) { return filter === 'all' || o.status === filter; });
@@ -957,11 +974,17 @@
       var tr = document.createElement('tr');
       tr.innerHTML = '<td style="white-space:nowrap;">' + escHtml((o.created || '').slice(0, 16)) + '</td>'
         + '<td>' + typ + '</td>'
-        + '<td>' + klient + '<br><span style="color:#bbb;font-size:0.75rem;">' + escHtml(o.sessionId || '') + '</span></td>'
+        + '<td>' + klient + '<br><span style="color:#bbb;font-size:0.75rem;">' + escHtml(o.id || o.sessionId || '') + '</span></td>'
         + '<td style="font-size:0.85rem;">' + kontakt + '</td>'
         + '<td style="font-size:0.85rem;">' + orderDetails(o) + '</td>'
         + '<td style="white-space:nowrap;">' + (parseInt(o.kwota) || 0) + ' zł</td>'
-        + '<td>' + orderStatusBadge(o.status) + '</td>';
+        + '<td>' + orderStatusBadge(o.status) + '</td>'
+        + '<td style="white-space:nowrap;">'
+          + (o.status !== 'paid'
+              ? '<button onclick="markPaid(\'' + o.id + '\')" style="background:#2e7d32;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:0.8rem;cursor:pointer;margin-right:4px;">Opłać</button>'
+              : '')
+          + '<button onclick="archiveOrder(\'' + o.id + '\')" style="background:#eee;color:#555;border:none;border-radius:6px;padding:4px 10px;font-size:0.8rem;cursor:pointer;">Archiwizuj</button>'
+        + '</td>';
       tbody.appendChild(tr);
     });
   }

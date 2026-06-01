@@ -99,5 +99,16 @@ $conf = autopay_confirmation_xml('211642', ['BOOK-1' => 'CONFIRMED'], $KEY, 'sha
 check('confirm: zawiera CONFIRMED i orderID', str_contains($conf, '<confirmation>CONFIRMED</confirmation>') && str_contains($conf, '<orderID>BOOK-1</orderID>'));
 check('confirm: zawiera hash', str_contains($conf, '<hash>'));
 
+// --- safe_order_id (ochrona przed path traversal w akcjach admina) ---
+require __DIR__ . '/../../admin-auth.php';
+check('safe_id: blokuje traversal (kropki/slashe -> _)',
+    safe_order_id('../../etc/passwd') === '______etc_passwd'
+    && strpos(safe_order_id('../../etc/passwd'), '/') === false
+    && strpos(safe_order_id('../../etc/passwd'), '.') === false);
+check('safe_id: zachowuje poprawny id',
+    safe_order_id('BOOK-20260601-185829-b5f26f9d') === 'BOOK-20260601-185829-b5f26f9d');
+check('safe_id: usuwa rozszerzenie/kropki',
+    safe_order_id('plik.json') === 'plik_json');
+
 echo "\n$pass PASS, $fail FAIL\n";
 exit($fail === 0 ? 0 : 1);

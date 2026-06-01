@@ -21,3 +21,12 @@ function admin_password_valid(string $provided): bool
 {
     return admin_pwd_check(ADMIN_PASSWORD, $provided);
 }
+
+/**
+ * Sanityzuje identyfikator zamowienia do bezpiecznej nazwy pliku.
+ * Blokuje path traversal — dozwolone tylko [A-Za-z0-9_-], reszta -> '_'.
+ */
+function safe_order_id(string $id): string
+{
+    return preg_replace('/[^A-Za-z0-9_-]/', '_', $id);
+}
