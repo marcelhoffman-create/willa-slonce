@@ -9,21 +9,6 @@ require __DIR__ . '/autopay-config.php';
 
 header('Content-Type: application/xml; charset=utf-8');
 
-// === TEMP DEBUG ITN (usunac po diagnozie) ===
-$__rawInput = file_get_contents('php://input');
-$__dbg  = '[' . date('Y-m-d H:i:s') . "] ITN hit\n"
-        . 'METHOD: ' . ($_SERVER['REQUEST_METHOD'] ?? '') . "\n"
-        . 'CONTENT_TYPE: ' . ($_SERVER['CONTENT_TYPE'] ?? '') . "\n"
-        . 'POST_KEYS: ' . implode(',', array_keys($_POST)) . "\n"
-        . 'GET_KEYS: ' . implode(',', array_keys($_GET)) . "\n"
-        . 'RAW_INPUT: ' . substr($__rawInput, 0, 5000) . "\n";
-if (!empty($_POST['transactions'])) {
-    $__dbg .= "DECODED_XML:\n" . base64_decode($_POST['transactions'], true) . "\n";
-}
-$__dbg .= "----\n";
-@file_put_contents(__DIR__ . '/orders/_itn_raw.log', $__dbg, FILE_APPEND | LOCK_EX);
-// === /TEMP DEBUG ===
-
 $transactionsParam = $_POST['transactions'] ?? '';
 if ($transactionsParam === '') {
     error_log('Autopay ITN: brak pola transactions | ' . file_get_contents('php://input'));
@@ -50,8 +35,8 @@ if ((string) AUTOPAY_SERVICE_ID !== '' && $parsed['serviceID'] !== (string) AUTO
 
 // Weryfikacja hasha CALEGO komunikatu (jeden hash dla transactionList)
 if (!autopay_verify_message_hash($parsed, AUTOPAY_HASH_KEY, AUTOPAY_HASH_ALGO, AUTOPAY_HASH_SEP)) {
-    // TEMP: log wartosci (BEZ klucza) na wypadek rozjazdu kolejnosci pol — usunac po potwierdzeniu
-    @file_put_contents(__DIR__ . '/orders/_itn_raw.log',
+    // Diagnostyka (bez klucza/danych osobowych) — gdyby Autopay zmienil format hasha
+    @file_put_contents(__DIR__ . '/orders/_hash_mismatch.log',
         '[' . date('Y-m-d H:i:s') . "] HASH MISMATCH\n"
         . 'values=' . implode('|', $parsed['hashValues'] ?? []) . "\n"
         . 'received=' . ($parsed['hash'] ?? '') . "\n----\n", FILE_APPEND | LOCK_EX);
