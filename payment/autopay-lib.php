@@ -40,8 +40,20 @@ function autopay_payment_fields(
 
 /**
  * Dekoduje ITN (base64 XML z pola POST `transactions`) i zwraca strukture.
- * Zwraca ['serviceID' => ..., 'transactions' => [ {pola transakcji w kolejnosci dokumentu, z 'hash'} ]] lub null.
- * Kolejnosc pol zachowana (wazne dla weryfikacji hasha po kolejnosci dokumentu).
+ *
+ * Realna struktura Autopay (potwierdzona produkcyjnym ITN):
+ *   <transactionList>
+ *     <serviceID>..</serviceID>
+ *     <transactions><transaction>..pola..</transaction>..</transactions>
+ *     <hash>..</hash>            <-- jeden hash dla CALEGO komunikatu, nie per transakcja
+ *   </transactionList>
+ *
+ * Zwraca:
+ *   'serviceID'    => string,
+ *   'hash'         => string (z poziomu transactionList),
+ *   'transactions' => [ [pole=>wartosc, ...], ... ],
+ *   'hashValues'   => [wartosci wszystkich pol w kolejnosci dokumentu, BEZ pola hash]
+ * lub null przy bledzie.
  */
 function autopay_parse_itn(string $transactionsParam): ?array
 {
@@ -53,31 +65,47 @@ function autopay_parse_itn(string $transactionsParam): ?array
     libxml_use_internal_errors($prev);
     if ($root === false) return null;
 
-    $out = ['serviceID' => (string) ($root->serviceID ?? ''), 'transactions' => []];
-    foreach ($root->transactions->transaction ?? [] as $tx) {
-        $fields = [];
-        foreach ($tx->children() as $child) {
-            $fields[$child->getName()] = (string) $child; // kolejnosc dokumentu zachowana
+    $out = ['serviceID' => '', 'hash' => '', 'transactions' => [], 'hashValues' => []];
+
+    foreach ($root->children() as $child) {
+        $name = $child->getName();
+
+        if ($name === 'hash') {
+            $out['hash'] = (string) $child; // hash nie wchodzi do wartosci
+            continue;
         }
-        $out['transactions'][] = $fields;
+
+        if ($name === 'transactions') {
+            foreach ($child->transaction as $tx) {
+                $fields = [];
+                foreach ($tx->children() as $f) {
+                    $fields[$f->getName()] = (string) $f;
+                    $out['hashValues'][] = (string) $f; // kolejnosc dokumentu
+                }
+                $out['transactions'][] = $fields;
+            }
+            continue;
+        }
+
+        // pola na poziomie glownym (serviceID i ew. inne) — wartosc wchodzi do hasha
+        if ($name === 'serviceID') {
+            $out['serviceID'] = (string) $child;
+        }
+        $out['hashValues'][] = (string) $child;
     }
+
     return $out;
 }
 
 /**
- * Weryfikuje hash transakcji: hash nad wartosciami wszystkich pol (w kolejnosci dokumentu)
- * OPROCZ samego 'hash', + klucz. Porownanie odporne na timing.
+ * Weryfikuje hash CALEGO komunikatu ITN: hash nad wartosciami wszystkich pol
+ * (w kolejnosci dokumentu, bez pola hash) + klucz. Porownanie odporne na timing.
  */
-function autopay_verify_tx_hash(array $txFields, string $key, string $algo, string $sep): bool
+function autopay_verify_message_hash(array $parsed, string $key, string $algo, string $sep): bool
 {
-    $received = $txFields['hash'] ?? '';
+    $received = $parsed['hash'] ?? '';
     if ($received === '') return false;
-    $values = [];
-    foreach ($txFields as $name => $val) {
-        if ($name === 'hash') continue;
-        $values[] = $val;
-    }
-    $expected = autopay_hash_raw($values, $key, $algo, $sep);
+    $expected = autopay_hash_raw($parsed['hashValues'] ?? [], $key, $algo, $sep);
     return hash_equals($expected, $received);
 }
 

@@ -57,29 +57,40 @@ check('fields: gatewayUrl przekazany', $pf['gatewayUrl'] === 'https://testpay.au
 check('fields: hash policzony nad wartosciami w kolejnosci',
     $pf['fields']['Hash'] === autopay_hash_raw(['211642','BOOK-1','29.00','Test zakup','PLN','jan@example.com'], 'KLUCZTESTOWY', 'sha256', '|'));
 
-// --- ITN: budujemy probke XML, kodujemy base64, parsujemy, weryfikujemy ---
+// --- ITN: realna struktura z produkcji (hash na poziomie transactionList, nie w transaction) ---
 $KEY = 'KLUCZTESTOWY';
-$txHash = autopay_hash_raw(['211642','BOOK-1','29.00','PLN','SUCCESS'], $KEY, 'sha256', '|');
-$xml = '<?xml version="1.0" encoding="UTF-8"?>'
-     . '<transactionList><serviceID>211642</serviceID><transactions><transaction>'
-     . '<serviceID>211642</serviceID><orderID>BOOK-1</orderID><amount>29.00</amount>'
-     . '<currency>PLN</currency><paymentStatus>SUCCESS</paymentStatus>'
-     . '<hash>' . $txHash . '</hash>'
-     . '</transaction></transactions></transactionList>';
-$b64 = base64_encode($xml);
+$realXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    . '<transactionList><serviceID>211642</serviceID><transactions><transaction>'
+    . '<orderID>BOOK-20260601-185829-b5f26f9d</orderID><remoteID>ASW235N95K</remoteID>'
+    . '<amount>1.00</amount><currency>PLN</currency><gatewayID>509</gatewayID>'
+    . '<paymentDate>20260601185852</paymentDate><paymentStatus>SUCCESS</paymentStatus>'
+    . '<paymentStatusDetails>AUTHORIZED</paymentStatusDetails>'
+    . '</transaction></transactions>'
+    . '<hash>cc235e8bd94d0d05ffca743a36010775cb02b44450c09b7208e923dcf9bccd45</hash>'
+    . '</transactionList>';
 
-$parsed = autopay_parse_itn($b64);
-check('itn: parsuje serviceID', $parsed['serviceID'] === '211642');
+$parsed = autopay_parse_itn(base64_encode($realXml));
+check('itn: serviceID z poziomu glownego', $parsed['serviceID'] === '211642');
+check('itn: hash z poziomu transactionList', $parsed['hash'] === 'cc235e8bd94d0d05ffca743a36010775cb02b44450c09b7208e923dcf9bccd45');
 check('itn: parsuje 1 transakcje', count($parsed['transactions']) === 1);
-check('itn: pola transakcji', $parsed['transactions'][0]['orderID'] === 'BOOK-1' && $parsed['transactions'][0]['paymentStatus'] === 'SUCCESS');
+check('itn: pola transakcji', $parsed['transactions'][0]['orderID'] === 'BOOK-20260601-185829-b5f26f9d' && $parsed['transactions'][0]['paymentStatus'] === 'SUCCESS');
+check('itn: hashValues w kolejnosci dokumentu (serviceID + pola tx, bez hash)',
+    $parsed['hashValues'] === ['211642','BOOK-20260601-185829-b5f26f9d','ASW235N95K','1.00','PLN','509','20260601185852','SUCCESS','AUTHORIZED']);
 
-check('itn: weryfikacja hash poprawna',
-    autopay_verify_tx_hash($parsed['transactions'][0], $KEY, 'sha256', '|') === true);
+// round-trip weryfikacji hasha calego komunikatu (z kluczem testowym)
+$expectHash = autopay_hash_raw($parsed['hashValues'], $KEY, 'sha256', '|');
+$signedXml  = str_replace('cc235e8bd94d0d05ffca743a36010775cb02b44450c09b7208e923dcf9bccd45', $expectHash, $realXml);
+$ps = autopay_parse_itn(base64_encode($signedXml));
+check('itn: weryfikacja hash komunikatu poprawna',
+    autopay_verify_message_hash($ps, $KEY, 'sha256', '|') === true);
 
-$tampered = $parsed['transactions'][0];
-$tampered['amount'] = '1.00';
-check('itn: weryfikacja hash wykrywa manipulacje',
-    autopay_verify_tx_hash($tampered, $KEY, 'sha256', '|') === false);
+$tamperedXml = str_replace('<amount>1.00</amount>', '<amount>999.00</amount>', $signedXml);
+$pt = autopay_parse_itn(base64_encode($tamperedXml));
+check('itn: weryfikacja wykrywa manipulacje kwoty',
+    autopay_verify_message_hash($pt, $KEY, 'sha256', '|') === false);
+
+check('itn: brak hasha = false',
+    autopay_verify_message_hash(['hashValues' => ['x'], 'hash' => ''], $KEY, 'sha256', '|') === false);
 
 check('itn: zly base64 = null', autopay_parse_itn('@@@niepoprawne@@@') === null);
 

@@ -48,16 +48,22 @@ if ((string) AUTOPAY_SERVICE_ID !== '' && $parsed['serviceID'] !== (string) AUTO
     exit;
 }
 
+// Weryfikacja hasha CALEGO komunikatu (jeden hash dla transactionList)
+if (!autopay_verify_message_hash($parsed, AUTOPAY_HASH_KEY, AUTOPAY_HASH_ALGO, AUTOPAY_HASH_SEP)) {
+    // TEMP: log wartosci (BEZ klucza) na wypadek rozjazdu kolejnosci pol — usunac po potwierdzeniu
+    @file_put_contents(__DIR__ . '/orders/_itn_raw.log',
+        '[' . date('Y-m-d H:i:s') . "] HASH MISMATCH\n"
+        . 'values=' . implode('|', $parsed['hashValues'] ?? []) . "\n"
+        . 'received=' . ($parsed['hash'] ?? '') . "\n----\n", FILE_APPEND | LOCK_EX);
+    http_response_code(400);
+    echo '<error>invalid hash</error>';
+    exit;
+}
+
 $confirmations = [];
 foreach ($parsed['transactions'] as $tx) {
     $orderId = $tx['orderID'] ?? '';
     if ($orderId === '') continue;
-
-    if (!autopay_verify_tx_hash($tx, AUTOPAY_HASH_KEY, AUTOPAY_HASH_ALGO, AUTOPAY_HASH_SEP)) {
-        error_log("Autopay ITN: zly hash | orderId=$orderId | " . json_encode($tx));
-        $confirmations[$orderId] = 'NOTCONFIRMED';
-        continue;
-    }
 
     $order = load_order($orderId);
     if (!$order) {
