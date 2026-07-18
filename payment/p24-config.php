@@ -28,8 +28,10 @@ if (file_exists($credFile)) {
 define('SITE_URL', 'https://willaslonce.pl');
 
 // Webhooki n8n
-define('N8N_SHOP_WEBHOOK',    'https://n8n.marcelhoffman.pl/webhook/N8LA2zPOksuXPntB/webhook/brenna-shop-order');
-define('N8N_BOOKING_WEBHOOK', 'https://n8n.marcelhoffman.pl/webhook/N8LA2zPOksuXPntB/webhook/brenna-book');
+// n8n zhibernowany (2026-07) — powiadomienia ida mailem (autopay_admin_paid_email,
+// booking-bank, shop-bank). Puste URL = send_webhook nic nie robi.
+define('N8N_SHOP_WEBHOOK',    '');
+define('N8N_BOOKING_WEBHOOK', '');
 
 // === P24 endpoints ===
 define('P24_API_URL', P24_SANDBOX
@@ -208,9 +210,10 @@ function load_order(string $sessionId): ?array
     return json_decode(file_get_contents($file), true) ?: null;
 }
 
-/** Wyslij webhook do n8n */
+/** Wyslij webhook do n8n (no-op gdy URL pusty — n8n zhibernowany) */
 function send_webhook(string $url, array $data): void
 {
+    if ($url === '') return;
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_POST           => true,
