@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ============================================
     // 3. PŁYNNE PRZEWIJANIE z offsetem
     // ============================================
-    var NAV_OFFSET = 70;
+    var NAV_OFFSET = 106; /* 36px pasek kontaktowy + 70px nawigacja */
 
     document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
         anchor.addEventListener('click', function (e) {

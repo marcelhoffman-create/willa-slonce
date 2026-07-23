@@ -134,10 +134,68 @@ em.accent,
     padding: 0 24px;
 }
 
+/* ----- PASEK KONTAKTOWY ----- */
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 36px;
+    background: var(--color-bg-dark);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+}
+
+.topbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 28px;
+}
+
+.topbar-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.topbar-link:hover {
+    color: var(--color-accent-light);
+}
+
+.topbar-link svg {
+    color: var(--color-accent);
+    flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+    .topbar-container {
+        padding: 0 16px;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .topbar-link {
+        font-size: 12px;
+        gap: 6px;
+    }
+}
+
 /* ----- NAWIGACJA ----- */
 .nav {
     position: fixed;
-    top: 0;
+    top: 36px;
     left: 0;
     width: 100%;
     height: 70px;
