@@ -16,8 +16,11 @@ $FX = __DIR__ . '/fixtures';
 $r = calc_booking_amount(2, '2026-07-10', '2026-07-12', "$FX/prices.json");
 check('booking: 2 goscie x 2 noce = 840', $r['ok'] && $r['amount'] === 840 && $r['nights'] === 2);
 
-$r = calc_booking_amount(6, '2026-07-10', '2026-07-11', "$FX/prices.json");
-check('booking: 6 gosci x 1 noc = 620', $r['ok'] && $r['amount'] === 620 && $r['nights'] === 1);
+$r = calc_booking_amount(6, '2026-07-10', '2026-07-12', "$FX/prices.json");
+check('booking: 6 gosci x 2 noce = 1240', $r['ok'] && $r['amount'] === 1240 && $r['nights'] === 2);
+
+$r = calc_booking_amount(2, '2026-07-10', '2026-07-11', "$FX/prices.json");
+check('booking: 1 noc = blad (minimum 2 doby)', $r['ok'] === false);
 
 $r = calc_booking_amount(2, '2026-07-12', '2026-07-10', "$FX/prices.json");
 check('booking: checkout przed checkin = blad', $r['ok'] === false);

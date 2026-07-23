@@ -44,6 +44,14 @@ if (empty($imie) || empty($checkin) || $kwota < 1) {
     exit;
 }
 
+$inDate  = DateTime::createFromFormat('Y-m-d', $checkin);
+$outDate = DateTime::createFromFormat('Y-m-d', $checkout);
+if (!$inDate || !$outDate || (int) $inDate->diff($outDate)->format('%r%a') < 2) {
+    http_response_code(400);
+    echo json_encode(['ok' => false, 'error' => 'Minimalna dlugosc rezerwacji to 2 doby.']);
+    exit;
+}
+
 $bookingId = 'BBOOK-' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
 
 $data = [

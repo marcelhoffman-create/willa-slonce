@@ -275,21 +275,25 @@ em.accent,
     background: var(--color-accent-light);
 }
 
-/* Nawigacja po przewinięciu */
-.nav-scrolled {
+/* Nawigacja po przewinięciu (.nav-scrolled) oraz stała jasna na podstronach (.nav-solid) */
+.nav-scrolled,
+.nav-solid {
     background-color: var(--color-white);
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
 }
 
-.nav-scrolled .nav-logo {
+.nav-scrolled .nav-logo,
+.nav-solid .nav-logo {
     color: var(--color-text-dark);
 }
 
-.nav-scrolled .nav-link {
+.nav-scrolled .nav-link,
+.nav-solid .nav-link {
     color: var(--color-text-dark);
 }
 
-.nav-scrolled .nav-link:hover {
+.nav-scrolled .nav-link:hover,
+.nav-solid .nav-link:hover {
     color: var(--color-accent);
 }
 
@@ -317,7 +321,8 @@ em.accent,
     transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.4s ease;
 }
 
-.nav-scrolled .hamburger span {
+.nav-scrolled .hamburger span,
+.nav-solid .hamburger span {
     background: var(--color-text-dark);
 }
 

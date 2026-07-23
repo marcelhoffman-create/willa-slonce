@@ -335,7 +335,7 @@
         </div>
     </div>
 
-  <nav class="nav" id="nav">
+  <nav class="nav nav-solid" id="nav">
     <div class="nav-container">
       <a href="index.html" class="nav-logo">Willa Słońce</a>
       <div class="nav-links" id="navLinks">
@@ -392,6 +392,7 @@
               <input type="text" id="checkout" name="checkout" placeholder="Wybierz datę" readonly required>
             </div>
           </div>
+          <p style="margin-top:8px;font-size:.85rem;color:#888;">Minimalna długość pobytu: 2 doby</p>
 
           <div class="form-row" style="margin-top:20px;">
             <div class="form-group">
@@ -706,10 +707,11 @@
     }
 
     var checkinFp, checkoutFp;
+    var MIN_NIGHTS = 2;
 
     function initCalendar() {
-      var tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      var minStayDate = new Date();
+      minStayDate.setDate(minStayDate.getDate() + MIN_NIGHTS);
 
       checkinFp = flatpickr('#checkin', {
         locale: 'pl',
@@ -722,7 +724,7 @@
         onChange: function(selectedDates) {
           if (selectedDates[0]) {
             var minCheckout = new Date(selectedDates[0]);
-            minCheckout.setDate(minCheckout.getDate() + 1);
+            minCheckout.setDate(minCheckout.getDate() + MIN_NIGHTS);
             checkoutFp.set('minDate', minCheckout);
             checkoutFp.clear();
             checkoutFp.open();
@@ -736,7 +738,7 @@
         dateFormat: 'Y-m-d',
         altInput: true,
         altFormat: 'd.m.Y',
-        minDate: tomorrow,
+        minDate: minStayDate,
         disable: blockedDates,
         disableMobile: false,
         onChange: function() {
@@ -753,7 +755,7 @@
       if (pCheckin) {
         checkinFp.setDate(pCheckin, false);
         var minCo = new Date(pCheckin);
-        minCo.setDate(minCo.getDate() + 1);
+        minCo.setDate(minCo.getDate() + MIN_NIGHTS);
         checkoutFp.set('minDate', minCo);
       }
       if (pCheckout) {
@@ -885,6 +887,11 @@
 
       if (!document.getElementById('checkin').value || !document.getElementById('checkout').value) {
         alert('Wybierz daty przyjazdu i wyjazdu.');
+        return;
+      }
+
+      if (getNights() < MIN_NIGHTS) {
+        alert('Minimalna długość rezerwacji to 2 doby.');
         return;
       }
 

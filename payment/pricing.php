@@ -15,6 +15,7 @@ function calc_booking_amount(int $guests, string $checkin, string $checkout, str
 
     $nights = (int) $in->diff($out)->format('%r%a');
     if ($nights < 1) return $err('Data wyjazdu musi byc po dacie przyjazdu.');
+    if ($nights < 2) return $err('Minimalna dlugosc rezerwacji to 2 doby.');
 
     $prices = json_decode(@file_get_contents($pricesPath), true);
     $perNight = $prices['by_guests'][(string) $guests] ?? null;
