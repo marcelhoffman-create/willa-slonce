@@ -52,9 +52,15 @@ check('tresc: kontakt zwrotny',    str_contains($b, WILLA_CONTACT_PHONE));
 check('tresc: polskie znaki',      str_contains($b, 'Rezerwacja przyjęta'));
 check('tresc: brak dlugiej pauzy', !str_contains($b, '—') && !str_contains($b, '–'));
 
-// Adres podajemy dopiero po zaksiegowaniu wplaty, nie w dniu rezerwacji.
+// Dokladnego adresu nie ma w ZADNYM mailu - idzie osobno w dniu przyjazdu.
 check('tresc: BEZ dokladnego adresu', !str_contains($b, 'Markówka'));
 check('tresc: miejscowosc moze byc',  str_contains($b, 'Brenn'));
+
+// Forma grzecznosciowa: Panstwo, nigdy na Ty.
+$naTy = ['Twój', 'Twoj', 'Twoja', 'Twoje', 'Ciebie', 'Tobie', 'odpisz', 'Odpisz', 'zadzwoń do nas'];
+foreach ($naTy as $slowo) {
+    check("forma: rezerwacja bez '$slowo'", !str_contains($b, $slowo));
+}
 
 // Podpis: imie i nazwisko + strona + telefon.
 check('podpis: imie i nazwisko', str_contains($b, WILLA_OWNER));
@@ -65,9 +71,17 @@ check('podpis: telefon',         str_contains($b, WILLA_CONTACT_PHONE));
 $p = guest_paid_body($order);
 check('platnosc: potwierdza termin',    str_contains($p, '23.08.2026'));
 check('platnosc: bez danych do przelewu', !str_contains($p, WILLA_BANK_ACCOUNT));
-check('platnosc: PELNY adres obiektu',  str_contains($p, 'Markówka'));
+check('platnosc: BEZ dokladnego adresu', !str_contains($p, 'Markówka'));
 check('platnosc: brak dlugiej pauzy',   !str_contains($p, '—') && !str_contains($p, '–'));
 check('platnosc: podpis wlasciciela',   str_contains($p, WILLA_OWNER));
+check('platnosc: bez wzmianki o kluczach', !str_contains($p, 'skrytka') && !str_contains($p, 'Klucze'));
+check('platnosc: szczegoly w dniu przyjazdu', str_contains($p, 'w dniu Państwa przyjazdu'));
+foreach ($naTy as $slowo) {
+    check("forma: potwierdzenie bez '$slowo'", !str_contains($p, $slowo));
+}
+
+// Stopka ma byc podpisem, nie automatem.
+check('stopka: bez formulki o odpisywaniu', !str_contains($b, 'Wystarczy odpisać') && !str_contains($p, 'Wystarczy odpisać'));
 
 // --- kopia do wlasciciela (podglad tego, co dostal gosc) ---
 check('kopia: temat oznaczony prefiksem', str_starts_with(guest_owner_copy_subject('Rezerwacja przyjęta'), '[kopia]'));
