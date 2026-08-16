@@ -35,6 +35,7 @@ $telefon  = mb_substr(trim($body['telefon']  ?? ''), 0, 50);
 $checkin  = trim($body['checkin']            ?? '');
 $checkout = trim($body['checkout']           ?? '');
 $noce     = intval($body['noce']             ?? 0);
+$goscie   = intval($body['goscie']           ?? 0);
 $kwota    = intval($body['kwota']            ?? 0);
 $uwagi    = mb_substr(trim($body['uwagi']    ?? ''), 0, 500);
 
@@ -64,6 +65,7 @@ $data = [
     'checkin'   => $checkin,
     'checkout'  => $checkout,
     'noce'      => $noce,
+    'goscie'    => $goscie,
     'kwota'     => $kwota,
     'uwagi'     => $uwagi,
     'created'   => date('Y-m-d H:i:s'),
@@ -85,6 +87,7 @@ $htmlBody = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style
   <tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;">Check-in</td><td style="padding:6px 12px;">' . htmlspecialchars($checkin) . '</td></tr>
   <tr><td style="padding:6px 12px;font-weight:bold;">Check-out</td><td style="padding:6px 12px;">' . htmlspecialchars($checkout) . '</td></tr>
   <tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;">Noce</td><td style="padding:6px 12px;">' . $noce . '</td></tr>
+  <tr><td style="padding:6px 12px;font-weight:bold;">Liczba osób</td><td style="padding:6px 12px;">' . ($goscie ?: 'nie podano') . '</td></tr>
   ' . ($uwagi ? '<tr><td style="padding:6px 12px;font-weight:bold;">Uwagi</td><td style="padding:6px 12px;">' . nl2br(htmlspecialchars($uwagi)) . '</td></tr>' : '') . '
   <tr><td style="padding:6px 12px;font-weight:bold;font-size:1.1em;">Kwota</td><td style="padding:6px 12px;font-size:1.1em;color:#C17817;font-weight:bold;">' . $kwota . ' zł</td></tr>
 </table>

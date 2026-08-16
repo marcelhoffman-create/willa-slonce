@@ -17,6 +17,7 @@ $order = [
     'checkin'   => '2026-08-23',
     'checkout'  => '2026-08-26',
     'noce'      => 3,
+    'goscie'    => 4,
     'kwota'     => 1800,
 ];
 
@@ -48,6 +49,17 @@ check('tresc: numer konta',        str_contains($b, WILLA_BANK_ACCOUNT));
 check('tresc: kwota',              str_contains($b, '1800 z'));
 check('tresc: tytul przelewu',     str_contains($b, guest_transfer_title($order)));
 check('tresc: id rezerwacji',      str_contains($b, $order['bookingId']));
+
+// --- liczba osob ---
+check('tresc: liczba osob w mailu',  str_contains($b, 'Liczba osób') && str_contains($b, '4 osoby'));
+check('platnosc: liczba osob',       str_contains(guest_paid_body($order), '4 osoby'));
+// Stare rezerwacje nie maja tego pola - wiersz ma wtedy zniknac, nie pokazywac zera.
+check('tresc: brak pola = brak wiersza',
+    !str_contains(guest_booking_body(array_diff_key($order, ['goscie' => 1])), 'Liczba osób'));
+check('odmiana: 1 osoba',  guest_guests_label(1) === '1 osoba');
+check('odmiana: 2 osoby',  guest_guests_label(2) === '2 osoby');
+check('odmiana: 5 osob',   guest_guests_label(5) === '5 osób');
+check('odmiana: 0 = pusto', guest_guests_label(0) === '');
 check('tresc: kontakt zwrotny',    str_contains($b, WILLA_CONTACT_PHONE));
 check('tresc: polskie znaki',      str_contains($b, 'Rezerwacja przyjęta'));
 check('tresc: brak dlugiej pauzy', !str_contains($b, '—') && !str_contains($b, '–'));

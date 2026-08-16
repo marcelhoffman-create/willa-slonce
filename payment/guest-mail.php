@@ -54,6 +54,16 @@ function guest_transfer_title(array $o): string
         . ' ' . $ascii((string) ($o['imie'] ?? '')) . ' ' . $ascii((string) ($o['nazwisko'] ?? ''));
 }
 
+/** "1 osoba" / "2 osoby" / "5 osób". Pusty string gdy brak danych (stare rezerwacje). */
+function guest_guests_label(int $n): string
+{
+    if ($n < 1) return '';
+    if ($n === 1) return '1 osoba';
+    $last = $n % 10;
+    $word = ($last >= 2 && $last <= 4 && ($n < 12 || $n > 14)) ? 'osoby' : 'osób';
+    return $n . ' ' . $word;
+}
+
 function guest_booking_subject(array $o): string
 {
     return 'Rezerwacja przyjęta - Willa Słońce, ' . guest_date_pl((string) ($o['checkin'] ?? ''));
@@ -98,6 +108,7 @@ function guest_row(string $label, string $value, bool $shaded = false, bool $str
 function guest_booking_body(array $o): string
 {
     $e = static fn ($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+    $goscie = guest_guests_label(intval($o['goscie'] ?? 0));
 
     $inner = '<p>Dziękujemy za rezerwację. Termin jest wstępnie zarezerwowany dla Państwa.</p>'
         . '<table style="border-collapse:collapse;width:100%;margin:16px 0;">'
@@ -105,7 +116,8 @@ function guest_booking_body(array $o): string
         . guest_row('Przyjazd', $e(guest_date_pl((string) ($o['checkin'] ?? ''))))
         . guest_row('Wyjazd', $e(guest_date_pl((string) ($o['checkout'] ?? ''))), true)
         . guest_row('Liczba nocy', $e($o['noce'] ?? ''))
-        . guest_row('Numer rezerwacji', $e($o['bookingId'] ?? ''), true)
+        . ($goscie !== '' ? guest_row('Liczba osób', $goscie, true) : '')
+        . guest_row('Numer rezerwacji', $e($o['bookingId'] ?? ''), $goscie === '')
         . '</table>'
         . '<h3 style="margin-bottom:8px;">Dane do przelewu</h3>'
         . '<table style="border-collapse:collapse;width:100%;margin-bottom:16px;">'
@@ -124,12 +136,14 @@ function guest_booking_body(array $o): string
 function guest_paid_body(array $o): string
 {
     $e = static fn ($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+    $goscie = guest_guests_label(intval($o['goscie'] ?? 0));
 
     $inner = '<p>Wpłata dotarła. Pobyt Państwa w Willi Słońce jest potwierdzony.</p>'
         . '<table style="border-collapse:collapse;width:100%;margin:16px 0;">'
         . guest_row('Gość', $e(($o['imie'] ?? '') . ' ' . ($o['nazwisko'] ?? '')), true)
         . guest_row('Przyjazd', $e(guest_date_pl((string) ($o['checkin'] ?? ''))) . ', od ' . WILLA_CHECKIN_TIME)
         . guest_row('Wyjazd', $e(guest_date_pl((string) ($o['checkout'] ?? ''))) . ', do ' . WILLA_CHECKOUT_TIME, true)
+        . ($goscie !== '' ? guest_row('Liczba osób', $goscie) : '')
         . guest_row('Numer rezerwacji', $e($o['bookingId'] ?? ''), true)
         . '</table>'
         . '<p>Szczegóły dojazdu i odbioru kluczy prześlemy w dniu Państwa przyjazdu. '
