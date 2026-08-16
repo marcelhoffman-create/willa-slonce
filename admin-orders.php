@@ -44,9 +44,16 @@ if ($action === 'mark-paid' || $action === 'archive') {
         $o = json_decode(file_get_contents($file), true) ?: [];
         $o['status']       = 'paid';
         $o['paidAt']       = date('Y-m-d H:i:s');
-        $o['paidManually'] = true; // recznie oznaczone w panelu (bez ITN, bez maila/webhooka)
+        $o['paidManually'] = true; // recznie oznaczone w panelu (bez ITN, bez webhooka)
         file_put_contents($file, json_encode($o, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-        echo json_encode(['ok' => true]);
+
+        // Potwierdzenie dla goscia - tylko dla rezerwacji (zamowienia ze sklepu maja inny obieg).
+        $mailed = false;
+        if (($o['type'] ?? '') === 'booking_bank' || ($o['type'] ?? '') === 'booking') {
+            require_once __DIR__ . '/payment/guest-mail.php';
+            $mailed = guest_send_booking_paid($o + ['bookingId' => $id]);
+        }
+        echo json_encode(['ok' => true, 'guestMailed' => $mailed]);
         exit;
     }
 

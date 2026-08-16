@@ -97,6 +97,11 @@ $headers .= 'From: Willa Slonce <noreply@willaslonce.pl>' . "\r\n";
 
 mail($adminEmail, $subject, $htmlBody, $headers);
 
+// Mail do goscia z danymi do przelewu. Bez niego gosc ma numer konta wylacznie
+// na ekranie po rezerwacji - zamkniecie karty = brak mozliwosci zaplaty.
+require_once __DIR__ . '/guest-mail.php';
+guest_send_booking_created($data);
+
 // Opcjonalnie: spróbuj też n8n
 if (defined('N8N_BOOKING_WEBHOOK') && N8N_BOOKING_WEBHOOK !== '') {
     send_webhook(N8N_BOOKING_WEBHOOK, array_merge($body, ['bookingId' => $bookingId]));
