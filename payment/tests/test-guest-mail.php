@@ -52,12 +52,28 @@ check('tresc: kontakt zwrotny',    str_contains($b, WILLA_CONTACT_PHONE));
 check('tresc: polskie znaki',      str_contains($b, 'Rezerwacja przyjęta'));
 check('tresc: brak dlugiej pauzy', !str_contains($b, '—') && !str_contains($b, '–'));
 
+// Adres podajemy dopiero po zaksiegowaniu wplaty, nie w dniu rezerwacji.
+check('tresc: BEZ dokladnego adresu', !str_contains($b, 'Markówka'));
+check('tresc: miejscowosc moze byc',  str_contains($b, 'Brenn'));
+
+// Podpis: imie i nazwisko + strona + telefon.
+check('podpis: imie i nazwisko', str_contains($b, WILLA_OWNER));
+check('podpis: link do strony',  str_contains($b, WILLA_SITE));
+check('podpis: telefon',         str_contains($b, WILLA_CONTACT_PHONE));
+
 // --- tresc maila po wplacie ---
 $p = guest_paid_body($order);
 check('platnosc: potwierdza termin',    str_contains($p, '23.08.2026'));
 check('platnosc: bez danych do przelewu', !str_contains($p, WILLA_BANK_ACCOUNT));
-check('platnosc: adres obiektu',        str_contains($p, 'Brenna'));
+check('platnosc: PELNY adres obiektu',  str_contains($p, 'Markówka'));
 check('platnosc: brak dlugiej pauzy',   !str_contains($p, '—') && !str_contains($p, '–'));
+check('platnosc: podpis wlasciciela',   str_contains($p, WILLA_OWNER));
+
+// --- kopia do wlasciciela (podglad tego, co dostal gosc) ---
+check('kopia: temat oznaczony prefiksem', str_starts_with(guest_owner_copy_subject('Rezerwacja przyjęta'), '[kopia]'));
+check('kopia: zawiera oryginalny temat',  str_contains(guest_owner_copy_subject('Rezerwacja przyjęta'), 'Rezerwacja przyjęta'));
+check('kopia: naglowek z adresem goscia', str_contains(guest_owner_copy_body($order, 'TRESC'), 'krzysiekk22@vp.pl'));
+check('kopia: zawiera tresc goscia',      str_contains(guest_owner_copy_body($order, 'TRESC'), 'TRESC'));
 
 // --- XSS / wstrzykniecie HTML z formularza ---
 $evil = array_merge($order, ['imie' => '<script>alert(1)</script>', 'nazwisko' => '"><b>x']);

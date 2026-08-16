@@ -13,6 +13,8 @@ const WILLA_BANK_ACCOUNT   = '13 1050 1214 1000 0023 1765 9577';
 const WILLA_BANK_RECIPIENT = 'Willa Słońce - właściciel';
 const WILLA_CONTACT_EMAIL  = 'marcelhoffman@gmail.com';
 const WILLA_CONTACT_PHONE  = '+48 690 300 359';
+const WILLA_OWNER          = 'Marcel Hoffman';
+const WILLA_SITE           = 'https://willaslonce.pl';
 const WILLA_ADDRESS        = 'ul. Markówka 26, 43-438 Brenna';
 // Godziny zgodne z regulaminem (regulamin.html): przyjazd od 15:00, wyjazd do 12:00.
 const WILLA_CHECKIN_TIME   = '15:00';
@@ -63,17 +65,28 @@ function guest_paid_subject(array $o): string
     return 'Potwierdzenie rezerwacji - Willa Słońce, ' . guest_date_pl((string) ($o['checkin'] ?? ''));
 }
 
-/** Wspolna ramka HTML maila. */
-function guest_mail_shell(string $title, string $inner): string
+/**
+ * Wspolna ramka HTML maila.
+ *
+ * $withAddress: dokladny adres podajemy DOPIERO po zaksiegowaniu wplaty.
+ * W dniu rezerwacji wystarczy miejscowosc - termin jest wtedy tylko wstepny.
+ */
+function guest_mail_shell(string $title, string $inner, bool $withAddress = true): string
 {
+    $where = $withAddress ? 'Willa Słońce, ' . WILLA_ADDRESS : 'Willa Słońce, Brenna';
+
     return '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
         . '<body style="font-family:sans-serif;color:#222;max-width:600px;margin:0 auto;padding:20px;line-height:1.6;">'
         . '<h2 style="color:#C17817;margin-bottom:16px;">' . $title . '</h2>'
         . $inner
-        . '<p style="margin-top:28px;padding-top:16px;border-top:1px solid #eee;color:#888;font-size:.85em;">'
-        . 'Willa Słońce, ' . WILLA_ADDRESS . '<br>'
-        . 'Pytania? Odpisz na tego maila lub zadzwoń: ' . WILLA_CONTACT_PHONE
-        . '</p></body></html>';
+        . '<div style="margin-top:28px;padding-top:16px;border-top:1px solid #eee;color:#666;font-size:.9em;">'
+        . '<p style="margin:0 0 4px;"><strong>' . WILLA_OWNER . '</strong><br>' . $where . '</p>'
+        . '<p style="margin:0;">'
+        . 'tel. <a href="tel:' . str_replace(' ', '', WILLA_CONTACT_PHONE) . '" style="color:#C17817;">' . WILLA_CONTACT_PHONE . '</a><br>'
+        . '<a href="' . WILLA_SITE . '" style="color:#C17817;">' . WILLA_SITE . '</a>'
+        . '</p>'
+        . '<p style="margin:12px 0 0;color:#999;font-size:.9em;">Pytania? Wystarczy odpisać na tego maila.</p>'
+        . '</div></body></html>';
 }
 
 /** Wiersz tabelki. */
@@ -106,9 +119,9 @@ function guest_booking_body(array $o): string
         . guest_row('Tytuł przelewu', '<strong>' . $e(guest_transfer_title($o)) . '</strong>')
         . '</table>'
         . '<p>Prosimy o wpłatę w ciągu <strong>48 godzin</strong>. Po zaksięgowaniu wpłaty wyślemy '
-        . 'potwierdzenie rezerwacji na ten adres.</p>';
+        . 'potwierdzenie rezerwacji wraz z dokładnym adresem i szczegółami dojazdu.</p>';
 
-    return guest_mail_shell('Rezerwacja przyjęta', $inner);
+    return guest_mail_shell('Rezerwacja przyjęta', $inner, false);
 }
 
 /** Mail wysylany po zaksiegowaniu wplaty - bez danych do przelewu. */
@@ -131,7 +144,30 @@ function guest_paid_body(array $o): string
     return guest_mail_shell('Rezerwacja potwierdzona', $inner);
 }
 
-/** Wspolna wysylka. Zwraca false gdy brak poprawnego adresu - nigdy nie przerywa requestu. */
+/** Temat kopii dla wlasciciela - prefiks, zeby dalo sie filtrowac w skrzynce. */
+function guest_owner_copy_subject(string $subject): string
+{
+    return '[kopia] ' . $subject;
+}
+
+/** Kopia maila goscia z naglowkiem: do kogo poszlo. */
+function guest_owner_copy_body(array $o, string $guestBody): string
+{
+    $e = static fn ($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+
+    $head = '<div style="max-width:600px;margin:0 auto;padding:12px 20px;background:#f5f0e8;'
+        . 'border-left:4px solid #C17817;font-family:sans-serif;font-size:.9em;color:#555;">'
+        . 'Kopia wiadomości wysłanej do gościa: <strong>' . $e($o['email'] ?? '') . '</strong>'
+        . ' (' . $e(($o['imie'] ?? '') . ' ' . ($o['nazwisko'] ?? '')) . ', tel. ' . $e($o['telefon'] ?? 'brak') . ')'
+        . '</div>';
+
+    return $head . $guestBody;
+}
+
+/**
+ * Wspolna wysylka. Zwraca false gdy brak poprawnego adresu - nigdy nie przerywa requestu.
+ * Kopia leci do wlasciciela, zeby bylo widac co dostal gosc i czy w ogole poszlo.
+ */
 function guest_send(array $o, string $subject, string $body): bool
 {
     if (!guest_email_valid((string) ($o['email'] ?? ''))) return false;
@@ -142,8 +178,21 @@ function guest_send(array $o, string $subject, string $body): bool
     $headers .= 'Reply-To: ' . WILLA_CONTACT_EMAIL . "\r\n";
 
     $encoded = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+    $sent    = @mail(trim((string) $o['email']), $encoded, $body, $headers);
 
-    return @mail(trim((string) $o['email']), $encoded, $body, $headers);
+    // Kopia dla wlasciciela. Nie wplywa na wynik - liczy sie dostarczenie do goscia.
+    $copyHeaders  = 'MIME-Version: 1.0' . "\r\n";
+    $copyHeaders .= 'Content-Type: text/html; charset=UTF-8' . "\r\n";
+    $copyHeaders .= 'From: ' . WILLA_FROM . "\r\n";
+    $copyHeaders .= 'Reply-To: ' . trim((string) $o['email']) . "\r\n"; // odpowiedz idzie wprost do goscia
+    @mail(
+        WILLA_CONTACT_EMAIL,
+        '=?UTF-8?B?' . base64_encode(guest_owner_copy_subject($subject)) . '?=',
+        guest_owner_copy_body($o, $body),
+        $copyHeaders
+    );
+
+    return $sent;
 }
 
 function guest_send_booking_created(array $o): bool
