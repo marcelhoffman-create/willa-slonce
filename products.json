@@ -46,20 +46,20 @@
       "available": false
     },
     {
-      "id": "krowka-miodowa-lyson",
-      "name": "Krówka miodowa",
-      "origin": "Pasieka Łysoń · 220 g",
-      "description": "Krówki mleczne z dodatkiem miodu.",
-      "price": 16,
+      "id": "miod-z-malinami",
+      "name": "Miód z malinami",
+      "origin": "Pasieka Pszczele Specjały, Kostkowice k. Skoczowa · 250 g",
+      "description": "Miód z dodatkiem malin, do herbaty i na śniadanie.",
+      "price": 26,
       "image": "",
       "available": false
     },
     {
-      "id": "granola-z-miodem-lyson",
-      "name": "Granola owocowa z miodem",
-      "origin": "Pasieka Łysoń · 300 g",
-      "description": "Płatki zbożowe z owocami, pieczone z miodem.",
-      "price": 24,
+      "id": "calusk-pierniki-miodowe",
+      "name": "Pierniki miodowe „Całuski”",
+      "origin": "Pasieka Pszczele Specjały, Kostkowice k. Skoczowa · 100 g",
+      "description": "Małe pierniki na miodzie.",
+      "price": 13,
       "image": "",
       "available": false
     }
