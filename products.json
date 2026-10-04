@@ -1,58 +1,67 @@
 {
   "products": [
     {
-      "id": "miod-beskidzki",
-      "name": "Miód beskidzki",
-      "origin": "Pasieka Dolina Brennicy · 250 ml",
-      "description": "Wielokwiatowy, gęsty, pachnący łąkami. Zbierany przez pszczoły, które znają te zbocza.",
-      "price": 39,
-      "image": "https://images.unsplash.com/photo-1558642891-54be180ea339?w=600&q=80",
-      "available": true
-    },
-    {
-      "id": "nalewka-brennicowka",
-      "name": "Nalewka góralska \"Brennicówka\"",
-      "origin": "Produkcja domowa · 500 ml",
-      "description": "Domowa, na ziołach beskidzkich, leżakowana minimum pół roku. Smak gór w butelce.",
-      "price": 59,
-      "image": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80",
-      "available": true
-    },
-    {
-      "id": "ser-owczy",
-      "name": "Ser owczy",
-      "origin": "Bacówka spod Błatniej · 300 g",
-      "description": "Wędzony na juniprusie, twardy, aromatyczny. Prosto z hali — prawdziwy smak Beskidów.",
-      "price": 35,
-      "image": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=600&q=80",
-      "available": true
-    },
-    {
-      "id": "herbata-beskidzka-laka",
-      "name": "Herbata \"Beskidzka Łąka\"",
-      "origin": "Zioła zbierane ręcznie · 100 g",
-      "description": "Tymianek, mięta, rumianek, lipa — zbierane ręcznie na beskidzkich łąkach.",
+      "id": "miod-lipowy-brenna",
+      "name": "Miód lipowy z Brennej",
+      "origin": "Pasieka gminna, Brenna · 250 g",
+      "description": "Jasny, delikatny, z wyraźnym aromatem kwiatów lipy.",
       "price": 29,
-      "image": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=600&q=80",
-      "available": true
+      "image": "",
+      "available": false
     },
     {
-      "id": "swieca-beskidzki-las",
-      "name": "Świeca sojowa \"Beskidzki Las\"",
-      "origin": "Ręcznie robiona · 180 ml",
-      "description": "Zapach żywicy, mchu i mokrego drewna po deszczu. Długi czas palenia — ok. 40 godzin.",
-      "price": 45,
-      "image": "https://images.unsplash.com/photo-1599059813005-11265ba4b4ce?w=600&q=80",
-      "available": true
+      "id": "miod-wielokwiatowy-brenna",
+      "name": "Miód wielokwiatowy z Brennej",
+      "origin": "Pasieka gminna, Brenna · 250 g",
+      "description": "Z łąk i sadów doliny Brennicy. Łagodny, na co dzień.",
+      "price": 29,
+      "image": "",
+      "available": false
     },
     {
-      "id": "kosz-smaki-beskidow",
-      "name": "Kosz powitalny \"Smaki Beskidów\"",
-      "origin": "Kompozycja lokalnych produktów",
-      "description": "Czeka na Was w domku. Idealny na początek pobytu — miód, herbata, ciastka i ser.",
-      "price": 89,
-      "image": "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=600&q=80",
-      "available": true
+      "id": "miod-spadziowy-brenna",
+      "name": "Miód spadziowy z Brennej",
+      "origin": "Pasieka gminna, Brenna · 250 g",
+      "description": "Ciemny, gęsty, z beskidzkich lasów. Mniej słodki niż miody kwiatowe.",
+      "price": 35,
+      "image": "",
+      "available": false
+    },
+    {
+      "id": "herbata-napar-zieliniork",
+      "name": "Herbata „Napar Zieliniork”",
+      "origin": "Breńskie Herbaty, Brenna",
+      "description": "Mięta, melisa, kwiat czarnego bzu, lipa, liście maliny i dzika róża. Mieszanka ziół, które pito w dolinie Brennicy.",
+      "price": 32,
+      "image": "",
+      "available": false
+    },
+    {
+      "id": "herbata-z-maliny",
+      "name": "Herbata „Z Maliny”",
+      "origin": "Breńskie Herbaty, Brenna",
+      "description": "Kwiat czarnego bzu, suszone jabłka, gruszki i maliny.",
+      "price": 32,
+      "image": "",
+      "available": false
+    },
+    {
+      "id": "krowka-miodowa-lyson",
+      "name": "Krówka miodowa",
+      "origin": "Pasieka Łysoń · 220 g",
+      "description": "Krówki mleczne z dodatkiem miodu.",
+      "price": 16,
+      "image": "",
+      "available": false
+    },
+    {
+      "id": "granola-z-miodem-lyson",
+      "name": "Granola owocowa z miodem",
+      "origin": "Pasieka Łysoń · 300 g",
+      "description": "Płatki zbożowe z owocami, pieczone z miodem.",
+      "price": 24,
+      "image": "",
+      "available": false
     }
   ]
 }
