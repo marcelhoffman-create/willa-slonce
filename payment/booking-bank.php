@@ -53,6 +53,17 @@ if (!$inDate || !$outDate || (int) $inDate->diff($outDate)->format('%r%a') < 2) 
     exit;
 }
 
+// Kwote liczy serwer z prices.json, nie przegladarka (wczesniej przyjmowana z formularza).
+require_once __DIR__ . '/pricing.php';
+$priced = calc_booking_amount($goscie, $checkin, $checkout, __DIR__ . '/../prices.json');
+if (!$priced['ok']) {
+    http_response_code(400);
+    echo json_encode(['ok' => false, 'error' => $priced['error']]);
+    exit;
+}
+$kwota = $priced['amount'];
+$noce  = $priced['nights'];
+
 $bookingId = 'BBOOK-' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
 
 $data = [
@@ -110,4 +121,4 @@ if (defined('N8N_BOOKING_WEBHOOK') && N8N_BOOKING_WEBHOOK !== '') {
     send_webhook(N8N_BOOKING_WEBHOOK, array_merge($body, ['bookingId' => $bookingId]));
 }
 
-echo json_encode(['ok' => true, 'bookingId' => $bookingId]);
+echo json_encode(['ok' => true, 'bookingId' => $bookingId, 'kwota' => $kwota, 'noce' => $noce]);

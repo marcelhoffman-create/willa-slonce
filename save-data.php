@@ -51,6 +51,13 @@ if ($type === 'products') {
 
 // ===== CENY =====
 } elseif ($type === 'prices') {
+    // Od 30.10.2026 ceny strony przychodza z cennika RoomAdmin (edytor cen Marcela); reczna zmiana zostalaby nadpisana.
+    $obecne = json_decode(@file_get_contents(__DIR__ . '/prices.json'), true);
+    if (($obecne['zrodlo'] ?? '') === 'RoomAdmin') {
+        http_response_code(409);
+        echo json_encode(['ok' => false, 'error' => 'Ceny strony sa pobierane z RoomAdmin. Zmieniaj je w edytorze cennika (Cennik.command).']);
+        exit;
+    }
     $byGuests = $body['by_guests'] ?? [];
     for ($i = 1; $i <= 6; $i++) {
         $p = intval($byGuests[(string)$i] ?? 0);

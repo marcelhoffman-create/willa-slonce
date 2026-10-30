@@ -13,23 +13,48 @@ function check(string $name, $cond): void {
 $FX = __DIR__ . '/fixtures';
 
 // --- calc_booking_amount ---
-$r = calc_booking_amount(2, '2026-07-10', '2026-07-12', "$FX/prices.json");
+$r = calc_booking_amount(2, '2027-07-10', '2027-07-12', "$FX/prices.json");
 check('booking: 2 goscie x 2 noce = 840', $r['ok'] && $r['amount'] === 840 && $r['nights'] === 2);
 
-$r = calc_booking_amount(6, '2026-07-10', '2026-07-12', "$FX/prices.json");
+$r = calc_booking_amount(6, '2027-07-10', '2027-07-12', "$FX/prices.json");
 check('booking: 6 gosci x 2 noce = 1240', $r['ok'] && $r['amount'] === 1240 && $r['nights'] === 2);
 
-$r = calc_booking_amount(2, '2026-07-10', '2026-07-11', "$FX/prices.json");
+$r = calc_booking_amount(2, '2027-07-10', '2027-07-11', "$FX/prices.json");
 check('booking: 1 noc = blad (minimum 2 doby)', $r['ok'] === false);
 
-$r = calc_booking_amount(2, '2026-07-12', '2026-07-10', "$FX/prices.json");
+$r = calc_booking_amount(2, '2027-07-12', '2027-07-10', "$FX/prices.json");
 check('booking: checkout przed checkin = blad', $r['ok'] === false);
 
-$r = calc_booking_amount(9, '2026-07-10', '2026-07-12', "$FX/prices.json");
+$r = calc_booking_amount(9, '2027-07-10', '2027-07-12', "$FX/prices.json");
 check('booking: liczba gosci poza zakresem = blad', $r['ok'] === false);
 
-$r = calc_booking_amount(2, 'nie-data', '2026-07-12', "$FX/prices.json");
+$r = calc_booking_amount(2, 'nie-data', '2027-07-12', "$FX/prices.json");
 check('booking: zla data = blad', $r['ok'] === false);
+
+// --- calc_booking_amount: ceny dzienne z RoomAdmin (zakresy wlacznie, bez_ceny) ---
+$Z = "$FX/prices-zakresy.json";
+$r = calc_booking_amount(2, '2026-12-22', '2026-12-24', $Z);
+check('zakresy: przed zakresem 2 x 550 = 1100', $r['ok'] && $r['amount'] === 1100);
+$r = calc_booking_amount(2, '2026-12-23', '2026-12-25', $Z);
+check('zakresy: 550 + 800 = 1350 (pierwszy dzien zakresu liczony)', $r['ok'] && $r['amount'] === 1350);
+$r = calc_booking_amount(6, '2026-12-26', '2026-12-28', $Z);
+check('zakresy: 1600 + 1200 = 2800 (ostatni dzien zakresu wlacznie)', $r['ok'] && $r['amount'] === 2800);
+$r = calc_booking_amount(2, '2026-12-27', '2026-12-29', $Z);
+check('zakresy: noc bez ceny = blad', $r['ok'] === false);
+$r = calc_booking_amount(1, '2026-12-24', '2026-12-26', $Z);
+check('zakresy: 1 osoba w zakresie = 2 x 800', $r['ok'] && $r['amount'] === 1600);
+$r = calc_booking_amount(2, '2026-12-01', '2027-03-01', $Z);
+check('zakresy: ponad 60 nocy = blad', $r['ok'] === false);
+$r = calc_booking_amount(2, '2026-12-19', '2026-12-21', $Z);
+check('zakresy: noc zajeta w RoomAdmin (zajete) = blad', $r['ok'] === false);
+$r = calc_booking_amount(2, '2026-12-18', '2026-12-20', $Z);
+check('zakresy: wyjazd w dzien zajety (noc nieliczona) = ok', $r['ok'] && $r['amount'] === 1100);
+$r = calc_booking_amount(2, '2020-01-01', '2020-01-03', $Z);
+check('booking: przyjazd w przeszlosci = blad', $r['ok'] === false);
+$r = calc_booking_amount(2, '2027-01-09', '2027-01-11', $Z);
+check('zakresy: ostatnia noc cennika 10.01 wlacznie = 2 x 550', $r['ok'] && $r['amount'] === 1100);
+$r = calc_booking_amount(2, '2027-01-10', '2027-01-12', $Z);
+check('zakresy: noc po koncu cennika = blad', $r['ok'] === false);
 
 // --- calc_shop_items ---
 $r = calc_shop_items([['id'=>'miod-beskidzki','qty'=>2,'price'=>1]], "$FX/products.json");

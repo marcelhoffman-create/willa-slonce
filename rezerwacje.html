@@ -667,6 +667,7 @@
     };
 
     var blockedDates = [];
+    var cennikDo = null; // ostatnia noc z cena w RoomAdmin (prices.json: cennik_do); dalej rezerwacja niemozliwa
 
     // Pobierz ceny i dostępność równolegle
     Promise.all([
@@ -684,7 +685,9 @@
         var p = prices.per_night;
         PRICES.by_guests = {'1':p,'2':p,'3':p,'4':p,'5':p,'6':p};
       }
-      blockedDates = avail.blocked || [];
+      // Noce bez ceny w cenniku RoomAdmin (prices.json: bez_ceny) sa niedostepne tak jak zajete.
+      blockedDates = (avail.blocked || []).concat(prices.bez_ceny || [], prices.zajete || []);
+      cennikDo = prices.cennik_do || null;
       initCalendar();
     });
 
@@ -719,6 +722,7 @@
         altInput: true,
         altFormat: 'd.m.Y',
         minDate: 'today',
+        maxDate: cennikDo || undefined,
         disable: blockedDates,
         disableMobile: false,
         onChange: function(selectedDates) {
@@ -739,7 +743,7 @@
         altInput: true,
         altFormat: 'd.m.Y',
         minDate: minStayDate,
-        disable: blockedDates,
+        maxDate: cennikDo ? new Date(new Date(cennikDo + 'T12:00:00').getTime() + 86400000) : undefined,
         disableMobile: false,
         onChange: function() {
           updatePrice();
@@ -802,14 +806,27 @@
       var firstPrice = null;
       var allSame = true;
       var d = new Date(ci + 'T12:00:00'); // noon żeby uniknąć DST
+      var niedostepna = null;
 
       for (var i = 0; i < nights; i++) {
-        var isoDate = d.toISOString().substring(0, 10);
+        // Data z lokalnych składowych (toISOString przesuwał dzień w części stref czasowych).
+        var isoDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        if (blockedDates.indexOf(isoDate) !== -1 || (cennikDo && isoDate > cennikDo)) niedostepna = niedostepna || isoDate;
         var p = getPriceForNight(isoDate, guests);
         if (firstPrice === null) firstPrice = p;
         else if (p !== firstPrice) allSame = false;
         total += p;
         d.setDate(d.getDate() + 1);
+      }
+
+      if (niedostepna) {
+        // Pobyt obejmuje noc zajętą albo bez ceny: nie pokazuję kwoty, serwer i tak by go odrzucił.
+        summary.style.display = 'none';
+        document.getElementById('noceHidden').value = '';
+        document.getElementById('kwotaHidden').value = '';
+        alert('Noc ' + niedostepna.split('-').reverse().join('.') + ' jest niedostępna. Wybierz inny termin.');
+        checkoutFp.clear();
+        return;
       }
 
       var nightsLabel = nights + (nights === 1 ? ' noc' : nights < 5 ? ' noce' : ' nocy');
@@ -937,7 +954,16 @@
         })
         .then(function(r) { return r.json(); })
         .catch(function() { return {}; })
-        .then(function() { showSuccess(body); });
+        .then(function(data) {
+          if (data && data.ok) {
+            // Kwota z serwera (liczona z cennika), nie z formularza.
+            showSuccess(Object.assign({}, body, { kwota: data.kwota }));
+          } else {
+            alert((data && data.error) || 'Nie udało się wysłać rezerwacji. Spróbuj ponownie albo zadzwoń.');
+            btn.disabled = false;
+            btn.textContent = 'Rezerwuj termin →';
+          }
+        });
       }
     });
 
