@@ -10,7 +10,7 @@
  "date_ranges": [
   {
    "from": "2026-10-31",
-   "to": "2026-11-01",
+   "to": "2026-11-02",
    "label": "RoomAdmin",
    "by_guests": {
     "2": 522,
