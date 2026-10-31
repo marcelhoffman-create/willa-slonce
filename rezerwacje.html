@@ -131,6 +131,19 @@
     /* Daty — podwójny flatpickr */
     .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .date-row .form-group { margin-bottom: 0; }
+    /* Noce zajęte w kalendarzu: czerwone i przekreślone, wolne bez zmian */
+    .flatpickr-day.zajety.flatpickr-disabled,
+    .flatpickr-day.zajety.flatpickr-disabled:hover {
+      background: #fde8e8;
+      border-color: #fde8e8;
+      color: #b42318;
+      text-decoration: line-through;
+      cursor: not-allowed;
+    }
+    .flatpickr-day.zajety.flatpickr-disabled.prevMonthDay,
+    .flatpickr-day.zajety.flatpickr-disabled.nextMonthDay { opacity: 0.45; }
+    .legenda-kalendarza { margin-top:8px; font-size:.85rem; color:#888; display:flex; flex-wrap:wrap; gap:4px 16px; }
+    .legenda-kalendarza .probka { display:inline-block; width:12px; height:12px; border-radius:3px; background:#fde8e8; border:1px solid #f3b7b7; vertical-align:-1px; margin-right:6px; }
 
     /* Kalkulator ceny */
     .price-summary {
@@ -392,7 +405,7 @@
               <input type="text" id="checkout" name="checkout" placeholder="Wybierz datę" readonly required>
             </div>
           </div>
-          <p style="margin-top:8px;font-size:.85rem;color:#888;">Minimalna długość pobytu: 2 doby</p>
+          <p class="legenda-kalendarza"><span>Minimalna długość pobytu: 2 doby</span><span><span class="probka"></span>termin zajęty</span></p>
 
           <div class="form-row" style="margin-top:20px;">
             <div class="form-group">
@@ -712,6 +725,43 @@
     var checkinFp, checkoutFp;
     var MIN_NIGHTS = 2;
 
+    // Data RRRR-MM-DD z lokalnych składowych (toISOString przesuwa dzień w części stref czasowych).
+    function isoLokalnie(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function zajetaNoc(iso) {
+      return blockedDates.indexOf(iso) !== -1;
+    }
+    // Pierwsza zajęta noc od dnia przyjazdu: tego dnia można jeszcze wyjechać, później już nie.
+    function pierwszaZajetaPo(ci) {
+      var d = new Date(ci.getFullYear(), ci.getMonth(), ci.getDate(), 12);
+      var koniec = cennikDo ? cennikDo : null;
+      for (var i = 0; i < 400; i++) {
+        var iso = isoLokalnie(d);
+        if (zajetaNoc(iso) || (koniec && iso > koniec)) return iso;
+        d.setDate(d.getDate() + 1);
+      }
+      return null;
+    }
+    // Wyjazd dnia D wymaga wolnej nocy D-1, a po wybraniu przyjazdu wszystkich nocy od przyjazdu do D-1.
+    function wyjazdNiedostepny(date) {
+      var iso = isoLokalnie(date);
+      var ci = checkinFp && checkinFp.selectedDates[0];
+      if (ci) {
+        var granica = pierwszaZajetaPo(ci);
+        return granica !== null && iso > granica;
+      }
+      var poprzednia = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1, 12);
+      return zajetaNoc(isoLokalnie(poprzednia));
+    }
+    // Zajęte noce, których nie da się wybrać, dostają kolor; dzień wyjazdu po zajętej nocy zostaje szary.
+    function oznaczZajete(dObj, dStr, fp, dayElem) {
+      if (zajetaNoc(isoLokalnie(dayElem.dateObj)) && dayElem.classList.contains('flatpickr-disabled')) {
+        dayElem.classList.add('zajety');
+        dayElem.title = 'Termin zajęty';
+      }
+    }
+
     function initCalendar() {
       var minStayDate = new Date();
       minStayDate.setDate(minStayDate.getDate() + MIN_NIGHTS);
@@ -725,11 +775,13 @@
         maxDate: cennikDo || undefined,
         disable: blockedDates,
         disableMobile: false,
+        onDayCreate: oznaczZajete,
         onChange: function(selectedDates) {
           if (selectedDates[0]) {
             var minCheckout = new Date(selectedDates[0]);
             minCheckout.setDate(minCheckout.getDate() + MIN_NIGHTS);
             checkoutFp.set('minDate', minCheckout);
+            checkoutFp.redraw();
             checkoutFp.clear();
             checkoutFp.open();
           }
@@ -744,7 +796,9 @@
         altFormat: 'd.m.Y',
         minDate: minStayDate,
         maxDate: cennikDo ? new Date(new Date(cennikDo + 'T12:00:00').getTime() + 86400000) : undefined,
+        disable: [wyjazdNiedostepny],
         disableMobile: false,
+        onDayCreate: oznaczZajete,
         onChange: function() {
           updatePrice();
         }
