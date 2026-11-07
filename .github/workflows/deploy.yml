@@ -31,3 +31,5 @@ jobs:
             **/.git*/**
             .github/**
             .DS_Store
+            docs/**
+            payment/tests/**
