@@ -1,6 +1,6 @@
 <?php
 /**
- * Przelewy24 — IPN webhook (powiadomienie o platnosci)
+ * Przelewy24 - IPN webhook (powiadomienie o platnosci)
  * POST /payment/notify.php
  *
  * P24 wysyla ten request po potwierdzeniu platnosci.
@@ -60,7 +60,7 @@ if ($amount !== ($order['amountGrosze'] ?? 0)) {
     exit;
 }
 
-// Jesli juz oplacone — idempotentnosc
+// Jesli juz oplacone - idempotentnosc
 if (($order['status'] ?? '') === 'paid') {
     echo json_encode(['status' => 200]);
     exit;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Przelewy24 — Konfiguracja i helpery
+ * Przelewy24 - Konfiguracja i helpery
  *
  * PRZED URUCHOMIENIEM:
  * 1. Uzupelnij dane z panelu Przelewy24: https://panel.przelewy24.pl
@@ -11,12 +11,12 @@
 
 // === KONFIGURACJA ===
 // Laduje p24-credentials.php jesli istnieje (plik lokalny, poza git).
-// Jesli nie istnieje — uzupelnij stale ponizej lub wgraj plik przez FTP.
+// Jesli nie istnieje - uzupelnij stale ponizej lub wgraj plik przez FTP.
 $credFile = __DIR__ . '/p24-credentials.php';
 if (file_exists($credFile)) {
     require $credFile;
 } else {
-    // Fallback — uzupelnij bezposrednio (tylko jesli nie uzywasz p24-credentials.php)
+    // Fallback - uzupelnij bezposrednio (tylko jesli nie uzywasz p24-credentials.php)
     define('P24_MERCHANT_ID', '');   // np. '123456'
     define('P24_POS_ID',      '');   // zwykle = MERCHANT_ID
     define('P24_CRC',         '');   // klucz CRC
@@ -28,7 +28,7 @@ if (file_exists($credFile)) {
 define('SITE_URL', 'https://willaslonce.pl');
 
 // Webhooki n8n
-// n8n zhibernowany (2026-07) — powiadomienia ida mailem (autopay_admin_paid_email,
+// n8n zhibernowany (2026-07) - powiadomienia ida mailem (autopay_admin_paid_email,
 // booking-bank, shop-bank). Puste URL = send_webhook nic nie robi.
 define('N8N_SHOP_WEBHOOK',    '');
 define('N8N_BOOKING_WEBHOOK', '');
@@ -57,7 +57,7 @@ function p24_configured(): bool
     return P24_MERCHANT_ID !== '' && P24_CRC !== '' && P24_API_KEY !== '';
 }
 
-/** Ostatni blad P24 — dostepny po nieudanej rejestracji */
+/** Ostatni blad P24 - dostepny po nieudanej rejestracji */
 $GLOBALS['p24_last_error'] = null;
 
 /**
@@ -210,7 +210,7 @@ function load_order(string $sessionId): ?array
     return json_decode(file_get_contents($file), true) ?: null;
 }
 
-/** Wyslij webhook do n8n (no-op gdy URL pusty — n8n zhibernowany) */
+/** Wyslij webhook do n8n (no-op gdy URL pusty - n8n zhibernowany) */
 function send_webhook(string $url, array $data): void
 {
     if ($url === '') return;

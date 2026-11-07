@@ -128,7 +128,7 @@
     }
     .form-group textarea { resize: vertical; min-height: 80px; }
 
-    /* Daty — podwójny flatpickr */
+    /* Daty - podwójny flatpickr */
     .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .date-row .form-group { margin-bottom: 0; }
     /* Noce zajęte w kalendarzu: czerwone i przekreślone, wolne bez zmian */
@@ -423,9 +423,9 @@
             <div class="form-group">
               <label>Planowana godzina przyjazdu</label>
               <select name="godzina" id="godzina">
-                <option value="15:00-17:00">15:00 – 17:00</option>
-                <option value="17:00-19:00">17:00 – 19:00</option>
-                <option value="19:00-21:00">19:00 – 21:00</option>
+                <option value="15:00-17:00">15:00-17:00</option>
+                <option value="17:00-19:00">17:00-19:00</option>
+                <option value="19:00-21:00">19:00-21:00</option>
                 <option value="po 21:00">Po 21:00</option>
                 <option value="do ustalenia">Do ustalenia</option>
               </select>
@@ -436,15 +436,15 @@
           <div class="price-summary" id="priceSummary" style="display:none;">
             <div class="price-row">
               <span id="priceNightsLabel">Noce</span>
-              <span id="priceNightsVal">—</span>
+              <span id="priceNightsVal">-</span>
             </div>
             <div class="price-row">
               <span>Cena za noc</span>
-              <span id="pricePerNight">—</span>
+              <span id="pricePerNight">-</span>
             </div>
             <div class="price-row total">
               <span>Łącznie</span>
-              <span id="priceTotal">—</span>
+              <span id="priceTotal">-</span>
             </div>
           </div>
 
@@ -495,7 +495,7 @@
             Po kliknięciu wyślemy Ci dane do przelewu. Termin zostaje zarezerwowany po zaksięgowaniu wpłaty.
           </p>
 
-          <!-- Uwagi — opcjonalne, po przycisku -->
+          <!-- Uwagi - opcjonalne, po przycisku -->
           <details style="margin-top:20px;">
             <summary style="cursor:pointer;font-size:0.88rem;color:var(--text-medium);user-select:none;">+ Uwagi / specjalne życzenia (opcjonalnie)</summary>
             <div class="form-group" style="margin-top:12px;">
@@ -595,13 +595,13 @@
         </svg>
       </div>
       <h2>Rezerwacja przyjęta!</h2>
-      <p>Termin jest zarezerwowany dla Ciebie. Dokonaj wpłaty w ciągu <strong>48 godzin</strong> — po zaksięgowaniu wyślemy potwierdzenie.</p>
+      <p>Termin jest zarezerwowany dla Ciebie. Dokonaj wpłaty w ciągu <strong>48 godzin</strong> - po zaksięgowaniu wyślemy potwierdzenie.</p>
 
       <div class="transfer-details">
         <h4>Dane do przelewu:</h4>
         <div class="transfer-row">
           <span>Odbiorca</span>
-          <strong>Willa Słońce — właściciel</strong>
+          <strong>Willa Słońce - właściciel</strong>
         </div>
         <div class="transfer-row">
           <span>Numer konta</span>
@@ -609,11 +609,11 @@
         </div>
         <div class="transfer-row">
           <span>Kwota do wpłaty</span>
-          <strong id="transferAmount">—</strong>
+          <strong id="transferAmount">-</strong>
         </div>
         <div class="transfer-row">
           <span>Tytuł przelewu</span>
-          <strong class="transfer-title" id="transferTitle">—</strong>
+          <strong class="transfer-title" id="transferTitle">-</strong>
         </div>
       </div>
 
@@ -628,7 +628,7 @@
       <div class="footer-grid">
         <div class="footer-col">
           <h4 class="footer-heading">O nas</h4>
-          <p class="footer-text">Willa Słońce to klimatyczny dom w Beskidzie Śląskim. Cisza, natura i komfort — wszystko, czego potrzebujesz na górski wypoczynek.</p>
+          <p class="footer-text">Willa Słońce to klimatyczny dom w Beskidzie Śląskim. Cisza, natura i komfort - wszystko, czego potrzebujesz na górski wypoczynek.</p>
         </div>
         <div class="footer-col">
           <h4 class="footer-heading">Nawigacja</h4>
@@ -673,7 +673,7 @@
   (function() {
     var BOOKING_BANK_URL = 'payment/booking-bank.php';
 
-    // Domyślne ceny — nadpisywane przez prices.json
+    // Domyślne ceny - nadpisywane przez prices.json
     var PRICES = {
       by_guests: {'1': 350, '2': 420, '3': 480, '4': 520, '5': 570, '6': 620},
       date_ranges: []
@@ -694,7 +694,7 @@
         PRICES.by_guests = prices.by_guests;
         PRICES.date_ranges = prices.date_ranges || [];
       } else if (prices.per_night) {
-        // Stary format — ustaw tę samą cenę dla wszystkich gości
+        // Stary format - ustaw tę samą cenę dla wszystkich gości
         var p = prices.per_night;
         PRICES.by_guests = {'1':p,'2':p,'3':p,'4':p,'5':p,'6':p};
       }
@@ -1000,7 +1000,7 @@
         });
 
       } else {
-        // Przelew bankowy — PHP (mail + zapis)
+        // Przelew bankowy - PHP (mail + zapis)
         fetch(BOOKING_BANK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1026,7 +1026,7 @@
       var title = 'Willa Slonce ' + formatDate(data.checkin) + '-' + formatDate(data.checkout)
                 + ' ' + (data.imie || '') + ' ' + (data.nazwisko || '');
 
-      document.getElementById('transferAmount').textContent = kwota ? kwota + ' zł' : '—';
+      document.getElementById('transferAmount').textContent = kwota ? kwota + ' zł' : '-';
       document.getElementById('transferTitle').textContent  = title;
 
       document.getElementById('successOverlay').classList.add('active');

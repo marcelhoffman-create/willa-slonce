@@ -1,6 +1,6 @@
 <?php
 /**
- * Autopay ITN — notyfikacja o platnosci.
+ * Autopay ITN - notyfikacja o platnosci.
  * POST /payment/autopay-notify.php  (pole `transactions` = base64(XML))
  * URL skonfigurowac w panel.autopay.eu -> usluga -> adres powiadomien.
  */
@@ -35,7 +35,7 @@ if ((string) AUTOPAY_SERVICE_ID !== '' && $parsed['serviceID'] !== (string) AUTO
 
 // Weryfikacja hasha CALEGO komunikatu (jeden hash dla transactionList)
 if (!autopay_verify_message_hash($parsed, AUTOPAY_HASH_KEY, AUTOPAY_HASH_ALGO, AUTOPAY_HASH_SEP)) {
-    // Diagnostyka (bez klucza/danych osobowych) — gdyby Autopay zmienil format hasha
+    // Diagnostyka (bez klucza/danych osobowych) - gdyby Autopay zmienil format hasha
     @file_put_contents(__DIR__ . '/orders/_hash_mismatch.log',
         '[' . date('Y-m-d H:i:s') . "] HASH MISMATCH\n"
         . 'values=' . implode('|', $parsed['hashValues'] ?? []) . "\n"
@@ -59,7 +59,7 @@ foreach ($parsed['transactions'] as $tx) {
 
     $status = $tx['paymentStatus'] ?? '';
 
-    // Idempotentnosc — juz oplacone
+    // Idempotentnosc - juz oplacone
     if (($order['status'] ?? '') === 'paid') {
         $confirmations[$orderId] = 'CONFIRMED';
         continue;
@@ -89,7 +89,7 @@ foreach ($parsed['transactions'] as $tx) {
         save_order($orderId, $order);
         $confirmations[$orderId] = 'CONFIRMED'; // potwierdzamy odbior notyfikacji (porazka tez)
     } else {
-        // PENDING — potwierdzamy odbior, status bez zmian
+        // PENDING - potwierdzamy odbior, status bez zmian
         $confirmations[$orderId] = 'CONFIRMED';
     }
 }

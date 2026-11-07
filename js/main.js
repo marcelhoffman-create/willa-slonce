@@ -1,17 +1,17 @@
 /**
- * Domek Brenna — Strona internetowa
+ * Domek Brenna - Strona internetowa
  * Skrypt główny (vanilla JS)
  *
  * Funkcje:
- * 1. Nawigacja — zmiana tła po przewinięciu
- * 2. Menu mobilne — hamburger, overlay, zamykanie
- * 3. Płynne przewijanie — z offsetem 70px
- * 4. Animacje przy przewijaniu — IntersectionObserver
- * 5. Parallax — subtelne przesunięcie tła
- * 6. Walidacja formularza — daty, pola wymagane, email
- * 7. Aktywny link nawigacji — podświetlanie wg pozycji
- * 8. Animacja liczb — odliczanie w cenach
- * 9. Pasek postępu — cienka linia u góry strony
+ * 1. Nawigacja - zmiana tła po przewinięciu
+ * 2. Menu mobilne - hamburger, overlay, zamykanie
+ * 3. Płynne przewijanie - z offsetem 70px
+ * 4. Animacje przy przewijaniu - IntersectionObserver
+ * 5. Parallax - subtelne przesunięcie tła
+ * 6. Walidacja formularza - daty, pola wymagane, email
+ * 7. Aktywny link nawigacji - podświetlanie wg pozycji
+ * 8. Animacja liczb - odliczanie w cenach
+ * 9. Pasek postępu - cienka linia u góry strony
  */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const heroDots = document.querySelectorAll('.hero-dots .dot');
 
     // ============================================
-    // 1. NAWIGACJA — zmiana tła po przewinięciu
+    // 1. NAWIGACJA - zmiana tła po przewinięciu
     // ============================================
     function handleNavScroll() {
         if (window.scrollY > 100) {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
             entries.forEach(function (entry) {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    // Raz widoczny — nie obserwujemy dalej
+                    // Raz widoczny - nie obserwujemy dalej
                     scrollObserver.unobserve(entry.target);
                 }
             });
@@ -135,14 +135,14 @@ document.addEventListener('DOMContentLoaded', function () {
             scrollObserver.observe(el);
         });
     } else {
-        // Fallback — pokaż wszystko od razu
+        // Fallback - pokaż wszystko od razu
         animatedElements.forEach(function (el) {
             el.classList.add('visible');
         });
     }
 
     // ============================================
-    // 5. PARALLAX — subtelne przesunięcie tła
+    // 5. PARALLAX - subtelne przesunięcie tła
     // ============================================
     var parallaxElements = document.querySelectorAll('.parallax .parallax-bg');
 
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return re.test(email);
     }
 
-    // Obsługa formularza — przekieruj do pełnego formularza z datami
+    // Obsługa formularza - przekieruj do pełnego formularza z datami
     if (bookingForm) {
         bookingForm.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var guestsEl = document.getElementById('guests');
             var guests   = guestsEl ? guestsEl.value : '';
 
-            if (!checkIn || !checkOut) return; // przycisk jest disabled gdy brak dat — backup check
+            if (!checkIn || !checkOut) return; // przycisk jest disabled gdy brak dat - backup check
 
             var params = 'checkin=' + encodeURIComponent(checkIn) + '&checkout=' + encodeURIComponent(checkOut);
             if (guests) params += '&goscie=' + encodeURIComponent(guests);
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!startTime) startTime = timestamp;
             var progress = Math.min((timestamp - startTime) / duration, 1);
 
-            // Easing — ease-out
+            // Easing - ease-out
             var eased = 1 - Math.pow(1 - progress, 3);
             var current = Math.floor(eased * target);
 
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function () {
             priceObserver.observe(priceElements[0]);
         }
     } else {
-        // Fallback — pokaż od razu
+        // Fallback - pokaż od razu
         priceElements.forEach(function (el) {
             el.textContent = el.getAttribute('data-target');
         });
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 renderCalendar();
             })
             .catch(function() {
-                // Brak pliku lub błąd — kalendarz bez blokad
+                // Brak pliku lub błąd - kalendarz bez blokad
                 renderCalendar();
             });
 
@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         dayDiv.classList.add('cal-range');
                     }
 
-                    // Kliknięcie — wybierz datę
+                    // Kliknięcie - wybierz datę
                     (function (dateString, dayNum) {
                         dayDiv.addEventListener('click', function () {
                             handleDayClick(dateString);
@@ -492,17 +492,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function handleDayClick(dateString) {
             if (!selectedCheckIn || (selectedCheckIn && selectedCheckOut)) {
-                // Pierwszy klik lub reset — ustaw check-in
+                // Pierwszy klik lub reset - ustaw check-in
                 selectedCheckIn = dateString;
                 selectedCheckOut = null;
             } else {
-                // Drugi klik — ustaw check-out
+                // Drugi klik - ustaw check-out
                 if (dateString <= selectedCheckIn) {
-                    // Kliknął wcześniejszą lub tę samą datę — nowy check-in
+                    // Kliknął wcześniejszą lub tę samą datę - nowy check-in
                     selectedCheckIn = dateString;
                     selectedCheckOut = null;
                 } else if (hasBookedInRange(selectedCheckIn, dateString)) {
-                    // Zarezerwowane dni w środku zakresu — nowy check-in od tej daty
+                    // Zarezerwowane dni w środku zakresu - nowy check-in od tej daty
                     selectedCheckIn = dateString;
                     selectedCheckOut = null;
                 } else {

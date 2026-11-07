@@ -1,4 +1,4 @@
-# Spec: Wdrożenie płatności online Autopay — willaslonce.pl
+# Spec: Wdrożenie płatności online Autopay - willaslonce.pl
 
 **Data:** 2026-05-29
 **Status:** Zatwierdzony (Marcel, 2026-05-29)
@@ -19,28 +19,28 @@ Autopay potwierdził aktywację danych dostępowych usługi `211642`. Przelew ba
 Integracja jest w ~80% napisana, ale **nie zadziała w obecnej formie** i ma luki bezpieczeństwa.
 
 Pliki w `payment/`:
-- `autopay-config.php` — helpery Autopay (init + ITN). **Błędny protokół** (patrz §4) + **klucz na sztywno**.
-- `autopay-notify.php` — odbiór ITN. Błędny format (oczekuje JSON).
-- `booking-init.php` — init rezerwacji przez Autopay. **Kwota brana z przeglądarki.**
-- `shop-init.php` — init sklepu przez **Przelewy24** (niespójność).
-- `p24-config.php` — konfiguracja P24 + wspólne helpery (`save_order`, `load_order`, `send_webhook`, `SITE_URL`, `ORDERS_DIR`, webhooki n8n). Credentials P24 ładowane z `p24-credentials.php` (gitignore — dobry wzorzec).
+- `autopay-config.php` - helpery Autopay (init + ITN). **Błędny protokół** (patrz §4) + **klucz na sztywno**.
+- `autopay-notify.php` - odbiór ITN. Błędny format (oczekuje JSON).
+- `booking-init.php` - init rezerwacji przez Autopay. **Kwota brana z przeglądarki.**
+- `shop-init.php` - init sklepu przez **Przelewy24** (niespójność).
+- `p24-config.php` - konfiguracja P24 + wspólne helpery (`save_order`, `load_order`, `send_webhook`, `SITE_URL`, `ORDERS_DIR`, webhooki n8n). Credentials P24 ładowane z `p24-credentials.php` (gitignore - dobry wzorzec).
 - `notify.php`, `return.php`, `booking-bank.php`, `shop-bank.php`, `p24-credentials.example.php`.
 
 Dane: `prices.json` (ceny noclegu wg liczby gości), `products.json` (produkty sklepu). Zamówienia: pliki JSON w `payment/orders/` (gitignore).
 
 ## 3. Blokery zidentyfikowane
 
-### Bloker #1 (krytyczny) — sekret Autopay w publicznym repo
+### Bloker #1 (krytyczny) - sekret Autopay w publicznym repo
 `autopay-config.php` ma `AUTOPAY_SERVICE_ID` i `AUTOPAY_HASH_KEY` wpisane na sztywno (commit `3e7ee73`), repo publiczne. Klucz współdzielony = sekret. Z nim można podrobić ITN i oznaczyć zamówienie jako opłacone bez płatności (darmowa rezerwacja). Klucz jest już w historii git → **wymagana rotacja** w panelu Autopay; samo usunięcie z kodu nie wystarczy.
 
-### Bloker #2 (krytyczny) — kwota z klienta
-`booking-init.php`: `$kwota = intval($body['kwota'])` — wartość z ukrytego pola `kwotaHidden` w `rezerwacje.html`. Klient może zapłacić ile chce (np. 1 zł za pobyt). `shop-init.php` akceptuje dowolną cenę produktu ≥1 zł zamiast sprawdzać w `products.json`.
+### Bloker #2 (krytyczny) - kwota z klienta
+`booking-init.php`: `$kwota = intval($body['kwota'])` - wartość z ukrytego pola `kwotaHidden` w `rezerwacje.html`. Klient może zapłacić ile chce (np. 1 zł za pobyt). `shop-init.php` akceptuje dowolną cenę produktu ≥1 zł zamiast sprawdzać w `products.json`.
 
-### Bloker #3 — katalog PII bez ochrony
+### Bloker #3 - katalog PII bez ochrony
 `payment/orders/*.json` zawiera imię, nazwisko, email, telefon, adres. Brak `.htaccess`. Na Apache (Zenbox) ryzyko bezpośredniego pobrania plików.
 
-### Bloker #4 (funkcjonalny) — błędny protokół Autopay
-Patrz §4 — obecny kod był pisany pod nieistniejące REST API, nie pod faktyczną bramkę Autopay.
+### Bloker #4 (funkcjonalny) - błędny protokół Autopay
+Patrz §4 - obecny kod był pisany pod nieistniejące REST API, nie pod faktyczną bramkę Autopay.
 
 ## 4. Faktyczny protokół Autopay (z dokumentacji developers.autopay.pl)
 
@@ -71,7 +71,7 @@ Patrz §4 — obecny kod był pisany pod nieistniejące REST API, nie pod faktyc
 </confirmationList>
 ```
 
-**Do zweryfikowania w implementacji (z panelu Autopay usługi 211642):** dokładny **algorytm hash** (SHA256 vs SHA512) i **separator** (domyślnie `|`) — ustawienia panelu muszą być odwzorowane w kodzie co do znaku. Dokładna kolejność pól w hashu init i w hashu ITN/confirmation — wg tabeli pól w dokumentacji; potwierdzić realnym testem.
+**Do zweryfikowania w implementacji (z panelu Autopay usługi 211642):** dokładny **algorytm hash** (SHA256 vs SHA512) i **separator** (domyślnie `|`) - ustawienia panelu muszą być odwzorowane w kodzie co do znaku. Dokładna kolejność pól w hashu init i w hashu ITN/confirmation - wg tabeli pól w dokumentacji; potwierdzić realnym testem.
 
 ## 5. Architektura wdrożenia
 
@@ -86,24 +86,24 @@ Patrz §4 — obecny kod był pisany pod nieistniejące REST API, nie pod faktyc
 - Mapowanie statusów: `SUCCESS`→`paid`, `PENDING`→`pending`, `FAILURE`→`failed`.
 
 ### C. Cena po stronie serwera
-- **Rezerwacja** (`booking-init.php`): kwota liczona serwerowo = cena z `prices.json` (`by_guests[liczba_gości]`) × liczba nocy (różnica `checkout`−`checkin`). Walidacja: daty poprawne, `checkout` > `checkin`, liczba gości 1–6. Kwota z klienta **ignorowana**.
+- **Rezerwacja** (`booking-init.php`): kwota liczona serwerowo = cena z `prices.json` (`by_guests[liczba_gości]`) × liczba nocy (różnica `checkout`−`checkin`). Walidacja: daty poprawne, `checkout` > `checkin`, liczba gości 1-6. Kwota z klienta **ignorowana**.
 - **Sklep** (`shop-init.php`): cena każdej pozycji pobierana z `products.json` po `id` (nie z klienta). Pozycje spoza `products.json` lub `available=false` → błąd. Wysyłka liczona serwerowo wg obecnej reguły (kurier <150 zł → +15 zł).
 
 ### D. Ochrona danych osobowych
 - `payment/orders/.htaccess` z `Require all denied` (Apache 2.4) + `Options -Indexes`. Plik wersjonowany (sam katalog `orders/` zostaje w gitignore).
-- Opcjonalnie (jeśli struktura Zenbox pozwala): przeniesienie `ORDERS_DIR` poza webroot. Decyzja w planie — minimum to `.htaccess`.
+- Opcjonalnie (jeśli struktura Zenbox pozwala): przeniesienie `ORDERS_DIR` poza webroot. Decyzja w planie - minimum to `.htaccess`.
 
 ### E. Spójność operatora
 - `shop-init.php` przełączony z `p24_register` na ścieżkę Autopay (jak booking).
 - Adres ITN sklepu → `autopay-notify.php` (jeden odbiornik, rozróżnienie po `type` w zamówieniu).
-- Pliki P24 (`p24-config.php` helpery wspólne zostają; `notify.php` P24 uśpiony) — nie usuwamy, zostają jako zapas.
+- Pliki P24 (`p24-config.php` helpery wspólne zostają; `notify.php` P24 uśpiony) - nie usuwamy, zostają jako zapas.
 - Przelew bankowy (`booking-bank.php`, `shop-bank.php`) zostaje jako alternatywa w UI.
 
 ### F. Test na produkcji (decyzja: od razu live)
 1. Wdrożenie wszystkich zmian jednym pushem na `main` (auto-deploy FTP).
 2. Wgranie `autopay-credentials.php` przez FTP (z wyrotowanym kluczem).
 3. Reset opcache (produkcja cachuje stare PHP).
-4. **Test:** zakup w sklepie najtańszego produktu (herbata 29 zł) — najtańszy realny test (rezerwacja z cennika = min. 350 zł).
+4. **Test:** zakup w sklepie najtańszego produktu (herbata 29 zł) - najtańszy realny test (rezerwacja z cennika = min. 350 zł).
 5. Weryfikacja pełnej ścieżki: redirect na Autopay → płatność → ITN z poprawnym hashem → status `paid` → webhook n8n → `return.php` pokazuje „opłacone".
 6. Zwrot transakcji testowej w panelu Autopay.
 
@@ -111,8 +111,8 @@ Patrz §4 — obecny kod był pisany pod nieistniejące REST API, nie pod faktyc
 
 1. **Rotacja klucza** w panel.autopay.eu (usługa 211642) → przekazać nowy klucz (do pliku creds, nie do kodu).
 2. **Adres powiadomień ITN** w panelu → `https://willaslonce.pl/payment/autopay-notify.php`.
-3. **Produkt Autopay** — potwierdzić, że to klasyczna bramka „Płatności online" (formularz + ITN).
-4. **Konfiguracja hash** usługi — algorytm (SHA256/SHA512) + separator (`|`).
+3. **Produkt Autopay** - potwierdzić, że to klasyczna bramka „Płatności online" (formularz + ITN).
+4. **Konfiguracja hash** usługi - algorytm (SHA256/SHA512) + separator (`|`).
 
 ## 7. Poza zakresem (YAGNI)
 

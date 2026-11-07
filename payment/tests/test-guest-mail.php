@@ -62,7 +62,7 @@ check('odmiana: 5 osob',   guest_guests_label(5) === '5 osób');
 check('odmiana: 0 = pusto', guest_guests_label(0) === '');
 check('tresc: kontakt zwrotny',    str_contains($b, WILLA_CONTACT_PHONE));
 check('tresc: polskie znaki',      str_contains($b, 'Rezerwacja przyjęta'));
-check('tresc: brak dlugiej pauzy', !str_contains($b, '—') && !str_contains($b, '–'));
+check('tresc: brak dlugiej pauzy', !str_contains($b, "\u{2014}") && !str_contains($b, "\u{2013}"));
 
 // Dokladnego adresu nie ma w ZADNYM mailu - idzie osobno w dniu przyjazdu.
 check('tresc: BEZ dokladnego adresu', !str_contains($b, 'Markówka'));
@@ -84,7 +84,7 @@ $p = guest_paid_body($order);
 check('platnosc: potwierdza termin',    str_contains($p, '23.08.2026'));
 check('platnosc: bez danych do przelewu', !str_contains($p, WILLA_BANK_ACCOUNT));
 check('platnosc: BEZ dokladnego adresu', !str_contains($p, 'Markówka'));
-check('platnosc: brak dlugiej pauzy',   !str_contains($p, '—') && !str_contains($p, '–'));
+check('platnosc: brak dlugiej pauzy',   !str_contains($p, "\u{2014}") && !str_contains($p, "\u{2013}"));
 check('platnosc: podpis wlasciciela',   str_contains($p, WILLA_OWNER));
 check('platnosc: bez wzmianki o kluczach', !str_contains($p, 'skrytka') && !str_contains($p, 'Klucze'));
 check('platnosc: szczegoly w dniu przyjazdu', str_contains($p, 'w dniu Państwa przyjazdu'));

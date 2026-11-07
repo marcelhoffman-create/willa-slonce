@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Potwierdzenie płatności — Willa Słońce</title>
+  <title>Potwierdzenie płatności - Willa Słońce</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -67,7 +67,7 @@ if ($type === 'booking') {
     $title     = $isPaid ? 'Zamówienie opłacone!' : 'Zamówienie przyjęte!';
     $msg       = $isPaid
         ? 'Płatność za Twoje zamówienie ze sklepu Willi Słońce przeszła pomyślnie. Skontaktujemy się wkrótce w sprawie dostawy.'
-        : 'Twoje zamówienie zostało przyjęte. Czekamy na potwierdzenie płatności — zajmuje to zazwyczaj kilka minut.';
+        : 'Twoje zamówienie zostało przyjęte. Czekamy na potwierdzenie płatności - zajmuje to zazwyczaj kilka minut.';
     $iconColor = $isPaid ? 'ok' : 'wait';
     $iconPath  = $isPaid
         ? '<polyline points="20 6 9 17 4 12"/>'
@@ -110,7 +110,7 @@ if ($type === 'booking') {
     <a href="<?= $backUrl ?>" class="btn">
       <?= $type === 'booking' ? 'Wróć na stronę rezerwacji' : 'Wróć do sklepu' ?>
     </a>
-    <p class="notice">Numer ref.: <?= htmlspecialchars($sessionId ?: '—') ?></p>
+    <p class="notice">Numer ref.: <?= htmlspecialchars($sessionId ?: '-') ?></p>
   </div>
 </body>
 </html>

@@ -4,7 +4,7 @@
  * POST /payment/shop-bank.php
  *
  * Zapisuje zamówienie do pliku JSON i wysyła mail bezpośrednio przez mail().
- * Zero zależności od n8n — działa zawsze.
+ * Zero zależności od n8n - działa zawsze.
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -65,12 +65,12 @@ save_order($orderId, $data);
 
 // Wyślij mail do właściciela
 $adminEmail = 'marcelhoffman@gmail.com';
-$subject    = '=?UTF-8?B?' . base64_encode('Nowe zamówienie sklep — ' . $name . ' — ' . $total . ' zł') . '?=';
+$subject    = '=?UTF-8?B?' . base64_encode('Nowe zamówienie sklep - ' . $name . ' - ' . $total . ' zł') . '?=';
 
 $deliveryLabel = ($delivery === 'kurier') ? 'Kurier' : 'Odbiór w domku';
 
 $htmlBody = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:sans-serif;color:#222;max-width:600px;margin:0 auto;padding:20px;">
-<h2 style="color:#C17817;">Nowe zamówienie — Sklep Willa Słońce</h2>
+<h2 style="color:#C17817;">Nowe zamówienie - Sklep Willa Słońce</h2>
 <table style="border-collapse:collapse;width:100%;">
   <tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;width:40%;">ID zamówienia</td><td style="padding:6px 12px;">' . htmlspecialchars($orderId) . '</td></tr>
   <tr><td style="padding:6px 12px;font-weight:bold;">Imię i nazwisko</td><td style="padding:6px 12px;">' . htmlspecialchars($name) . '</td></tr>

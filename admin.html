@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin — Willa Słońce</title>
+  <title>Admin - Willa Słońce</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -114,7 +114,7 @@
     }
     .range-grid-top label { font-size: 0.75rem; margin-bottom: 3px; }
     .range-grid-top input { margin-bottom: 0; }
-    /* Tabela z wieloma kolumnami — scroll na mobile */
+    /* Tabela z wieloma kolumnami - scroll na mobile */
     .ranges-table-wrap { overflow-x: auto; }
     .ranges-table th, .ranges-table td { white-space: nowrap; }
     @media (max-width: 600px) {
@@ -172,7 +172,7 @@
 <!-- LOGOWANIE -->
 <div class="card" id="loginCard" class="active">
   <h1>Panel admina</h1>
-  <p>Willa Słońce — Brenna</p>
+  <p>Willa Słońce - Brenna</p>
   <label for="pwd">Hasło</label>
   <input type="password" id="pwd" placeholder="••••••••" autocomplete="current-password">
   <button class="btn-primary" onclick="login()">Zaloguj</button>
@@ -184,7 +184,7 @@
 
   <!-- Ceny per liczba gości -->
   <div class="card">
-    <h2>Ceny bazowe — liczba gości</h2>
+    <h2>Ceny bazowe - liczba gości</h2>
     <p class="section-hint">Cena za noc w zależności od liczby osób. Zakresy dat mają pierwszeństwo nad ceną bazową.</p>
 
     <div class="guests-grid">
@@ -217,8 +217,8 @@
 
   <!-- Zakresy dat -->
   <div class="card">
-    <h2>Ceny sezonowe — zakresy dat</h2>
-    <p class="section-hint">Specjalna cena za noc dla konkretnego okresu (np. wakacje, sylwester). Każdy zakres ma własne ceny per liczba gości — nadpisują ceny bazowe.</p>
+    <h2>Ceny sezonowe - zakresy dat</h2>
+    <p class="section-hint">Specjalna cena za noc dla konkretnego okresu (np. wakacje, sylwester). Każdy zakres ma własne ceny per liczba gości - nadpisują ceny bazowe.</p>
 
     <div class="ranges-table-wrap">
     <table class="ranges-table" id="rangesTable">
@@ -298,7 +298,7 @@
 
   <!-- ===== PRODUKTY ===== -->
   <div class="card">
-    <h2>Produkty — Sklep</h2>
+    <h2>Produkty - Sklep</h2>
     <p class="section-hint">Zarządzaj produktami wyświetlanymi w sklepie. Kliknij „Zapisz produkty" aby opublikować zmiany.</p>
 
     <!-- Tabela produktów -->
@@ -525,7 +525,7 @@
           document.getElementById('g5').value = data.by_guests['5'] || '';
           document.getElementById('g6').value = data.by_guests['6'] || '';
         } else if (data.per_night) {
-          // Stary format — wstaw tę samą cenę wszędzie
+          // Stary format - wstaw tę samą cenę wszędzie
           var p = data.per_night;
           for (var i = 1; i <= 6; i++) {
             document.getElementById('g' + i).value = p;
@@ -565,16 +565,16 @@
     tbody.innerHTML = '';
     dateRanges.forEach(function(r, idx) {
       var bg = r.by_guests || {};
-      var period = fromISO(r.from) + ' – ' + fromISO(r.to);
+      var period = fromISO(r.from) + ' - ' + fromISO(r.to);
       var tr = document.createElement('tr');
       tr.innerHTML = '<td>' + period + '</td>'
-        + '<td>' + (r.label || '—') + '</td>'
-        + '<td>' + (bg['1'] || '—') + '</td>'
-        + '<td>' + (bg['2'] || '—') + '</td>'
-        + '<td>' + (bg['3'] || '—') + '</td>'
-        + '<td>' + (bg['4'] || '—') + '</td>'
-        + '<td>' + (bg['5'] || '—') + '</td>'
-        + '<td>' + (bg['6'] || '—') + '</td>'
+        + '<td>' + (r.label || '-') + '</td>'
+        + '<td>' + (bg['1'] || '-') + '</td>'
+        + '<td>' + (bg['2'] || '-') + '</td>'
+        + '<td>' + (bg['3'] || '-') + '</td>'
+        + '<td>' + (bg['4'] || '-') + '</td>'
+        + '<td>' + (bg['5'] || '-') + '</td>'
+        + '<td>' + (bg['6'] || '-') + '</td>'
         + '<td><button class="btn-del" onclick="removeRange(' + idx + ')">Usuń</button></td>';
       tbody.appendChild(tr);
     });
@@ -585,7 +585,7 @@
     for (var i = 1; i <= 6; i++) {
       var val = parseInt(document.getElementById('rg' + i).value);
       if (!val || val < 1 || val > 9999) {
-        alert('Podaj prawidłową cenę dla ' + i + (i === 1 ? ' osoby' : ' osób') + ' w zakresie (1–9999 zł).');
+        alert('Podaj prawidłową cenę dla ' + i + (i === 1 ? ' osoby' : ' osób') + ' w zakresie (1-9999 zł).');
         return null;
       }
       prices[String(i)] = val;
@@ -630,7 +630,7 @@
     for (var i = 1; i <= 6; i++) {
       var val = parseInt(document.getElementById('g' + i).value);
       if (!val || val < 1 || val > 9999) {
-        alert('Cena dla ' + i + ' ' + (i === 1 ? 'osoby' : 'osób') + ' jest nieprawidłowa (1–9999 zł).');
+        alert('Cena dla ' + i + ' ' + (i === 1 ? 'osoby' : 'osób') + ' jest nieprawidłowa (1-9999 zł).');
         return null;
       }
       prices[String(i)] = val;
@@ -1003,7 +1003,7 @@
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (data.ok) {
-        showBlockedMsg('ok', 'Zablokowano ' + from + ' – ' + to);
+        showBlockedMsg('ok', 'Zablokowano ' + from + ' - ' + to);
         document.getElementById('blockFrom').value = '';
         document.getElementById('blockTo').value   = '';
         document.getElementById('blockNote').value = '';

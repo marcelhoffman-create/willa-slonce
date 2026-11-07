@@ -1,4 +1,4 @@
-# Plan wdrożenia: Płatności online Autopay — willaslonce.pl
+# Plan wdrożenia: Płatności online Autopay - willaslonce.pl
 
 > **Dla wykonawcy:** WYMAGANA PODSKILL: użyj superpowers:subagent-driven-development (zalecane) lub superpowers:executing-plans do realizacji zadanie po zadaniu. Kroki używają `- [ ]` do śledzenia.
 
@@ -19,21 +19,21 @@
 ## Struktura plików
 
 **Tworzone:**
-- `payment/autopay-lib.php` — czyste funkcje Autopay (hash, budowa pól, parsowanie/weryfikacja ITN, XML potwierdzenia). Bez efektów ubocznych, bez `require` innych plików.
-- `payment/pricing.php` — `calc_booking_amount()`, `calc_shop_items()`. Czyste, czytają ścieżkę do JSON przekazaną argumentem.
-- `payment/autopay-credentials.example.php` — szablon danych dostępowych.
-- `payment/tests/test-autopay.php` — harness testowy (asercje, liczniki).
-- `payment/tests/fixtures/prices.json`, `payment/tests/fixtures/products.json` — dane testowe.
-- `payment/orders/.htaccess` — blokada dostępu HTTP do plików zamówień.
+- `payment/autopay-lib.php` - czyste funkcje Autopay (hash, budowa pól, parsowanie/weryfikacja ITN, XML potwierdzenia). Bez efektów ubocznych, bez `require` innych plików.
+- `payment/pricing.php` - `calc_booking_amount()`, `calc_shop_items()`. Czyste, czytają ścieżkę do JSON przekazaną argumentem.
+- `payment/autopay-credentials.example.php` - szablon danych dostępowych.
+- `payment/tests/test-autopay.php` - harness testowy (asercje, liczniki).
+- `payment/tests/fixtures/prices.json`, `payment/tests/fixtures/products.json` - dane testowe.
+- `payment/orders/.htaccess` - blokada dostępu HTTP do plików zamówień.
 
 **Modyfikowane:**
-- `.gitignore` — dodać `payment/autopay-credentials.php`.
-- `payment/autopay-config.php` — ładowanie creds, stałe z konfiguracji, `require autopay-lib.php`, cienkie wrappery + glue.
-- `payment/booking-init.php` — cena serwerowa + zwrot pól bramki (JSON `{gatewayUrl, fields}`).
-- `payment/shop-init.php` — przełączenie P24 → Autopay + cena z `products.json`.
-- `payment/autopay-notify.php` — parsowanie ITN XML + weryfikacja + odpowiedź XML + webhook n8n.
-- `rezerwacje.html` — w sukcesie zamiast `window.location` budowa i submit formularza bramki.
-- `sklep.html` — to samo dla sklepu.
+- `.gitignore` - dodać `payment/autopay-credentials.php`.
+- `payment/autopay-config.php` - ładowanie creds, stałe z konfiguracji, `require autopay-lib.php`, cienkie wrappery + glue.
+- `payment/booking-init.php` - cena serwerowa + zwrot pól bramki (JSON `{gatewayUrl, fields}`).
+- `payment/shop-init.php` - przełączenie P24 → Autopay + cena z `products.json`.
+- `payment/autopay-notify.php` - parsowanie ITN XML + weryfikacja + odpowiedź XML + webhook n8n.
+- `rezerwacje.html` - w sukcesie zamiast `window.location` budowa i submit formularza bramki.
+- `sklep.html` - to samo dla sklepu.
 
 ---
 
@@ -110,7 +110,7 @@ echo "\n$pass PASS, $fail FAIL\n";
 exit($fail === 0 ? 0 : 1);
 ```
 
-- [ ] **Krok 3: Uruchom — ma się wywalić**
+- [ ] **Krok 3: Uruchom - ma się wywalić**
 
 Run: `/usr/local/bin/php payment/tests/test-autopay.php`
 Oczekiwane: błąd „Call to undefined function calc_booking_amount" (pricing.php pusty).
@@ -172,7 +172,7 @@ function calc_shop_items(array $items, string $productsPath): array
 }
 ```
 
-- [ ] **Krok 5: Uruchom — ma przejść**
+- [ ] **Krok 5: Uruchom - ma przejść**
 
 Run: `/usr/local/bin/php payment/tests/test-autopay.php`
 Oczekiwane: `8 PASS, 0 FAIL`, exit 0.
@@ -192,7 +192,7 @@ git commit -m "feat(pricing): serwerowe liczenie cen rezerwacji i sklepu + testy
 - Utwórz: `payment/autopay-lib.php`
 - Modyfikuj: `payment/tests/test-autopay.php`
 
-- [ ] **Krok 1: Testy (failing)** — dopisz w `test-autopay.php` po `require pricing.php`:
+- [ ] **Krok 1: Testy (failing)** - dopisz w `test-autopay.php` po `require pricing.php`:
 
 ```php
 require __DIR__ . '/../autopay-lib.php';
@@ -217,7 +217,7 @@ check('fields: hash policzony nad wartosciami w kolejnosci',
     $pf['fields']['Hash'] === autopay_hash_raw(['211642','BOOK-1','29.00','Test zakup','PLN','jan@example.com'], 'KLUCZTESTOWY', 'sha256', '|'));
 ```
 
-- [ ] **Krok 2: Uruchom — fail**
+- [ ] **Krok 2: Uruchom - fail**
 
 Run: `/usr/local/bin/php payment/tests/test-autopay.php`
 Oczekiwane: „Call to undefined function autopay_hash_raw".
@@ -267,7 +267,7 @@ function autopay_payment_fields(
 }
 ```
 
-- [ ] **Krok 4: Uruchom — pass**
+- [ ] **Krok 4: Uruchom - pass**
 
 Run: `/usr/local/bin/php payment/tests/test-autopay.php`
 Oczekiwane: wszystkie PASS (8 + 6 nowych), exit 0.
@@ -287,7 +287,7 @@ git commit -m "feat(autopay): hash i budowa pol platnosci + testy"
 - Modyfikuj: `payment/autopay-lib.php`
 - Modyfikuj: `payment/tests/test-autopay.php`
 
-- [ ] **Krok 1: Testy (failing)** — dopisz przed podsumowaniem w `test-autopay.php`:
+- [ ] **Krok 1: Testy (failing)** - dopisz przed podsumowaniem w `test-autopay.php`:
 
 ```php
 // --- ITN: budujemy probke XML, kodujemy base64, parsujemy, weryfikujemy ---
@@ -322,12 +322,12 @@ check('confirm: zawiera CONFIRMED i orderID', str_contains($conf, '<confirmation
 check('confirm: zawiera hash', str_contains($conf, '<hash>'));
 ```
 
-- [ ] **Krok 2: Uruchom — fail**
+- [ ] **Krok 2: Uruchom - fail**
 
 Run: `/usr/local/bin/php payment/tests/test-autopay.php`
 Oczekiwane: „Call to undefined function autopay_parse_itn".
 
-- [ ] **Krok 3: Implementacja `autopay-lib.php` (część 2)** — dopisz funkcje:
+- [ ] **Krok 3: Implementacja `autopay-lib.php` (część 2)** - dopisz funkcje:
 
 ```php
 /**
@@ -398,7 +398,7 @@ function autopay_confirmation_xml(string $serviceId, array $confirmations, strin
 }
 ```
 
-- [ ] **Krok 4: Uruchom — pass**
+- [ ] **Krok 4: Uruchom - pass**
 
 Run: `/usr/local/bin/php payment/tests/test-autopay.php`
 Oczekiwane: wszystkie PASS, exit 0.
@@ -410,7 +410,7 @@ git add payment/autopay-lib.php payment/tests/test-autopay.php
 git commit -m "feat(autopay): parsowanie/weryfikacja ITN + XML potwierdzenia + testy"
 ```
 
-> **UWAGA dot. kolejności pól hasha:** dokumentacja Autopay liczy hash ITN po wartościach pól w kolejności dokumentu — `autopay_verify_tx_hash` celowo iteruje po kolejności dokumentu (odporne). Dokładny algorytm hasha potwierdzenia (`autopay_confirmation_xml`) jest implementacją wg wzorca `confirmationList`; jeśli pierwszy realny ITN nie zostanie zaakceptowany (Autopay ponawia notyfikację), sprawdzić log z Zadania 7 i skorygować kolejność/skład. To jedyny punkt niepewny — siatka bezpieczeństwa = logowanie surowego ITN.
+> **UWAGA dot. kolejności pól hasha:** dokumentacja Autopay liczy hash ITN po wartościach pól w kolejności dokumentu - `autopay_verify_tx_hash` celowo iteruje po kolejności dokumentu (odporne). Dokładny algorytm hasha potwierdzenia (`autopay_confirmation_xml`) jest implementacją wg wzorca `confirmationList`; jeśli pierwszy realny ITN nie zostanie zaakceptowany (Autopay ponawia notyfikację), sprawdzić log z Zadania 7 i skorygować kolejność/skład. To jedyny punkt niepewny - siatka bezpieczeństwa = logowanie surowego ITN.
 
 ---
 
@@ -432,12 +432,12 @@ git commit -m "feat(autopay): parsowanie/weryfikacja ITN + XML potwierdzenia + t
  */
 define('AUTOPAY_SERVICE_ID', '');   // np. 211642
 define('AUTOPAY_HASH_KEY',   '');   // WYROTOWANY klucz wspoldzielony
-define('AUTOPAY_HASH_ALGO',  'sha256'); // 'sha256' lub 'sha512' — wg ustawien uslugi
-define('AUTOPAY_HASH_SEP',   '|');      // separator hasha — wg ustawien uslugi
+define('AUTOPAY_HASH_ALGO',  'sha256'); // 'sha256' lub 'sha512' - wg ustawien uslugi
+define('AUTOPAY_HASH_SEP',   '|');      // separator hasha - wg ustawien uslugi
 define('AUTOPAY_TEST_MODE',  false);    // true = testpay.autopay.eu
 ```
 
-- [ ] **Krok 2: `.gitignore`** — dodaj linię po `payment/p24-credentials.php`:
+- [ ] **Krok 2: `.gitignore`** - dodaj linię po `payment/p24-credentials.php`:
 
 ```
 payment/autopay-credentials.php
@@ -448,14 +448,14 @@ payment/autopay-credentials.php
 ```php
 <?php
 /**
- * Autopay — konfiguracja i glue. Czysta logika: autopay-lib.php.
+ * Autopay - konfiguracja i glue. Czysta logika: autopay-lib.php.
  * Dokumentacja: https://developers.autopay.pl/online/dokumentacja
  */
 
 require_once __DIR__ . '/p24-config.php';   // SITE_URL, ORDERS_DIR, save_order, load_order, send_webhook, N8N_*
 require_once __DIR__ . '/autopay-lib.php';  // czyste funkcje
 
-// Dane dostepowe — plik poza repo (wzorzec jak P24)
+// Dane dostepowe - plik poza repo (wzorzec jak P24)
 $autopayCred = __DIR__ . '/autopay-credentials.php';
 if (file_exists($autopayCred)) {
     require $autopayCred;
@@ -505,12 +505,12 @@ git commit -m "refactor(autopay): sekret poza repo + ladowanie creds (wzorzec P2
 
 ---
 
-## Zadanie 5: Rezerwacja — cena serwerowa + pola bramki (`booking-init.php`)
+## Zadanie 5: Rezerwacja - cena serwerowa + pola bramki (`booking-init.php`)
 
 **Pliki:**
 - Modyfikuj: `payment/booking-init.php`
 
-- [ ] **Krok 1: Przepisz logikę po walidacji pól** — zastąp w `booking-init.php` blok od `$kwota = intval(...)` oraz całą część budowania zamówienia/`autopay_create` tak, by:
+- [ ] **Krok 1: Przepisz logikę po walidacji pól** - zastąp w `booking-init.php` blok od `$kwota = intval(...)` oraz całą część budowania zamówienia/`autopay_create` tak, by:
   1. ładować `pricing.php`,
   2. liczyć kwotę serwerowo z `prices.json`,
   3. budować pola bramki przez `autopay_payment()`,
@@ -578,12 +578,12 @@ git commit -m "feat(booking): cena liczona serwerowo + pola bramki Autopay"
 
 ---
 
-## Zadanie 6: Sklep — Autopay + cena z katalogu (`shop-init.php`)
+## Zadanie 6: Sklep - Autopay + cena z katalogu (`shop-init.php`)
 
 **Pliki:**
 - Modyfikuj: `payment/shop-init.php`
 
-- [ ] **Krok 1: Przepisz** — przełącz z P24 na Autopay i licz ceny z `products.json`:
+- [ ] **Krok 1: Przepisz** - przełącz z P24 na Autopay i licz ceny z `products.json`:
 
 Dodaj na górze przy require:
 ```php
@@ -598,7 +598,7 @@ if (!autopay_configured()) {
     exit;
 }
 ```
-(oraz dodaj `require __DIR__ . '/autopay-config.php';` zamiast/obok `p24-config.php` — `autopay-config.php` i tak ładuje `p24-config.php`, więc wystarczy `require __DIR__ . '/autopay-config.php';`)
+(oraz dodaj `require __DIR__ . '/autopay-config.php';` zamiast/obok `p24-config.php` - `autopay-config.php` i tak ładuje `p24-config.php`, więc wystarczy `require __DIR__ . '/autopay-config.php';`)
 
 Zastąp ręczne liczenie `$subtotal` z pętli po `items` wywołaniem walidatora katalogu:
 ```php
@@ -663,7 +663,7 @@ git commit -m "feat(shop): platnosc przez Autopay + cena z products.json"
 ```php
 <?php
 /**
- * Autopay ITN — notyfikacja o platnosci.
+ * Autopay ITN - notyfikacja o platnosci.
  * POST /payment/autopay-notify.php  (pole `transactions` = base64(XML))
  * URL skonfigurowac w panel.autopay.eu -> usluga -> adres powiadomien.
  */
@@ -708,7 +708,7 @@ foreach ($parsed['transactions'] as $tx) {
 
     $status = $tx['paymentStatus'] ?? '';
 
-    // Idempotentnosc — juz oplacone
+    // Idempotentnosc - juz oplacone
     if (($order['status'] ?? '') === 'paid') {
         $confirmations[$orderId] = 'CONFIRMED';
         continue;
@@ -728,7 +728,7 @@ foreach ($parsed['transactions'] as $tx) {
         save_order($orderId, $order);
         $confirmations[$orderId] = 'CONFIRMED'; // potwierdzamy odbior notyfikacji (porazka tez)
     } else {
-        // PENDING — potwierdzamy odbior, status bez zmian
+        // PENDING - potwierdzamy odbior, status bez zmian
         $confirmations[$orderId] = 'CONFIRMED';
     }
 }
@@ -756,7 +756,7 @@ git commit -m "feat(autopay): odbior ITN XML + weryfikacja + potwierdzenie XML +
 
 ---
 
-## Zadanie 8: Frontend rezerwacji — submit formularza bramki (`rezerwacje.html`)
+## Zadanie 8: Frontend rezerwacji - submit formularza bramki (`rezerwacje.html`)
 
 **Pliki:**
 - Modyfikuj: `rezerwacje.html`
@@ -793,9 +793,9 @@ W gałęzi `if (payMethod === 'p24') { ... }` zastąp obsługę odpowiedzi:
         })
 ```
 
-(Reszta gałęzi `bank` bez zmian. Body `fetch` może nadal zawierać `kwota` — serwer ją ignoruje, więc nie trzeba usuwać, ale można.)
+(Reszta gałęzi `bank` bez zmian. Body `fetch` może nadal zawierać `kwota` - serwer ją ignoruje, więc nie trzeba usuwać, ale można.)
 
-- [ ] **Krok 2: Weryfikacja składni HTML/JS** — otwórz `rezerwacje.html` w przeglądarce lokalnie, otwórz konsolę, potwierdź brak błędów JS przy załadowaniu i przy kliknięciu „Rezerwuj" z wybraną opcją Autopay (fetch poleci na lokalny brak PHP, ale funkcja `submitGatewayForm` musi być zdefiniowana — sprawdź w konsoli `typeof submitGatewayForm === 'function'`).
+- [ ] **Krok 2: Weryfikacja składni HTML/JS** - otwórz `rezerwacje.html` w przeglądarce lokalnie, otwórz konsolę, potwierdź brak błędów JS przy załadowaniu i przy kliknięciu „Rezerwuj" z wybraną opcją Autopay (fetch poleci na lokalny brak PHP, ale funkcja `submitGatewayForm` musi być zdefiniowana - sprawdź w konsoli `typeof submitGatewayForm === 'function'`).
 
 Run: `open rezerwacje.html` (lub `python3 -m http.server` w katalogu repo i wejście na stronę).
 Oczekiwane: brak błędów składni JS w konsoli; `submitGatewayForm` zdefiniowana.
@@ -809,7 +809,7 @@ git commit -m "feat(rezerwacje): submit formularza bramki Autopay zamiast redire
 
 ---
 
-## Zadanie 9: Frontend sklepu — submit formularza bramki (`sklep.html`)
+## Zadanie 9: Frontend sklepu - submit formularza bramki (`sklep.html`)
 
 **Pliki:**
 - Modyfikuj: `sklep.html`
@@ -825,7 +825,7 @@ git commit -m "feat(rezerwacje): submit formularza bramki Autopay zamiast redire
 ```
 (Zachowaj istniejącą obsługę resetu przycisku i gałąź `SHOP_BANK_URL` bez zmian.)
 
-- [ ] **Krok 2: Weryfikacja składni JS** — jak w Zadaniu 8 dla `sklep.html`: konsola bez błędów, `typeof submitGatewayForm === 'function'`.
+- [ ] **Krok 2: Weryfikacja składni JS** - jak w Zadaniu 8 dla `sklep.html`: konsola bez błędów, `typeof submitGatewayForm === 'function'`.
 
 - [ ] **Krok 3: Commit**
 
@@ -849,7 +849,7 @@ Require all denied
 Options -Indexes
 ```
 
-- [ ] **Krok 2: Upewnij się, że plik trafi do repo** — `.gitignore` ignoruje `payment/orders/`, więc wymuś dodanie:
+- [ ] **Krok 2: Upewnij się, że plik trafi do repo** - `.gitignore` ignoruje `payment/orders/`, więc wymuś dodanie:
 
 Run: `git add -f payment/orders/.htaccess`
 Oczekiwane: plik dodany mimo gitignore.
@@ -879,26 +879,26 @@ Oczekiwane: „No syntax errors detected" dla każdego.
 Run: `/usr/local/bin/php payment/tests/test-autopay.php`
 Oczekiwane: wszystkie PASS, exit 0.
 
-- [ ] **Krok 3: Przegląd diffu** — `git log --oneline` i `git diff main@{upstream}...HEAD --stat` (lub `git diff 3e7ee73 --stat`). Potwierdź, że NIE ma w diffie `payment/autopay-credentials.php` ani realnego klucza. Zatrzymaj się — push wykonuje Marcel w Zadaniu 12.
+- [ ] **Krok 3: Przegląd diffu** - `git log --oneline` i `git diff main@{upstream}...HEAD --stat` (lub `git diff 3e7ee73 --stat`). Potwierdź, że NIE ma w diffie `payment/autopay-credentials.php` ani realnego klucza. Zatrzymaj się - push wykonuje Marcel w Zadaniu 12.
 
 ---
 
-## Zadanie 12: Go-live (Marcel + Claude) — checklist produkcyjna
+## Zadanie 12: Go-live (Marcel + Claude) - checklist produkcyjna
 
 > To zadanie wymaga działań Marcela w panelach (Autopay, FTP, Zenbox). Nie automatyzować.
 
-- [ ] **1. Rotacja klucza** — panel.autopay.eu → usługa 211642 → wygeneruj NOWY klucz współdzielony (stary jest publiczny w historii git → martwy po rotacji).
-- [ ] **2. Konfiguracja usługi** — odczytaj/ustaw algorytm hash (SHA256/SHA512) i separator (`|`); zapamiętaj do creds.
-- [ ] **3. Adres powiadomień ITN** — ustaw `https://willaslonce.pl/payment/autopay-notify.php`.
+- [ ] **1. Rotacja klucza** - panel.autopay.eu → usługa 211642 → wygeneruj NOWY klucz współdzielony (stary jest publiczny w historii git → martwy po rotacji).
+- [ ] **2. Konfiguracja usługi** - odczytaj/ustaw algorytm hash (SHA256/SHA512) i separator (`|`); zapamiętaj do creds.
+- [ ] **3. Adres powiadomień ITN** - ustaw `https://willaslonce.pl/payment/autopay-notify.php`.
 - [ ] **4. Utwórz `payment/autopay-credentials.php`** lokalnie z kopii `*.example.php`, wpisz: nowy ServiceID, nowy klucz, algo, separator, `AUTOPAY_TEST_MODE=false`.
 - [ ] **5. Push** zmian na `main` (auto-deploy FTP).
 - [ ] **6. Wgraj `payment/autopay-credentials.php` przez FTP** do `public_html/payment/` (plik nie jest w repo).
 - [ ] **7. Reset opcache** na Zenboksie (produkcja cachuje stare PHP).
-- [ ] **8. Weryfikacja dostępności** — `payment/orders/` zwraca 403; `willaslonce.pl/rezerwacje.html` i `/sklep.html` ładują się bez błędów JS.
-- [ ] **9. Test realny — sklep, herbata 29 zł** (najtańszy realny test; rezerwacja z cennika = min. 350 zł): pełna ścieżka koszyk → Autopay → płatność → powrót.
-- [ ] **10. Weryfikacja ITN** — sprawdź log serwera: ITN przyszedł, hash OK, status zamówienia `paid`, webhook n8n odpalił, `return.php` pokazuje „opłacone". Jeśli hash ITN/confirmation nie pasuje → log z Zadania 7 pokazuje surowy ITN; skoryguj kolejność/skład hasha i ponów.
+- [ ] **8. Weryfikacja dostępności** - `payment/orders/` zwraca 403; `willaslonce.pl/rezerwacje.html` i `/sklep.html` ładują się bez błędów JS.
+- [ ] **9. Test realny - sklep, herbata 29 zł** (najtańszy realny test; rezerwacja z cennika = min. 350 zł): pełna ścieżka koszyk → Autopay → płatność → powrót.
+- [ ] **10. Weryfikacja ITN** - sprawdź log serwera: ITN przyszedł, hash OK, status zamówienia `paid`, webhook n8n odpalił, `return.php` pokazuje „opłacone". Jeśli hash ITN/confirmation nie pasuje → log z Zadania 7 pokazuje surowy ITN; skoryguj kolejność/skład hasha i ponów.
 - [ ] **11. Zwrot transakcji testowej** w panelu Autopay.
-- [ ] **12. Aktualizacja kontekstu** — zaktualizuj memory (`project_willa_slonce_website.md`: płatności online live) + `decisions/log.md` w repo Asystent.
+- [ ] **12. Aktualizacja kontekstu** - zaktualizuj memory (`project_willa_slonce_website.md`: płatności online live) + `decisions/log.md` w repo Asystent.
 
 ---
 

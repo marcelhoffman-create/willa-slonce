@@ -24,7 +24,7 @@ function admin_password_valid(string $provided): bool
 
 /**
  * Sanityzuje identyfikator zamowienia do bezpiecznej nazwy pliku.
- * Blokuje path traversal — dozwolone tylko [A-Za-z0-9_-], reszta -> '_'.
+ * Blokuje path traversal - dozwolone tylko [A-Za-z0-9_-], reszta -> '_'.
  */
 function safe_order_id(string $id): string
 {

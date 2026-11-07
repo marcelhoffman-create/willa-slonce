@@ -1,6 +1,6 @@
 <?php
 /**
- * Lista zamowien dla panelu admina (PII — tylko POST + haslo).
+ * Lista zamowien dla panelu admina (PII - tylko POST + haslo).
  * POST /admin-orders.php  body: { "password": "..." }
  */
 header('Content-Type: application/json; charset=utf-8');
@@ -57,7 +57,7 @@ if ($action === 'mark-paid' || $action === 'archive') {
         exit;
     }
 
-    // archive — przenies do _archive (dziedziczy .htaccess Require all denied)
+    // archive - przenies do _archive (dziedziczy .htaccess Require all denied)
     $archiveDir = __DIR__ . '/payment/orders/_archive';
     if (!is_dir($archiveDir)) { @mkdir($archiveDir, 0755, true); }
     if (!@rename($file, $archiveDir . '/' . $id . '.json')) {

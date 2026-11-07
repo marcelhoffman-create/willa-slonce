@@ -87,7 +87,7 @@ function autopay_parse_itn(string $transactionsParam): ?array
             continue;
         }
 
-        // pola na poziomie glownym (serviceID i ew. inne) — wartosc wchodzi do hasha
+        // pola na poziomie glownym (serviceID i ew. inne) - wartosc wchodzi do hasha
         if ($name === 'serviceID') {
             $out['serviceID'] = (string) $child;
         }

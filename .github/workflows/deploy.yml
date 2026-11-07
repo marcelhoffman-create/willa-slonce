@@ -12,6 +12,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Blokada dlugich pauz (em dash i polpauza)
+        run: |
+          if LC_ALL=C.UTF-8 grep -rnIP '\x{2014}|\x{2013}' --exclude-dir=.git --exclude-dir=.github .; then
+            echo "Znaleziono dluga pauze lub polpauze. Zamien na zwykly myslnik '-'. Deploy zatrzymany."
+            exit 1
+          fi
+
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

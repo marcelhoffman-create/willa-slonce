@@ -1,13 +1,13 @@
 <?php
 /**
- * Autopay — konfiguracja i glue. Czysta logika: autopay-lib.php.
+ * Autopay - konfiguracja i glue. Czysta logika: autopay-lib.php.
  * Dokumentacja: https://developers.autopay.pl/online/dokumentacja
  */
 
 require_once __DIR__ . '/p24-config.php';   // SITE_URL, ORDERS_DIR, save_order, load_order, send_webhook, N8N_*
 require_once __DIR__ . '/autopay-lib.php';  // czyste funkcje
 
-// Dane dostepowe — plik poza repo (wzorzec jak P24)
+// Dane dostepowe - plik poza repo (wzorzec jak P24)
 $autopayCred = __DIR__ . '/autopay-credentials.php';
 if (file_exists($autopayCred)) {
     require $autopayCred;

@@ -4,7 +4,7 @@
  * POST /payment/booking-bank.php
  *
  * Zapisuje rezerwację do pliku JSON i wysyła mail bezpośrednio przez mail().
- * Zero zależności od n8n — działa zawsze.
+ * Zero zależności od n8n - działa zawsze.
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -86,10 +86,10 @@ $data = [
 save_order($bookingId, $data);
 
 $adminEmail = 'marcelhoffman@gmail.com';
-$subject    = '=?UTF-8?B?' . base64_encode('Nowa rezerwacja — ' . $imie . ' ' . $nazwisko . ' — ' . $checkin) . '?=';
+$subject    = '=?UTF-8?B?' . base64_encode('Nowa rezerwacja - ' . $imie . ' ' . $nazwisko . ' - ' . $checkin) . '?=';
 
 $htmlBody = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:sans-serif;color:#222;max-width:600px;margin:0 auto;padding:20px;">
-<h2 style="color:#C17817;">Nowa rezerwacja — Willa Słońce Brenna</h2>
+<h2 style="color:#C17817;">Nowa rezerwacja - Willa Słońce Brenna</h2>
 <table style="border-collapse:collapse;width:100%;">
   <tr><td style="padding:6px 12px;background:#f5f0e8;font-weight:bold;width:40%;">ID rezerwacji</td><td style="padding:6px 12px;">' . htmlspecialchars($bookingId) . '</td></tr>
   <tr><td style="padding:6px 12px;font-weight:bold;">Gość</td><td style="padding:6px 12px;">' . htmlspecialchars($imie . ' ' . $nazwisko) . '</td></tr>

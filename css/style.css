@@ -1,5 +1,5 @@
 /* =============================================
-   DOMEK BRENNA — Premium Editorial Style
+   DOMEK BRENNA - Premium Editorial Style
    Inspiracja: magazyn SIECI + góry
    ============================================= */
 
@@ -1652,7 +1652,7 @@ em.accent,
 }
 
 /* =====================================================
-   BOOKING WIDGET — Kalendarz + Panel obok siebie
+   BOOKING WIDGET - Kalendarz + Panel obok siebie
    ===================================================== */
 .booking-widget {
     display: grid;
@@ -1789,7 +1789,7 @@ em.accent,
     margin: 0;
 }
 
-/* Responsive — na mobile stack pionowo */
+/* Responsive - na mobile stack pionowo */
 @media (max-width: 900px) {
     .booking-widget {
         grid-template-columns: 1fr;

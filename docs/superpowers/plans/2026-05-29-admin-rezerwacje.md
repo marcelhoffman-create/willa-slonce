@@ -1,4 +1,4 @@
-# Plan: Widok rezerwacji w adminie + zabezpieczenie hasła — willaslonce.pl
+# Plan: Widok rezerwacji w adminie + zabezpieczenie hasła - willaslonce.pl
 
 > **Dla wykonawcy:** WYMAGANA PODSKILL: superpowers:subagent-driven-development (zalecane) lub superpowers:executing-plans. Kroki `- [ ]` do śledzenia.
 
@@ -19,15 +19,15 @@
 ## Struktura plików
 
 **Tworzone:**
-- `admin-auth.php` (root) — ładowanie creds + `admin_pwd_check()` (czysta) + `admin_password_valid()`.
-- `admin-credentials.example.php` (root) — szablon hasła.
-- `admin-orders.php` (root) — endpoint POST: auth + odczyt `payment/orders/*.json` → JSON.
-- `tests/test-admin.php` — test `admin_pwd_check`.
+- `admin-auth.php` (root) - ładowanie creds + `admin_pwd_check()` (czysta) + `admin_password_valid()`.
+- `admin-credentials.example.php` (root) - szablon hasła.
+- `admin-orders.php` (root) - endpoint POST: auth + odczyt `payment/orders/*.json` → JSON.
+- `tests/test-admin.php` - test `admin_pwd_check`.
 
 **Modyfikowane:**
-- `.gitignore` — `admin-credentials.php`.
-- `save-data.php` — auth przez `admin-auth.php`.
-- `admin.html` — login po stronie serwera (usunięcie klientowego hasha) + sekcja „Rezerwacje i zamówienia".
+- `.gitignore` - `admin-credentials.php`.
+- `save-data.php` - auth przez `admin-auth.php`.
+- `admin.html` - login po stronie serwera (usunięcie klientowego hasha) + sekcja „Rezerwacje i zamówienia".
 
 ---
 
@@ -37,7 +37,7 @@
 - Utwórz: `admin-auth.php`, `admin-credentials.example.php`, `tests/test-admin.php`
 - Modyfikuj: `.gitignore`
 
-- [ ] **Krok 1: Test (failing)** — `tests/test-admin.php`:
+- [ ] **Krok 1: Test (failing)** - `tests/test-admin.php`:
 ```php
 <?php
 // Uruchom: php tests/test-admin.php
@@ -54,7 +54,7 @@ echo "\n$pass PASS, $fail FAIL\n";
 exit($fail === 0 ? 0 : 1);
 ```
 
-- [ ] **Krok 2: Uruchom — fail**
+- [ ] **Krok 2: Uruchom - fail**
 
 Run: `/usr/local/bin/php tests/test-admin.php`
 Oczekiwane: „Failed opening required '.../admin-auth.php'" lub „undefined function admin_pwd_check".
@@ -96,12 +96,12 @@ function admin_password_valid(string $provided): bool
 define('ADMIN_PASSWORD', '');
 ```
 
-- [ ] **Krok 5: `.gitignore`** — dodaj linię (po `payment/autopay-credentials.php`):
+- [ ] **Krok 5: `.gitignore`** - dodaj linię (po `payment/autopay-credentials.php`):
 ```
 admin-credentials.php
 ```
 
-- [ ] **Krok 6: Uruchom — pass**
+- [ ] **Krok 6: Uruchom - pass**
 
 Run: `/usr/local/bin/php tests/test-admin.php`
 Oczekiwane: `4 PASS, 0 FAIL`, exit 0.
@@ -115,7 +115,7 @@ git commit -m "feat(admin-auth): haslo poza repo + timing-safe weryfikacja + tes
 
 ---
 
-## Zadanie 2: `save-data.php` — auth przez admin-auth
+## Zadanie 2: `save-data.php` - auth przez admin-auth
 
 **Pliki:** Modyfikuj: `save-data.php`
 
@@ -163,7 +163,7 @@ git commit -m "security(admin): save-data.php weryfikuje haslo przez admin-auth 
 ```php
 <?php
 /**
- * Lista zamowien dla panelu admina (PII — tylko POST + haslo).
+ * Lista zamowien dla panelu admina (PII - tylko POST + haslo).
  * POST /admin-orders.php  body: { "password": "..." }
  */
 header('Content-Type: application/json; charset=utf-8');
@@ -238,11 +238,11 @@ git commit -m "feat(admin): endpoint listy zamowien (POST + haslo, PII chronione
 
 ---
 
-## Zadanie 4: `admin.html` — login serwerowy + sekcja „Rezerwacje i zamówienia"
+## Zadanie 4: `admin.html` - login serwerowy + sekcja „Rezerwacje i zamówienia"
 
 **Pliki:** Modyfikuj: `admin.html`
 
-> Czytaj plik przed edycją. Numery linii orientacyjne — dopasuj do realnej zawartości.
+> Czytaj plik przed edycją. Numery linii orientacyjne - dopasuj do realnej zawartości.
 
 - [ ] **Krok 1: Usuń klientowy hash.** Usuń stałą `var PASSWORD_HASH = '...';` (≈linia 430) oraz funkcje `async function sha256(msg) {...}` (≈440-447) i `function sha256js(s) {...}` (≈450-466).
 
@@ -275,7 +275,7 @@ git commit -m "feat(admin): endpoint listy zamowien (POST + haslo, PII chronione
   }
 ```
 
-- [ ] **Krok 3: Napraw `loadBlockedDates`** — usuń pozostałościowy wrapper `sha256(pwd).then(function(hash) {...})`, zostaw samo `fetch`:
+- [ ] **Krok 3: Napraw `loadBlockedDates`** - usuń pozostałościowy wrapper `sha256(pwd).then(function(hash) {...})`, zostaw samo `fetch`:
 ```javascript
   function loadBlockedDates() {
     var pwd = sessionStorage.getItem('adminPwd') || '';
@@ -290,7 +290,7 @@ git commit -m "feat(admin): endpoint listy zamowien (POST + haslo, PII chronione
   }
 ```
 
-- [ ] **Krok 4: Dodaj sekcję HTML** — kartę po sekcji „Zablokowane terminy" (przed zamknięciem `#adminPanel`):
+- [ ] **Krok 4: Dodaj sekcję HTML** - kartę po sekcji „Zablokowane terminy" (przed zamknięciem `#adminPanel`):
 ```html
   <!-- Rezerwacje i zamówienia -->
   <div class="card">
@@ -345,20 +345,20 @@ git commit -m "feat(admin): endpoint listy zamowien (POST + haslo, PII chronione
     var map = { paid:   ['Opłacone', '#e8f5e9', '#2e7d32'],
                 pending:['Oczekuje', '#fff8e1', '#f57c00'],
                 failed: ['Nieudane', '#ffebee', '#c62828'] };
-    var v = map[s] || [s || '—', '#eee', '#555'];
+    var v = map[s] || [s || '-', '#eee', '#555'];
     return '<span style="background:' + v[1] + ';color:' + v[2] + ';padding:2px 8px;border-radius:10px;font-size:0.8rem;white-space:nowrap;">' + escHtml(v[0]) + '</span>';
   }
 
   function orderDetails(o) {
     if (o.type === 'booking') {
-      var d = escHtml(o.checkin) + '–' + escHtml(o.checkout);
+      var d = escHtml(o.checkin) + '-' + escHtml(o.checkout);
       if (o.noce) d += ' (' + o.noce + ' ' + nocWord(o.noce) + ')';
       if (o.goscie) d += ', ' + o.goscie + ' os.';
       return d;
     }
     var items = (o.items || []).map(function(i) { return escHtml(i.name) + ' ×' + i.qty; }).join(', ');
     var dost = o.delivery === 'kurier' ? ('kurier' + (o.address ? ': ' + escHtml(o.address) : '')) : 'odbiór w domku';
-    return items + ' — ' + dost;
+    return items + ' - ' + dost;
   }
 
   function renderOrders() {
@@ -388,7 +388,7 @@ git commit -m "feat(admin): endpoint listy zamowien (POST + haslo, PII chronione
   }
 ```
 
-- [ ] **Krok 6: Weryfikacja składni JS** — wyodrębnij inline JS i sprawdź `node --check` (jak przy płatnościach):
+- [ ] **Krok 6: Weryfikacja składni JS** - wyodrębnij inline JS i sprawdź `node --check` (jak przy płatnościach):
 ```bash
 node --version
 python3 - <<'PY'
@@ -430,7 +430,7 @@ grep -rn "brenna2026" save-data.php admin.html admin-auth.php; echo "exit grep: 
 ```
 Oczekiwane: `4 PASS, 0 FAIL`; grep nic nie znajduje (exit 1).
 
-- [ ] **Krok 3: Przegląd diffu** — `git diff <poprzedni-main>..HEAD --stat`. Potwierdź: brak `admin-credentials.php` w repo, brak `brenna2026`. Zatrzymaj się — push i go-live = Zadanie 6 z Marcelem.
+- [ ] **Krok 3: Przegląd diffu** - `git diff <poprzedni-main>..HEAD --stat`. Potwierdź: brak `admin-credentials.php` w repo, brak `brenna2026`. Zatrzymaj się - push i go-live = Zadanie 6 z Marcelem.
 
 ---
 
@@ -443,7 +443,7 @@ Oczekiwane: `4 PASS, 0 FAIL`; grep nic nie znajduje (exit 1).
 - [ ] **5. Sprawdź:** sekcja „Rezerwacje i zamówienia" pokazuje testową rezerwację 1 zł ze statusem „Opłacone"; filtr i „Odśwież" działają.
 - [ ] **6. Marcel:** w panelu przywróć realne ceny noclegu (jeśli deploy nie cofnął ich z repo) i rozważ podniesienie minimum z powrotem (osobno).
 
-> Między krokiem 1 a 2 panel jest zablokowany (brak creds → 403) — to oczekiwane.
+> Między krokiem 1 a 2 panel jest zablokowany (brak creds → 403) - to oczekiwane.
 
 ---
 
