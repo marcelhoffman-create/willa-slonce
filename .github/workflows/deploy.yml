@@ -31,5 +31,6 @@ jobs:
             **/.git*/**
             .github/**
             .DS_Store
-            docs/**
-            payment/tests/**
+            docs/superpowers/**
+            payment/tests/*.php
+            payment/tests/fixtures/**

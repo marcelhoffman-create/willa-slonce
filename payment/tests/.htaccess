@@ -1,0 +1,3 @@
+# Blokada bezposredniego dostepu HTTP do plikow zamowien (dane osobowe)
+Require all denied
+Options -Indexes
