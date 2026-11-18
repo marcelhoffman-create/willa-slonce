@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // 1. NAWIGACJA - zmiana tła po przewinięciu
     // ============================================
     function handleNavScroll() {
+        if (!nav) return; // strona bez głównej nawigacji (np. kontakt.html)
         if (window.scrollY > 100) {
             nav.classList.add('nav-scrolled');
         } else {
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    hamburger.addEventListener('click', toggleMobileMenu);
+    if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
 
     // Zamknij po kliknięciu w link
     mobileMenuLinks.forEach(function (link) {
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Zamknij po kliknięciu w tło overlay
-    mobileMenu.addEventListener('click', function (e) {
+    if (mobileMenu) mobileMenu.addEventListener('click', function (e) {
         if (e.target === mobileMenu) {
             closeMobileMenu();
         }
@@ -538,3 +539,131 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 });
+
+// ============================================
+// ZGODA NA STATYSTYKI I GOOGLE ANALYTICS 4
+// GA4 ładuje się dopiero po kliknięciu „Akceptuję”. Bez zgody nic nie trafia do Google.
+// ============================================
+(function () {
+    var GA = 'G-1QFL1VS2RW';
+    var KLUCZ = 'ws-zgoda';
+    var gaAktywny = false;   // skrypt GA wczytany na tej stronie
+    var zgodaTeraz = false;  // bieżąca zgoda; po wycofaniu żadne zdarzenie nie trafia do Google
+
+    function czytajZgode() {
+        try {
+            var z = JSON.parse(localStorage.getItem(KLUCZ) || 'null');
+            return z && (z.v === 'tak' || z.v === 'nie') ? z.v : null;
+        } catch (e) { return null; }
+    }
+    function zapiszZgode(v) {
+        try { localStorage.setItem(KLUCZ, JSON.stringify({ v: v, t: Date.now() })); } catch (e) {}
+    }
+    function usunCookiesGA() {
+        var domeny = ['', '; domain=' + location.hostname, '; domain=.' + location.hostname.replace(/^www\./, '')];
+        document.cookie.split(';').forEach(function (c) {
+            var n = c.split('=')[0].trim();
+            if (n === '_ga' || n.indexOf('_ga_') === 0 || n === '_gid') {
+                domeny.forEach(function (d) {
+                    document.cookie = n + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' + d;
+                });
+            }
+        });
+    }
+    function wlaczGA() {
+        zgodaTeraz = true;
+        window['ga-disable-' + GA] = false;
+        if (gaAktywny) { window.gtag('consent', 'update', { analytics_storage: 'granted' }); return; }
+        gaAktywny = true;
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { window.dataLayer.push(arguments); };
+        window.gtag('consent', 'default', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+        window.gtag('consent', 'update', { analytics_storage: 'granted' });
+        window.gtag('js', new Date());
+        window.gtag('config', GA);
+        var sc = document.createElement('script');
+        sc.async = true;
+        sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA);
+        document.head.appendChild(sc);
+    }
+    function wylaczGA() {
+        zgodaTeraz = false;
+        window['ga-disable-' + GA] = true; // oficjalny wyłącznik gtag: zero wysyłek po odmowie
+        if (gaAktywny && window.gtag) window.gtag('consent', 'update', { analytics_storage: 'denied' });
+        usunCookiesGA();
+    }
+
+    // Zdarzenie do GA tylko przy zgodzie, bez danych osobowych. gotowe() po wysłaniu albo po 800 ms.
+    window.willaZdarzenie = function (nazwa, parametry, gotowe) {
+        if (!(zgodaTeraz && gaAktywny && window.gtag)) { if (gotowe) gotowe(); return; }
+        var zrobione = false;
+        function koniec() { if (!zrobione) { zrobione = true; if (gotowe) gotowe(); } }
+        var p = parametry || {};
+        if (gotowe) { p.event_callback = koniec; setTimeout(koniec, 800); }
+        p.transport_type = 'beacon';
+        window.gtag('event', nazwa, p);
+    };
+
+    function zbudujPasek() {
+        var bar = document.createElement('div');
+        bar.className = 'cookie-bar';
+        bar.setAttribute('role', 'region');
+        bar.setAttribute('aria-label', 'Zgoda na pliki cookie');
+        bar.hidden = true;
+        var sciezka = location.pathname.indexOf('/blog/') !== -1 ? '../' : '';
+        bar.innerHTML =
+            '<p>Za Twoją zgodą używamy Google Analytics, żeby wiedzieć, które informacje o domku są przydatne. ' +
+            'Bez zgody strona działa tak samo. <a href="' + sciezka + 'regulamin.html#polityka">Szczegóły</a></p>' +
+            '<div class="cookie-btns">' +
+            '<button type="button" class="cookie-btn cookie-btn-tak" data-zgoda="tak">Akceptuję</button>' +
+            '<button type="button" class="cookie-btn" data-zgoda="nie">Odrzucam</button>' +
+            '</div>';
+        // na początku body: przy pierwszej wizycie klawiatura trafia na pasek od razu
+        document.body.insertBefore(bar, document.body.firstChild);
+        return bar;
+    }
+
+    function start() {
+        var bar = zbudujPasek();
+        var zg = czytajZgode();
+        if (zg === 'tak') wlaczGA();
+        else if (zg === null) bar.hidden = false;
+
+        bar.addEventListener('click', function (ev) {
+            var b = ev.target.closest('[data-zgoda]');
+            if (!b) return;
+            var v = b.getAttribute('data-zgoda');
+            zapiszZgode(v);
+            bar.hidden = true;
+            if (document.activeElement && bar.contains(document.activeElement)) document.activeElement.blur();
+            if (v === 'tak') wlaczGA(); else wylaczGA();
+        });
+
+        // Link „Ustawienia cookies” w stopce, obok polityki prywatności
+        var boxy = document.querySelectorAll('.footer-bottom-links');
+        if (!boxy.length) boxy = document.querySelectorAll('.footer-bottom');
+        Array.prototype.forEach.call(boxy, function (box) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'cookie-ustawienia';
+            b.textContent = 'Ustawienia cookies';
+            b.addEventListener('click', function () { bar.hidden = false; bar.querySelector('[data-zgoda]').focus(); });
+            box.appendChild(b);
+        });
+
+        // Kliknięcia, które prowadzą do rezerwacji (bez danych osobowych)
+        document.addEventListener('click', function (ev) {
+            var a = ev.target.closest('a[href]');
+            if (!a) return;
+            var h = a.getAttribute('href') || '';
+            var strona = location.pathname;
+            if (h.indexOf('tel:') === 0) window.willaZdarzenie('klik_telefon', { strona: strona });
+            else if (h.indexOf('mailto:') === 0) window.willaZdarzenie('klik_mail', { strona: strona });
+            else if (/rezerwacje\.html/.test(h)) window.willaZdarzenie('klik_rezerwuj', { strona: strona, miejsce: a.className || 'link' });
+            else if (/booking\.com|airbnb\./.test(h)) window.willaZdarzenie('klik_portal', { strona: strona, portal: /airbnb/.test(h) ? 'airbnb' : 'booking' });
+        });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
+})();

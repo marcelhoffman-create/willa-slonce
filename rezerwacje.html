@@ -35,7 +35,7 @@
   <!-- Flatpickr (kalendarz) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20261118">
 
   <style>
     /* ===== CSS VARIABLES (lokalne dla tej strony) ===== */
@@ -665,7 +665,7 @@
     </div>
   </footer>
 
-  <script src="js/main.js?v=20260506"></script>
+  <script src="js/main.js?v=20261118"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pl.js"></script>
 
@@ -986,7 +986,10 @@
         .then(function(r) { return r.json(); })
         .then(function(data) {
           if (data.ok && data.gatewayUrl && data.fields) {
-            submitGatewayForm(data.gatewayUrl, data.fields);
+            var zdarzenie = window.willaZdarzenie || function (n, p, g) { g(); };
+            zdarzenie('rezerwacja', { metoda: 'online', currency: 'PLN', value: body.zaliczka || 0 }, function () {
+              submitGatewayForm(data.gatewayUrl, data.fields);
+            });
           } else {
             alert((data.error || 'Błąd płatności.') + '\n\nWybierz przelew bankowy lub spróbuj ponownie.');
             btn.disabled = false;
@@ -1010,6 +1013,7 @@
         .catch(function() { return {}; })
         .then(function(data) {
           if (data && data.ok) {
+            if (window.willaZdarzenie) window.willaZdarzenie('rezerwacja', { metoda: 'przelew', currency: 'PLN', value: parseInt(data.kwota) || 0 });
             // Kwota z serwera (liczona z cennika), nie z formularza.
             showSuccess(Object.assign({}, body, { kwota: data.kwota }));
           } else {

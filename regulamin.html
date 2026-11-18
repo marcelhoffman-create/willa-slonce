@@ -49,6 +49,16 @@
 
     footer { text-align: center; padding: 32px; color: var(--light); font-size: .82rem; border-top: 1px solid var(--border); }
     footer a { color: var(--copper); text-decoration: none; }
+    /* zgoda na cookies (pasek tworzy js/main.js) */
+    .cookie-bar { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 2000; max-width: 720px; margin: 0 auto; padding: 16px 20px; background: #1a1a1a; color: #FAF8F5; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,.25); display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; font-size: .875rem; line-height: 1.5; }
+    .cookie-bar[hidden] { display: none; }
+    .cookie-bar p { flex: 1 1 320px; margin: 0; }
+    .cookie-bar a { color: #D4922E; text-decoration: underline; }
+    .cookie-btns { display: flex; gap: 8px; }
+    .cookie-btn { padding: 10px 18px; border: 1px solid #FAF8F5; border-radius: 4px; background: transparent; color: #FAF8F5; font: inherit; font-weight: 600; cursor: pointer; }
+    .cookie-btn-tak { background: #C17817; border-color: #C17817; color: #fff; }
+    .cookie-btn:focus-visible, .cookie-ustawienia:focus-visible { outline: 2px solid #D4922E; outline-offset: 2px; }
+    .cookie-ustawienia { background: none; border: 0; padding: 0; font: inherit; color: var(--copper); cursor: pointer; }
   </style>
 </head>
 <body>
@@ -247,7 +257,10 @@
 
   <!-- §13 -->
   <h2 id="polityka">§13 Polityka prywatności</h2>
-  <p>Serwis korzysta z plików cookie w celu zapewnienia prawidłowego działania strony. Pliki cookie nie są używane do celów marketingowych ani śledzenia użytkowników.</p>
+  <p>Serwis korzysta z plików cookie w celu zapewnienia prawidłowego działania strony. Pliki cookie nie są używane do celów marketingowych.</p>
+  <h3 id="cookies">Statystyki (Google Analytics)</h3>
+  <p>Za zgodą Użytkownika, wyrażoną na pasku wyświetlanym przy pierwszej wizycie, Serwis korzysta z Google Analytics 4 (Google Ireland Limited). Narzędzie zapisuje pliki cookie <code>_ga</code> i <code>_ga_*</code> i pozwala sprawdzić w formie zbiorczej, które strony są odwiedzane, skąd przychodzą goście i ile osób przechodzi do rezerwacji. Nie przekazujemy do Google imienia, nazwiska, adresu e-mail, numeru telefonu ani danych z formularzy. Okres przechowywania danych w Google Analytics wynosi 14 miesięcy. Podstawą jest zgoda Użytkownika (art. 6 ust. 1 lit. a RODO).</p>
+  <p>Bez zgody Google Analytics nie jest uruchamiany, a strona działa tak samo. Zgodę można w każdej chwili zmienić przyciskiem „Ustawienia cookies” w stopce strony. Wycofanie zgody nie wpływa na zgodność z prawem przetwarzania przed jej wycofaniem.</p>
   <p>Serwis może korzystać z zewnętrznych fontów (Google Fonts), co wiąże się z wysyłaniem zapytań do serwerów Google. Nie przekazujemy danych osobowych do Google w tym procesie.</p>
   <p>Użytkownik ma prawo do konfiguracji ustawień plików cookie w swojej przeglądarce internetowej.</p>
   <p>W sprawach związanych z ochroną prywatności prosimy o kontakt: <strong>marcelhoffman@gmail.com</strong>.</p>
@@ -259,12 +272,13 @@
   <p>Wszelkie spory rozstrzygane będą przez sądy powszechne właściwe dla miejsca siedziby Sprzedawcy, chyba że Klient będący konsumentem wybierze sąd właściwy dla swojego miejsca zamieszkania.</p>
   <p>Konsumenci mogą skorzystać z pozasądowych sposobów rozpatrywania reklamacji, w tym platformy ODR dostępnej pod adresem <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</p>
 
-  <p style="margin-top:48px;font-size:.82rem;color:var(--light);">Data ostatniej aktualizacji: 7 maja 2026 r.</p>
+  <p style="margin-top:48px;font-size:.82rem;color:var(--light);">Data ostatniej aktualizacji: 18 listopada 2026 r.</p>
 </div>
 
 <footer>
-  <p>&copy; 2026 Willa Słońce &mdash; <a href="index.html">Strona główna</a> &middot; <a href="kontakt.html">Kontakt</a></p>
+  <p>&copy; 2026 Willa Słońce - <a href="index.html">Strona główna</a> &middot; <a href="kontakt.html">Kontakt</a><span class="footer-bottom-links"> &middot; </span></p>
 </footer>
 
+<script src="js/main.js?v=20261118"></script>
 </body>
 </html>
