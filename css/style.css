@@ -1304,6 +1304,16 @@ em.accent,
     text-decoration: line-through;
 }
 
+/* Dzień przyjazdu kolejnych gości: można tu zakończyć pobyt (pół wolny, pół zajęty) */
+.cal-day.cal-wyjazd {
+    background: linear-gradient(135deg, #e8f5e9 50%, #ffebee 50%);
+    color: var(--color-text-dark);
+}
+
+.cal-day.cal-wyjazd:hover {
+    background: linear-gradient(135deg, #c8e6c9 50%, #ffcdd2 50%);
+}
+
 .cal-day.cal-selected {
     background: var(--color-accent);
     color: #fff;

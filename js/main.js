@@ -407,6 +407,12 @@ document.addEventListener('DOMContentLoaded', function () {
             return false;
         }
 
+        // Wyjazd w dniu D wymaga wolnych nocy od przyjazdu do D-1 (noc D może być już zajęta).
+        function mozliwyWyjazd(ds) {
+            return !!selectedCheckIn && !selectedCheckOut && ds > selectedCheckIn &&
+                !hasBookedInRange(selectedCheckIn, ds);
+        }
+
         function renderCalendar() {
             calendarDays.innerHTML = '';
             calMonthLabel.textContent = polishMonths[calMonth] + ' ' + calYear;
@@ -435,7 +441,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (isPast(calYear, calMonth, day)) {
                     dayDiv.classList.add('cal-past');
                 } else if (isBooked(calYear, calMonth, day)) {
-                    dayDiv.classList.add('cal-booked');
+                    // Zajęta noc. Dzień przyjazdu kolejnego gościa może być dniem wyjazdu:
+                    // gdy noce od przyjazdu do dnia przed nim są wolne, można go kliknąć jako wyjazd.
+                    var dsZ = dateStr(calYear, calMonth, day);
+                    if (dsZ === selectedCheckOut) {
+                        dayDiv.classList.add('cal-selected');
+                        // Ponowny klik czyści wybór (zajęty dzień nie może być przyjazdem).
+                        dayDiv.addEventListener('click', function () {
+                            selectedCheckIn = null;
+                            selectedCheckOut = null;
+                            updatePanel();
+                            renderCalendar();
+                        });
+                    } else if (mozliwyWyjazd(dsZ)) {
+                        dayDiv.classList.add('cal-wyjazd');
+                        dayDiv.title = 'Możliwy wyjazd (tego dnia przyjeżdżają kolejni goście)';
+                        (function (dateString) {
+                            dayDiv.addEventListener('click', function () {
+                                handleDayClick(dateString);
+                            });
+                        })(dsZ);
+                    } else {
+                        dayDiv.classList.add('cal-booked');
+                        dayDiv.title = 'Termin zajęty';
+                    }
                 } else {
                     dayDiv.classList.add('cal-free');
 
@@ -484,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (checkOutInput) { checkOutInput.value = ''; checkOutInput.removeAttribute('data-iso'); }
                 if (bookingBtn) bookingBtn.disabled = true;
             } else {
-                if (bookingStep) bookingStep.textContent = '\u2714 Daty wybrane \u2014 kliknij przycisk poni\u017cej';
+                if (bookingStep) bookingStep.textContent = '\u2714 Daty wybrane - kliknij przycisk poni\u017cej';
                 if (checkInInput)  { checkInInput.value = formatPL(selectedCheckIn); checkInInput.setAttribute('data-iso', selectedCheckIn); }
                 if (checkOutInput) { checkOutInput.value = formatPL(selectedCheckOut); checkOutInput.setAttribute('data-iso', selectedCheckOut); }
                 if (bookingBtn) bookingBtn.disabled = false;
